@@ -556,17 +556,8 @@
         pointRadius: 3,
         pointHoverRadius: 6,
         fill: false,
-        // Hide all but top 4 by total
         hidden: false,
       }));
-
-      // Hide minor series initially to keep chart legible
-      const sorted = [...datasets].sort((a, b) => {
-        const aTot = a.data.reduce((s, x) => s + x, 0);
-        const bTot = b.data.reduce((s, x) => s + x, 0);
-        return bTot - aTot;
-      });
-      sorted.forEach((d, i) => { if (i >= 4) d.hidden = true; });
 
       const ctx = $(canvasId).getContext('2d');
       new Chart(ctx, {
