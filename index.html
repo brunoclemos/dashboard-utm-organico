@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard de Leads e Faturamento por UTM — Orgânico 2026</title>
-  <meta name="description" content="Análise de leads (Closer / SDR / Perdido) e faturamento por UTM no tráfego orgânico de 2026." />
+  <meta name="description" content="Análise mensal de leads (Closer / SDR / Perdido) e faturamento por UTM no tráfego orgânico de 2026." />
   <link rel="icon" type="image/png" href="assets/logo-light.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,7 +30,6 @@
       --c-outros: #525252;
       --c-revenue: #facc15;
     }
-
     html, body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
@@ -38,7 +37,6 @@
       font-feature-settings: 'cv11', 'ss01';
       -webkit-font-smoothing: antialiased;
     }
-
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -46,60 +44,47 @@
       transition: border-color 0.15s ease;
     }
     .card:hover { border-color: #333; }
-
-    .kpi-value {
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-    }
-
+    .kpi-value { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
     table { font-variant-numeric: tabular-nums; }
-    table thead th {
-      background: var(--bg-card);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      cursor: pointer;
-      user-select: none;
-    }
+    table thead th { background: var(--bg-card); position: sticky; top: 0; z-index: 1; cursor: pointer; user-select: none; }
     table thead th:hover { background: var(--bg-card-hover); }
-    table tbody tr {
-      transition: background 0.12s ease;
-      cursor: default;
-    }
+    table tbody tr { transition: background 0.12s ease; }
     table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
-
     .scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
     .scrollbar::-webkit-scrollbar-track { background: transparent; }
     .scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
     .scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
-
     .sort-indicator { opacity: 0.4; margin-left: 4px; font-size: 10px; }
     .sort-active { opacity: 1; color: var(--text); }
-
-    .legend-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text-muted);
     }
-
-    /* Custom Chart.js tooltip — bigger, more legible */
-    .chartjs-tooltip {
-      background: rgba(15, 15, 15, 0.97) !important;
-      border: 1px solid #2a2a2a !important;
-      border-radius: 8px !important;
+    .section-title {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 4px;
+    }
+    .section-title::before {
+      content: ""; display: inline-block; width: 3px; height: 16px; background: var(--text); border-radius: 2px;
+    }
+    .toggle-btn {
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .toggle-btn:hover { background: var(--bg-card-hover); color: var(--text); }
+    .toggle-btn.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
+    .month-mini-card {
+      flex: 1; min-width: 0; padding: 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.015); border: 1px solid var(--border);
+      transition: all 0.15s ease;
+    }
+    .month-mini-card:hover { background: var(--bg-card-hover); border-color: #333; transform: translateY(-1px); }
+    .heat-cell {
+      padding: 6px 8px; font-size: 11px; text-align: right; font-variant-numeric: tabular-nums;
+      border-right: 1px solid var(--border); white-space: nowrap;
     }
   </style>
 </head>
@@ -112,7 +97,7 @@
         <img src="assets/logo-light.png" alt="Logo" class="h-9 w-9 object-contain" />
         <div>
           <h1 class="text-base sm:text-lg font-semibold tracking-tight">Dashboard de Leads e Faturamento</h1>
-          <p class="text-xs text-neutral-400">Tráfego Orgânico — Análise por UTM (2026)</p>
+          <p class="text-xs text-neutral-400">Tráfego Orgânico — Análise mensal por UTM (2026)</p>
         </div>
       </div>
       <div class="hidden sm:flex flex-col items-end text-right">
@@ -122,18 +107,18 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-10">
 
     <!-- KPI ROW -->
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      <div class="card p-5" title="Soma de todos os negócios criados no pipeline em 2026">
+      <div class="card p-5">
         <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Total de Leads</div>
         <div class="mt-2 flex items-baseline gap-2">
           <span id="kpiLeads" class="kpi-value text-3xl font-bold">0</span>
         </div>
-        <div class="text-xs text-neutral-500 mt-1">deals criados no pipeline</div>
+        <div class="text-xs text-neutral-500 mt-1">deals criados</div>
       </div>
-      <div class="card p-5" title="Leads qualificados pelo Typeform como Closer">
+      <div class="card p-5">
         <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Closer</div>
         <div class="mt-2 flex items-baseline gap-2">
           <span id="kpiCloser" class="kpi-value text-3xl font-bold" style="color: var(--c-closer)">0</span>
@@ -141,7 +126,7 @@
         </div>
         <div class="text-xs text-neutral-500 mt-1">qualificados</div>
       </div>
-      <div class="card p-5" title="Leads médios — fase SDR">
+      <div class="card p-5">
         <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">SDR</div>
         <div class="mt-2 flex items-baseline gap-2">
           <span id="kpiSdr" class="kpi-value text-3xl font-bold" style="color: var(--c-sdr)">0</span>
@@ -149,14 +134,14 @@
         </div>
         <div class="text-xs text-neutral-500 mt-1">não tão qualificados</div>
       </div>
-      <div class="card p-5" title="Soma do valor fechado dos negócios ganhos">
+      <div class="card p-5">
         <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Faturamento</div>
         <div class="mt-2 flex items-baseline gap-2">
           <span id="kpiRevenue" class="kpi-value text-3xl font-bold" style="color: var(--c-revenue)">R$ 0</span>
         </div>
-        <div id="kpiRevenueSub" class="text-xs text-neutral-500 mt-1">— deals ganhos</div>
+        <div id="kpiRevenueSub" class="text-xs text-neutral-500 mt-1">—</div>
       </div>
-      <div class="card p-5" title="Ticket médio: faturamento ÷ deals ganhos">
+      <div class="card p-5">
         <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Ticket Médio</div>
         <div class="mt-2 flex items-baseline gap-2">
           <span id="kpiTicket" class="kpi-value text-3xl font-bold">R$ 0</span>
@@ -165,69 +150,152 @@
       </div>
     </section>
 
-    <!-- STACKED BAR: LEADS POR UTM × CLASSIFICAÇÃO -->
-    <section class="card p-5">
-      <div class="flex items-start justify-between mb-2 flex-wrap gap-3">
-        <div>
-          <h2 class="text-base font-semibold">Leads por UTM × Classificação</h2>
-          <p class="text-xs text-neutral-500 mt-0.5">Distribuição dos leads em cada UTM por estágio do Typeform. Passe o mouse para ver o detalhe.</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-400">
-          <span class="badge"><span class="legend-dot" style="background:var(--c-closer)"></span> Closer (qualificado)</span>
-          <span class="badge"><span class="legend-dot" style="background:var(--c-sdr)"></span> SDR (médio)</span>
-          <span class="badge"><span class="legend-dot" style="background:var(--c-perdido)"></span> Perdido</span>
-          <span class="badge"><span class="legend-dot" style="background:var(--c-outros)"></span> Outros / sem classif.</span>
-        </div>
+    <!-- ============================================================ -->
+    <!-- SECTION: EVOLUÇÃO MENSAL                                       -->
+    <!-- ============================================================ -->
+    <section class="space-y-4">
+      <div>
+        <div class="section-title"><h2 class="text-lg font-semibold">Evolução mensal</h2></div>
+        <p class="text-xs text-neutral-500 ml-[15px]">Volume de leads (barras) e faturamento (linha) ao longo dos meses. Tooltip mostra detalhe Closer/SDR/Perdido.</p>
       </div>
-      <div class="relative mt-4" style="height: 360px;">
-        <canvas id="leadsBarChart"></canvas>
-      </div>
-    </section>
 
-    <!-- ROW: REVENUE BAR + DONUTS -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="card p-5 lg:col-span-2">
-        <h2 class="text-base font-semibold">Faturamento por UTM</h2>
-        <p class="text-xs text-neutral-500 mt-0.5 mb-4">Soma de "Valor fechado" dos negócios ganhos. Tooltip mostra ticket médio e quantidade de deals.</p>
-        <div class="relative" style="height: 320px;">
-          <canvas id="revenueBarChart"></canvas>
-        </div>
-      </div>
       <div class="card p-5">
-        <h2 class="text-base font-semibold">Mix de Classificação</h2>
-        <p class="text-xs text-neutral-500 mt-0.5 mb-4">Composição geral dos 6.777 leads.</p>
-        <div class="relative" style="height: 240px;">
-          <canvas id="classDonut"></canvas>
+        <div class="relative" style="height: 340px;">
+          <canvas id="monthlyOverviewChart"></canvas>
         </div>
-        <div id="classDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
       </div>
+
+      <div id="monthMiniCards" class="flex flex-wrap gap-3"></div>
     </section>
 
-    <!-- ROW: SHARE OF REVENUE -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- ============================================================ -->
+    <!-- SECTION: UTM × MÊS                                             -->
+    <!-- ============================================================ -->
+    <section class="space-y-4">
+      <div>
+        <div class="section-title"><h2 class="text-lg font-semibold">Análise por UTM × Mês</h2></div>
+        <p class="text-xs text-neutral-500 ml-[15px]">Como cada UTM performou ao longo dos meses. Clique nas legendas para isolar uma UTM. Tooltip mostra valores absolutos e percentuais.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <h3 class="text-base font-semibold mb-1">Leads por UTM × Mês</h3>
+          <p class="text-xs text-neutral-500 mb-4">Volume de leads por mês, separado por UTM.</p>
+          <div class="relative" style="height: 320px;">
+            <canvas id="leadsUtmMonthChart"></canvas>
+          </div>
+        </div>
+        <div class="card p-5">
+          <h3 class="text-base font-semibold mb-1">Faturamento por UTM × Mês</h3>
+          <p class="text-xs text-neutral-500 mb-4">Valor fechado por mês, separado por UTM.</p>
+          <div class="relative" style="height: 320px;">
+            <canvas id="revUtmMonthChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pivot table UTM × Mês -->
       <div class="card p-5">
-        <h2 class="text-base font-semibold">Share de Faturamento</h2>
-        <p class="text-xs text-neutral-500 mt-0.5 mb-4">% do faturamento por UTM.</p>
-        <div class="relative" style="height: 240px;">
-          <canvas id="revenueDonut"></canvas>
+        <div class="flex items-end justify-between gap-3 flex-wrap mb-4">
+          <div>
+            <h3 class="text-base font-semibold">Tabela mensal por UTM</h3>
+            <p class="text-xs text-neutral-500 mt-0.5">Quadro completo UTM × Mês. Alterne entre Leads e Faturamento.</p>
+          </div>
+          <div class="flex items-center gap-2" id="pivotToggle">
+            <button class="toggle-btn active" data-metric="leads">Leads</button>
+            <button class="toggle-btn" data-metric="faturamento">Faturamento</button>
+            <button class="toggle-btn" data-metric="ganhos">Ganhos</button>
+          </div>
         </div>
-        <div id="revenueDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
-      </div>
-      <div class="card p-5 lg:col-span-2">
-        <h2 class="text-base font-semibold">Taxa de Conversão por UTM</h2>
-        <p class="text-xs text-neutral-500 mt-0.5 mb-4">% de leads que viraram negócio ganho. Tooltip mostra leads e ganhos absolutos.</p>
-        <div class="relative" style="height: 240px;">
-          <canvas id="convBarChart"></canvas>
+        <div class="overflow-auto scrollbar">
+          <table id="pivotTable" class="w-full text-sm">
+            <thead class="text-xs text-neutral-400 border-b border-neutral-800">
+              <tr id="pivotHead"></tr>
+            </thead>
+            <tbody id="pivotBody"></tbody>
+            <tfoot class="text-xs border-t border-neutral-800 font-semibold text-neutral-200">
+              <tr id="pivotFoot"></tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     </section>
 
-    <!-- DETAILED TABLE -->
+    <!-- ============================================================ -->
+    <!-- SECTION: BREAKDOWN POR CLASSIFICAÇÃO                           -->
+    <!-- ============================================================ -->
+    <section class="space-y-4">
+      <div>
+        <div class="section-title"><h2 class="text-lg font-semibold">Qualificação dos leads</h2></div>
+        <p class="text-xs text-neutral-500 ml-[15px]">Closer = qualificados (top do funil). SDR = não tão qualificados (precisam aquecimento). Perdido = desqualificados.</p>
+      </div>
+
+      <!-- Stacked bar: Leads por UTM × Classificação -->
+      <div class="card p-5">
+        <div class="flex items-start justify-between mb-2 flex-wrap gap-3">
+          <div>
+            <h3 class="text-base font-semibold">Leads por UTM × Classificação</h3>
+            <p class="text-xs text-neutral-500 mt-0.5">Distribuição dos leads em cada UTM por estágio do Typeform.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="badge"><span class="legend-dot" style="background:var(--c-closer)"></span> Closer</span>
+            <span class="badge"><span class="legend-dot" style="background:var(--c-sdr)"></span> SDR</span>
+            <span class="badge"><span class="legend-dot" style="background:var(--c-perdido)"></span> Perdido</span>
+            <span class="badge"><span class="legend-dot" style="background:var(--c-outros)"></span> Outros</span>
+          </div>
+        </div>
+        <div class="relative mt-4" style="height: 360px;">
+          <canvas id="leadsBarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Row: revenue bar + 2 donuts -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="card p-5 lg:col-span-2">
+          <h3 class="text-base font-semibold mb-1">Faturamento por UTM</h3>
+          <p class="text-xs text-neutral-500 mb-4">Soma de "Valor fechado" dos negócios ganhos por UTM (todos os meses).</p>
+          <div class="relative" style="height: 320px;">
+            <canvas id="revenueBarChart"></canvas>
+          </div>
+        </div>
+        <div class="card p-5">
+          <h3 class="text-base font-semibold mb-1">Mix de classificação</h3>
+          <p class="text-xs text-neutral-500 mb-4">Composição geral dos leads.</p>
+          <div class="relative" style="height: 220px;">
+            <canvas id="classDonut"></canvas>
+          </div>
+          <div id="classDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
+        </div>
+      </div>
+
+      <!-- Donut Faturamento + Conv chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="card p-5">
+          <h3 class="text-base font-semibold mb-1">Share de faturamento</h3>
+          <p class="text-xs text-neutral-500 mb-4">% do faturamento por UTM.</p>
+          <div class="relative" style="height: 220px;">
+            <canvas id="revenueDonut"></canvas>
+          </div>
+          <div id="revenueDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
+        </div>
+        <div class="card p-5 lg:col-span-2">
+          <h3 class="text-base font-semibold mb-1">Taxa de conversão por UTM</h3>
+          <p class="text-xs text-neutral-500 mb-4">% de leads que viraram negócio ganho.</p>
+          <div class="relative" style="height: 240px;">
+            <canvas id="convBarChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- DETAILED TABLE                                                 -->
+    <!-- ============================================================ -->
     <section class="card p-5">
       <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
         <div>
-          <h2 class="text-base font-semibold">Detalhamento por UTM</h2>
-          <p class="text-xs text-neutral-500 mt-0.5">Clique nos cabeçalhos para ordenar. Passe o mouse na linha para destacar.</p>
+          <h2 class="text-base font-semibold">Detalhamento por UTM (acumulado)</h2>
+          <p class="text-xs text-neutral-500 mt-0.5">Total consolidado por UTM. Clique nos cabeçalhos para ordenar.</p>
         </div>
         <div class="text-xs text-neutral-500">
           <span id="tableRowsCount">—</span> UTMs · ordenado por Leads
@@ -272,37 +340,20 @@
     <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
       <div class="font-medium text-neutral-300 mb-2">Notas metodológicas</div>
       <ul class="space-y-1 list-disc list-inside">
-        <li><strong>Leads</strong>: cada linha do relatório "Novos Negócios" do HubSpot (todos os deals criados no pipeline Funil High Ticket).</li>
-        <li><strong>Classificação</strong>: campo Typeform "Classificação inicial do Lead (%)". Quando o lead tem mais de uma marcação, a prioridade é: <span style="color: var(--c-closer)">Closer</span> &gt; <span style="color: var(--c-sdr)">SDR</span> &gt; <span style="color: var(--c-perdido)">Perdido</span> &gt; Outros.</li>
-        <li><strong>Faturamento</strong>: soma da coluna "Valor fechado" do relatório "Ganhos x UTM" (somente negócios ganhos).</li>
+        <li><strong>Leads</strong>: cada linha do relatório "Novos Negócios" do HubSpot (todos os deals criados no pipeline Funil High Ticket/Low Ticket).</li>
+        <li><strong>Classificação</strong>: campo Typeform "Classificação inicial do Lead (%)". Quando há mais de uma marcação, a prioridade é <span style="color: var(--c-closer)">Closer</span> &gt; <span style="color: var(--c-sdr)">SDR</span> &gt; <span style="color: var(--c-perdido)">Perdido</span> &gt; Outros.</li>
+        <li><strong>Faturamento</strong>: soma da coluna "Valor fechado" do relatório "Negócios ganhos" (somente deals em estágio "Negócio ganho").</li>
+        <li><strong>Mês</strong>: derivado da coluna "Data de fechamento" do HubSpot.</li>
         <li><strong>Normalização de UTMs</strong>: <code class="text-neutral-300">yt-org / yt_org / YT-ORG</code> agrupados em "YouTube Orgânico"; <code class="text-neutral-300">ig_org / ig-org / IG_ORG</code> em "Instagram Orgânico"; <code class="text-neutral-300">@@MISSING@@</code> em "Sem UTM".</li>
-        <li><strong>Quebra mensal</strong>: os relatórios exportados não contêm coluna de data. Para visão por mês, re-exportar do HubSpot incluindo a coluna "Data de criação" ou "Data de fechamento".</li>
       </ul>
     </section>
   </main>
 
   <script>
     // ============================================================
-    // DATA (gerado a partir dos 2 CSVs do HubSpot — 2026-05-20)
+    // DATA — gerado a partir dos 2 CSVs do HubSpot (2026-05-20)
     // ============================================================
-    const DATA = {
-      "utms": [
-        {"utm":"yt-org","label":"YouTube Orgânico","leads_total":3681,"closer":1362,"sdr":2318,"perdido":0,"outros":1,"ganhos":241,"faturamento":2189375.24,"ticket_medio":9084.54,"taxa_conv":6.55},
-        {"utm":"ig-org","label":"Instagram Orgânico","leads_total":2568,"closer":979,"sdr":1584,"perdido":4,"outros":1,"ganhos":212,"faturamento":1862714.55,"ticket_medio":8786.39,"taxa_conv":8.26},
-        {"utm":"(sem utm)","label":"Sem UTM","leads_total":255,"closer":46,"sdr":21,"perdido":0,"outros":188,"ganhos":72,"faturamento":635128.5,"ticket_medio":8821.23,"taxa_conv":28.24},
-        {"utm":"org","label":"Orgânico (genérico)","leads_total":117,"closer":46,"sdr":70,"perdido":0,"outros":1,"ganhos":14,"faturamento":119487.94,"ticket_medio":8534.85,"taxa_conv":11.97},
-        {"utm":"social","label":"Social (genérico)","leads_total":91,"closer":0,"sdr":0,"perdido":0,"outros":91,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
-        {"utm":"fb-quente","label":"Facebook (Quente)","leads_total":34,"closer":25,"sdr":4,"perdido":5,"outros":0,"ganhos":4,"faturamento":39404.0,"ticket_medio":9851.0,"taxa_conv":11.76},
-        {"utm":"fb-adv","label":"Facebook (Avançado)","leads_total":11,"closer":10,"sdr":0,"perdido":1,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
-        {"utm":"fb-frio","label":"Facebook (Frio)","leads_total":6,"closer":5,"sdr":1,"perdido":0,"outros":0,"ganhos":1,"faturamento":9900.0,"ticket_medio":9900.0,"taxa_conv":16.67},
-        {"utm":"yt-quente","label":"YouTube (Quente)","leads_total":5,"closer":5,"sdr":0,"perdido":0,"outros":0,"ganhos":4,"faturamento":44300.0,"ticket_medio":11075.0,"taxa_conv":80.0},
-        {"utm":"search","label":"Search","leads_total":4,"closer":3,"sdr":1,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
-        {"utm":"p0-youtube-dhiego","label":"YouTube Dhiego","leads_total":4,"closer":0,"sdr":4,"perdido":0,"outros":0,"ganhos":1,"faturamento":11499.0,"ticket_medio":11499.0,"taxa_conv":25.0},
-        {"utm":"yt-frio","label":"YouTube (Frio)","leads_total":1,"closer":1,"sdr":0,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0}
-      ],
-      "totals": {"leads_total":6777,"closer":2482,"sdr":4003,"perdido":10,"outros":282,"ganhos":549,"faturamento":4911809.23,"ticket_medio":8946.83,"taxa_conv":8.1},
-      "generated_at": "2026-05-20"
-    };
+    const DATA = {"utms":[{"utm":"yt-org","label":"YouTube Orgânico","leads_total":3681,"closer":1362,"sdr":2318,"perdido":0,"outros":1,"ganhos":241,"faturamento":2189375.24,"ticket_medio":9084.54,"taxa_conv":6.55,"leads_by_month":{"2026-01":944,"2026-02":914,"2026-03":514,"2026-04":987,"2026-05":322},"class_by_month":{"2026-01":{"closer":346,"sdr":597,"perdido":0,"outros":1},"2026-02":{"closer":349,"sdr":565,"perdido":0,"outros":0},"2026-03":{"closer":287,"sdr":227,"perdido":0,"outros":0},"2026-04":{"closer":275,"sdr":712,"perdido":0,"outros":0},"2026-05":{"closer":105,"sdr":217,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":738049.22,"2026-02":574230.02,"2026-03":486376.0,"2026-04":319332.0,"2026-05":71388.0},"won_by_month":{"2026-01":87,"2026-02":59,"2026-03":49,"2026-04":36,"2026-05":10}},{"utm":"ig-org","label":"Instagram Orgânico","leads_total":2568,"closer":979,"sdr":1584,"perdido":4,"outros":1,"ganhos":212,"faturamento":1862714.55,"ticket_medio":8786.39,"taxa_conv":8.26,"leads_by_month":{"2026-01":1217,"2026-02":711,"2026-03":176,"2026-04":372,"2026-05":92},"class_by_month":{"2026-01":{"closer":423,"sdr":793,"perdido":0,"outros":1},"2026-02":{"closer":276,"sdr":433,"perdido":2,"outros":0},"2026-03":{"closer":120,"sdr":55,"perdido":1,"outros":0},"2026-04":{"closer":130,"sdr":241,"perdido":1,"outros":0},"2026-05":{"closer":30,"sdr":62,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":939829.1,"2026-02":510395.59,"2026-03":213998.86,"2026-04":189591.0,"2026-05":8900.0},"won_by_month":{"2026-01":117,"2026-02":57,"2026-03":19,"2026-04":18,"2026-05":1}},{"utm":"(sem utm)","label":"Sem UTM","leads_total":255,"closer":46,"sdr":21,"perdido":0,"outros":188,"ganhos":72,"faturamento":635128.5,"ticket_medio":8821.23,"taxa_conv":28.24,"leads_by_month":{"2026-01":49,"2026-02":31,"2026-03":96,"2026-04":61,"2026-05":18},"class_by_month":{"2026-01":{"closer":13,"sdr":6,"perdido":0,"outros":30},"2026-02":{"closer":11,"sdr":7,"perdido":0,"outros":13},"2026-03":{"closer":11,"sdr":2,"perdido":0,"outros":83},"2026-04":{"closer":8,"sdr":4,"perdido":0,"outros":49},"2026-05":{"closer":3,"sdr":2,"perdido":0,"outros":13}},"revenue_by_month":{"2026-01":163837.6,"2026-02":84697.0,"2026-03":230694.0,"2026-04":136999.9,"2026-05":18900.0},"won_by_month":{"2026-01":24,"2026-02":9,"2026-03":21,"2026-04":11,"2026-05":7}},{"utm":"org","label":"Orgânico (genérico)","leads_total":117,"closer":46,"sdr":70,"perdido":0,"outros":1,"ganhos":14,"faturamento":119487.94,"ticket_medio":8534.85,"taxa_conv":11.97,"leads_by_month":{"2026-01":41,"2026-02":29,"2026-03":7,"2026-04":32,"2026-05":8},"class_by_month":{"2026-01":{"closer":15,"sdr":25,"perdido":0,"outros":1},"2026-02":{"closer":11,"sdr":18,"perdido":0,"outros":0},"2026-03":{"closer":5,"sdr":2,"perdido":0,"outros":0},"2026-04":{"closer":11,"sdr":21,"perdido":0,"outros":0},"2026-05":{"closer":4,"sdr":4,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":42187.94,"2026-02":28900.0,"2026-03":26400.0,"2026-04":0,"2026-05":22000.0},"won_by_month":{"2026-01":6,"2026-02":3,"2026-03":3,"2026-04":0,"2026-05":2}},{"utm":"social","label":"Social (genérico)","leads_total":91,"closer":0,"sdr":0,"perdido":0,"outros":91,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":19,"2026-02":16,"2026-03":24,"2026-04":17,"2026-05":15},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":19},"2026-02":{"closer":0,"sdr":0,"perdido":0,"outros":16},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":24},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":17},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":15}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"fb-quente","label":"Facebook (Quente)","leads_total":34,"closer":25,"sdr":4,"perdido":5,"outros":0,"ganhos":4,"faturamento":39404.0,"ticket_medio":9851.0,"taxa_conv":11.76,"leads_by_month":{"2026-01":3,"2026-02":15,"2026-03":10,"2026-04":5,"2026-05":1},"class_by_month":{"2026-01":{"closer":2,"sdr":1,"perdido":0,"outros":0},"2026-02":{"closer":14,"sdr":1,"perdido":0,"outros":0},"2026-03":{"closer":6,"sdr":2,"perdido":2,"outros":0},"2026-04":{"closer":2,"sdr":0,"perdido":3,"outros":0},"2026-05":{"closer":1,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":17900.0,"2026-02":11004.0,"2026-03":10500.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":2,"2026-02":1,"2026-03":1,"2026-04":0,"2026-05":0}},{"utm":"fb-adv","label":"Facebook (Avançado)","leads_total":11,"closer":10,"sdr":0,"perdido":1,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":5,"2026-03":0,"2026-04":3,"2026-05":3},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":5,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":3,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":2,"sdr":0,"perdido":1,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"fb-frio","label":"Facebook (Frio)","leads_total":6,"closer":5,"sdr":1,"perdido":0,"outros":0,"ganhos":1,"faturamento":9900.0,"ticket_medio":9900.0,"taxa_conv":16.67,"leads_by_month":{"2026-01":0,"2026-02":5,"2026-03":1,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":4,"sdr":1,"perdido":0,"outros":0},"2026-03":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":9900.0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":1,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"yt-quente","label":"YouTube (Quente)","leads_total":5,"closer":5,"sdr":0,"perdido":0,"outros":0,"ganhos":4,"faturamento":44300.0,"ticket_medio":11075.0,"taxa_conv":80.0,"leads_by_month":{"2026-01":1,"2026-02":2,"2026-03":2,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":12000.0,"2026-02":8400.0,"2026-03":23900.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":1,"2026-02":1,"2026-03":2,"2026-04":0,"2026-05":0}},{"utm":"search","label":"Search","leads_total":4,"closer":3,"sdr":1,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":2,"2026-03":1,"2026-04":1,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"p0-youtube-dhiego","label":"YouTube Dhiego","leads_total":4,"closer":0,"sdr":4,"perdido":0,"outros":0,"ganhos":1,"faturamento":11499.0,"ticket_medio":11499.0,"taxa_conv":25.0,"leads_by_month":{"2026-01":2,"2026-02":0,"2026-03":1,"2026-04":1,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":2,"perdido":0,"outros":0},"2026-02":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":11499.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":1,"2026-04":0,"2026-05":0}},{"utm":"yt-frio","label":"YouTube (Frio)","leads_total":1,"closer":1,"sdr":0,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":1,"2026-03":0,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}}],"totals":{"leads_total":6777,"closer":2482,"sdr":4003,"perdido":10,"outros":282,"ganhos":549,"faturamento":4911809.23,"ticket_medio":8946.83,"taxa_conv":8.1},"months":["2026-01","2026-02","2026-03","2026-04","2026-05"],"totals_by_month":{"2026-01":{"leads":2276,"closer":800,"sdr":1424,"perdido":0,"outros":52,"faturamento":1913803.86,"ganhos":237},"2026-02":{"leads":1731,"closer":675,"sdr":1025,"perdido":2,"outros":29,"faturamento":1227526.61,"ganhos":131},"2026-03":{"leads":832,"closer":433,"sdr":289,"perdido":3,"outros":107,"faturamento":1003367.86,"ganhos":96},"2026-04":{"leads":1479,"closer":429,"sdr":980,"perdido":4,"outros":66,"faturamento":645922.9,"ganhos":65},"2026-05":{"leads":459,"closer":145,"sdr":285,"perdido":1,"outros":28,"faturamento":121188.0,"ganhos":20}},"generated_at":"2026-05-20","date_field":"Data de fechamento (HubSpot)"};
 
     // ============================================================
     // FORMATTING
@@ -317,6 +368,12 @@
       if (v >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k';
       return fmtBRL(v);
     };
+    const MONTH_LABELS = { '01':'Jan','02':'Fev','03':'Mar','04':'Abr','05':'Mai','06':'Jun','07':'Jul','08':'Ago','09':'Set','10':'Out','11':'Nov','12':'Dez' };
+    const fmtMonth = (ym) => {
+      if (!ym) return '—';
+      const [y, m] = ym.split('-');
+      return `${MONTH_LABELS[m]}/${y.slice(2)}`;
+    };
 
     // Chart.js global theme
     Chart.defaults.color = '#a3a3a3';
@@ -327,7 +384,28 @@
     const $ = (id) => document.getElementById(id);
 
     // ============================================================
-    // KPI ROW
+    // COLOR PALETTE FOR UTMs (consistent across charts)
+    // ============================================================
+    const UTM_PALETTE = ['#facc15', '#3b82f6', '#a78bfa', '#34d399', '#fb923c', '#ec4899', '#22d3ee', '#a3a3a3', '#737373', '#525252', '#404040', '#262626'];
+    const utmColor = {};
+    DATA.utms.forEach((u, i) => { utmColor[u.utm] = UTM_PALETTE[i % UTM_PALETTE.length]; });
+
+    const tooltipStyle = {
+      backgroundColor: 'rgba(15,15,15,0.97)',
+      borderColor: '#2a2a2a',
+      borderWidth: 1,
+      padding: 12,
+      titleColor: '#f5f5f5',
+      titleFont: { size: 12, weight: '600' },
+      bodyColor: '#d4d4d4',
+      bodyFont: { size: 11 },
+      footerColor: '#a3a3a3',
+      footerFont: { size: 11, weight: '600' },
+      cornerRadius: 8,
+    };
+
+    // ============================================================
+    // KPIs
     // ============================================================
     function renderKPIs() {
       const t = DATA.totals;
@@ -337,14 +415,232 @@
       $('kpiSdr').textContent = fmtInt(t.sdr);
       $('kpiSdrPct').textContent = fmtPct(t.sdr / t.leads_total * 100);
       $('kpiRevenue').textContent = fmtBRLShort(t.faturamento);
-      $('kpiRevenueSub').textContent = `${fmtInt(t.ganhos)} deals ganhos · ${fmtBRLfull(t.faturamento)}`;
+      $('kpiRevenueSub').textContent = `${fmtInt(t.ganhos)} deals · ${fmtBRLfull(t.faturamento)}`;
       $('kpiTicket').textContent = fmtBRL(t.ticket_medio);
       $('kpiConv').textContent = `conv. ${fmtPct(t.taxa_conv)} (leads → ganhos)`;
       $('dataDate').textContent = new Date(DATA.generated_at).toLocaleDateString('pt-BR');
     }
 
     // ============================================================
-    // CHART: LEADS POR UTM × CLASSIFICAÇÃO (stacked bar)
+    // MONTHLY OVERVIEW: bars (leads) + line (faturamento)
+    // ============================================================
+    function renderMonthlyOverview() {
+      const months = DATA.months;
+      const labels = months.map(fmtMonth);
+      const tbm = DATA.totals_by_month;
+
+      const ctx = $('monthlyOverviewChart').getContext('2d');
+      new Chart(ctx, {
+        data: {
+          labels,
+          datasets: [
+            { type: 'bar', label: 'Closer',  data: months.map(m => tbm[m].closer),  backgroundColor: 'rgba(245,245,245,0.95)', borderWidth: 0, stack: 'L', yAxisID: 'y', order: 3 },
+            { type: 'bar', label: 'SDR',     data: months.map(m => tbm[m].sdr),     backgroundColor: 'rgba(163,163,163,0.9)',  borderWidth: 0, stack: 'L', yAxisID: 'y', order: 3 },
+            { type: 'bar', label: 'Perdido', data: months.map(m => tbm[m].perdido), backgroundColor: 'rgba(239,68,68,0.9)',    borderWidth: 0, stack: 'L', yAxisID: 'y', order: 3 },
+            { type: 'bar', label: 'Outros',  data: months.map(m => tbm[m].outros),  backgroundColor: 'rgba(82,82,82,0.9)',     borderWidth: 0, stack: 'L', yAxisID: 'y', order: 3 },
+            {
+              type: 'line', label: 'Faturamento',
+              data: months.map(m => tbm[m].faturamento),
+              borderColor: '#facc15', backgroundColor: '#facc15',
+              borderWidth: 2.5, tension: 0.25,
+              pointRadius: 5, pointHoverRadius: 7, pointBackgroundColor: '#facc15',
+              fill: false, yAxisID: 'y1', order: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { color: '#a3a3a3', boxWidth: 10, padding: 16, font: { size: 11 } } },
+            tooltip: {
+              ...tooltipStyle,
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  if (item.dataset.type === 'line') return `  Faturamento: ${fmtBRLfull(item.parsed.y)}`;
+                  return `  ${item.dataset.label}: ${fmtInt(item.parsed.y)}`;
+                },
+                footer: (items) => {
+                  const m = months[items[0].dataIndex];
+                  const t = tbm[m];
+                  return [
+                    `Leads totais: ${fmtInt(t.leads)}`,
+                    `Deals ganhos: ${fmtInt(t.ganhos)} · ticket médio: ${t.ganhos ? fmtBRL(t.faturamento / t.ganhos) : '—'}`,
+                  ];
+                },
+              },
+            },
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, position: 'left', beginAtZero: true, grid: { color: '#1f1f1f' },
+                 title: { display: true, text: 'Leads', color: '#737373', font: { size: 10 } },
+                 ticks: { callback: (v) => fmtInt(v) } },
+            y1: { position: 'right', beginAtZero: true, grid: { display: false },
+                  title: { display: true, text: 'Faturamento', color: '#facc15', font: { size: 10 } },
+                  ticks: { callback: (v) => fmtBRLShort(v), color: '#facc15' } },
+          },
+        },
+      });
+    }
+
+    function renderMonthMiniCards() {
+      const tbm = DATA.totals_by_month;
+      const months = DATA.months;
+      const wrap = $('monthMiniCards');
+      wrap.innerHTML = months.map(m => {
+        const t = tbm[m];
+        const tm = t.ganhos ? t.faturamento / t.ganhos : 0;
+        return `
+          <div class="month-mini-card">
+            <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">${fmtMonth(m)}</div>
+            <div class="mt-1 flex items-baseline gap-2">
+              <span class="kpi-value text-xl font-bold">${fmtInt(t.leads)}</span>
+              <span class="text-[11px] text-neutral-500">leads</span>
+            </div>
+            <div class="mt-1 text-xs" style="color: var(--c-revenue)">${fmtBRLShort(t.faturamento)}</div>
+            <div class="mt-1 text-[11px] text-neutral-500">${fmtInt(t.ganhos)} ganhos · ticket ${tm > 0 ? fmtBRL(tm) : '—'}</div>
+            <div class="mt-2 text-[10px] text-neutral-500">
+              <span style="color: var(--c-closer)">${t.closer} closer</span>
+              · <span style="color: var(--c-sdr)">${t.sdr} sdr</span>
+              ${t.perdido > 0 ? ` · <span style="color: var(--c-perdido)">${t.perdido} perd</span>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ============================================================
+    // UTM × MONTH multi-line charts
+    // ============================================================
+    function renderUtmMonthLine(canvasId, field, fmt, ttlPrefix) {
+      const months = DATA.months;
+      const utms = [...DATA.utms].filter(u => {
+        return field === 'leads_by_month'
+          ? u.leads_total > 0
+          : (u.faturamento > 0);
+      });
+
+      const datasets = utms.map(u => ({
+        label: u.label,
+        utm: u.utm,
+        data: months.map(m => u[field][m] || 0),
+        borderColor: utmColor[u.utm],
+        backgroundColor: utmColor[u.utm],
+        borderWidth: 2,
+        tension: 0.25,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        fill: false,
+        // Hide all but top 4 by total
+        hidden: false,
+      }));
+
+      // Hide minor series initially to keep chart legible
+      const sorted = [...datasets].sort((a, b) => {
+        const aTot = a.data.reduce((s, x) => s + x, 0);
+        const bTot = b.data.reduce((s, x) => s + x, 0);
+        return bTot - aTot;
+      });
+      sorted.forEach((d, i) => { if (i >= 4) d.hidden = true; });
+
+      const ctx = $(canvasId).getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: { labels: months.map(fmtMonth), datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a3a3a3', boxWidth: 10, padding: 10, font: { size: 11 }, usePointStyle: true } },
+            tooltip: {
+              ...tooltipStyle,
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  const v = item.parsed.y;
+                  return `  ${item.dataset.label}: ${fmt(v)}`;
+                },
+                footer: (items) => {
+                  if (items.length === 0) return '';
+                  const visible = items.filter(i => i.dataset && !i.dataset.hidden);
+                  const total = visible.reduce((s, i) => s + i.parsed.y, 0);
+                  return `${ttlPrefix} no mês (visíveis): ${fmt(total)}`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, grid: { color: '#1f1f1f' }, ticks: { callback: (v) => fmt(v).replace('R$ ','R$') } },
+          },
+        },
+      });
+    }
+
+    // ============================================================
+    // PIVOT TABLE UTM × MONTH
+    // ============================================================
+    const pivotState = { metric: 'leads' };
+    const METRICS = {
+      leads:       { field: 'leads_by_month',  totalField: 'leads_total',  fmt: fmtInt,        title: 'Leads' },
+      faturamento: { field: 'revenue_by_month', totalField: 'faturamento', fmt: fmtBRLShort,   title: 'Faturamento' },
+      ganhos:      { field: 'won_by_month',     totalField: 'ganhos',      fmt: fmtInt,        title: 'Ganhos' },
+    };
+
+    function renderPivot() {
+      const months = DATA.months;
+      const cfg = METRICS[pivotState.metric];
+
+      // Header
+      let html = '<th class="text-left p-3 font-medium">UTM</th>';
+      for (const m of months) html += `<th class="text-right p-3 font-medium">${fmtMonth(m)}</th>`;
+      html += '<th class="text-right p-3 font-medium border-l border-neutral-800">Total</th>';
+      $('pivotHead').innerHTML = html;
+
+      // Body: sort UTMs by total desc
+      const rows = [...DATA.utms].sort((a, b) => (b[cfg.totalField] || 0) - (a[cfg.totalField] || 0));
+      const max = Math.max(...rows.flatMap(r => months.map(m => r[cfg.field][m] || 0)));
+      $('pivotBody').innerHTML = rows.map(r => {
+        const total = r[cfg.totalField] || 0;
+        let row = `<tr><td class="p-3"><div class="font-medium text-neutral-100">${r.label}</div><div class="text-[11px] text-neutral-500 font-mono">${r.utm}</div></td>`;
+        for (const m of months) {
+          const v = r[cfg.field][m] || 0;
+          const intensity = max ? Math.min(0.55, (v / max) * 0.55) : 0;
+          const tipStr = pivotState.metric === 'faturamento' ? fmtBRLfull(v) : fmtInt(v);
+          const bg = v > 0 ? (pivotState.metric === 'faturamento' ? `background: rgba(250,204,21,${intensity});` : `background: rgba(245,245,245,${intensity});`) : '';
+          row += `<td class="p-3 text-right" style="${bg}" title="${r.label} · ${fmtMonth(m)}: ${tipStr}">${v > 0 ? cfg.fmt(v) : '<span class="text-neutral-700">—</span>'}</td>`;
+        }
+        row += `<td class="p-3 text-right border-l border-neutral-800 font-semibold text-neutral-100" style="color: ${pivotState.metric === 'faturamento' ? 'var(--c-revenue)' : 'var(--text)'};">${cfg.fmt(total)}</td></tr>`;
+        return row;
+      }).join('');
+
+      // Foot: totals per month
+      const tbm = DATA.totals_by_month;
+      let foot = '<td class="p-3">Total</td>';
+      for (const m of months) {
+        const v = pivotState.metric === 'leads' ? tbm[m].leads
+                : pivotState.metric === 'faturamento' ? tbm[m].faturamento
+                : tbm[m].ganhos;
+        foot += `<td class="p-3 text-right">${cfg.fmt(v)}</td>`;
+      }
+      const gt = pivotState.metric === 'leads' ? DATA.totals.leads_total
+              : pivotState.metric === 'faturamento' ? DATA.totals.faturamento
+              : DATA.totals.ganhos;
+      foot += `<td class="p-3 text-right border-l border-neutral-800" style="color: ${pivotState.metric === 'faturamento' ? 'var(--c-revenue)' : 'var(--text)'};">${cfg.fmt(gt)}</td>`;
+      $('pivotFoot').innerHTML = foot;
+    }
+
+    document.querySelectorAll('#pivotToggle .toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pivotState.metric = btn.dataset.metric;
+        document.querySelectorAll('#pivotToggle .toggle-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderPivot();
+      });
+    });
+
+    // ============================================================
+    // LEADS BAR: UTM × Classificação
     // ============================================================
     function renderLeadsBar() {
       const data = [...DATA.utms].sort((a, b) => b.leads_total - a.leads_total);
@@ -356,29 +652,19 @@
         data: {
           labels,
           datasets: [
-            { label: 'Closer',  data: data.map(d => d.closer),  backgroundColor: 'rgba(245,245,245,0.95)', borderColor: 'rgba(245,245,245,1)', borderWidth: 0, stack: 's' },
-            { label: 'SDR',     data: data.map(d => d.sdr),     backgroundColor: 'rgba(163,163,163,0.85)', borderColor: 'rgba(163,163,163,1)', borderWidth: 0, stack: 's' },
-            { label: 'Perdido', data: data.map(d => d.perdido), backgroundColor: 'rgba(239,68,68,0.85)',   borderColor: 'rgba(239,68,68,1)',   borderWidth: 0, stack: 's' },
-            { label: 'Outros',  data: data.map(d => d.outros),  backgroundColor: 'rgba(82,82,82,0.85)',    borderColor: 'rgba(82,82,82,1)',    borderWidth: 0, stack: 's' },
+            { label: 'Closer',  data: data.map(d => d.closer),  backgroundColor: 'rgba(245,245,245,0.95)', borderWidth: 0, stack: 's' },
+            { label: 'SDR',     data: data.map(d => d.sdr),     backgroundColor: 'rgba(163,163,163,0.9)',  borderWidth: 0, stack: 's' },
+            { label: 'Perdido', data: data.map(d => d.perdido), backgroundColor: 'rgba(239,68,68,0.9)',    borderWidth: 0, stack: 's' },
+            { label: 'Outros',  data: data.map(d => d.outros),  backgroundColor: 'rgba(82,82,82,0.9)',     borderWidth: 0, stack: 's' },
           ],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15,15,15,0.97)',
-              borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 12,
-              titleColor: '#f5f5f5',
-              titleFont: { size: 12, weight: '600' },
-              bodyColor: '#d4d4d4',
-              bodyFont: { size: 11 },
-              footerColor: '#a3a3a3',
-              footerFont: { size: 11, weight: '600' },
+              ...tooltipStyle,
               callbacks: {
                 title: (items) => items[0].label,
                 label: (item) => {
@@ -389,9 +675,7 @@
                 },
                 footer: (items) => {
                   const utm = data[items[0].dataIndex];
-                  const lines = [
-                    `Total: ${fmtInt(utm.leads_total)} leads`,
-                  ];
+                  const lines = [`Total leads: ${fmtInt(utm.leads_total)}`];
                   if (utm.faturamento > 0) lines.push(`Faturamento: ${fmtBRL(utm.faturamento)} (${utm.ganhos} ganhos · ticket ${fmtBRL(utm.ticket_medio)})`);
                   return lines;
                 },
@@ -399,7 +683,7 @@
             },
           },
           scales: {
-            x: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, maxRotation: 30, minRotation: 0, color: '#a3a3a3' } },
+            x: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, maxRotation: 30, minRotation: 0 } },
             y: { stacked: true, grid: { color: '#1f1f1f' }, ticks: { precision: 0, callback: (v) => fmtInt(v) }, beginAtZero: true },
           },
         },
@@ -407,39 +691,29 @@
     }
 
     // ============================================================
-    // CHART: FATURAMENTO POR UTM
+    // REVENUE BAR
     // ============================================================
     function renderRevenueBar() {
       const data = DATA.utms.filter(d => d.faturamento > 0).sort((a, b) => b.faturamento - a.faturamento);
-      const labels = data.map(d => d.label);
       const ctx = $('revenueBarChart').getContext('2d');
       new Chart(ctx, {
         type: 'bar',
         data: {
-          labels,
+          labels: data.map(d => d.label),
           datasets: [{
             label: 'Faturamento',
             data: data.map(d => d.faturamento),
             backgroundColor: 'rgba(250,204,21,0.85)',
-            borderColor: 'rgba(250,204,21,1)',
             borderWidth: 0,
             borderRadius: 4,
           }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15,15,15,0.97)',
-              borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 12,
-              titleColor: '#f5f5f5',
-              titleFont: { size: 12, weight: '600' },
-              bodyColor: '#d4d4d4',
-              bodyFont: { size: 11 },
+              ...tooltipStyle,
               callbacks: {
                 title: (items) => items[0].label,
                 label: (item) => {
@@ -450,7 +724,7 @@
                     `  Share: ${pct} do total`,
                     `  Deals ganhos: ${fmtInt(utm.ganhos)}`,
                     `  Ticket médio: ${fmtBRL(utm.ticket_medio)}`,
-                    `  Leads originados: ${fmtInt(utm.leads_total)} · conv. ${fmtPct(utm.taxa_conv)}`,
+                    `  Leads: ${fmtInt(utm.leads_total)} · conv. ${fmtPct(utm.taxa_conv)}`,
                   ];
                 },
               },
@@ -465,15 +739,15 @@
     }
 
     // ============================================================
-    // CHART: DONUT CLASSIFICAÇÃO
+    // CLASS DONUT
     // ============================================================
     function renderClassDonut() {
       const t = DATA.totals;
       const segs = [
-        { label: 'Closer', value: t.closer, color: '#f5f5f5' },
-        { label: 'SDR', value: t.sdr, color: '#a3a3a3' },
+        { label: 'Closer',  value: t.closer,  color: '#f5f5f5' },
+        { label: 'SDR',     value: t.sdr,     color: '#a3a3a3' },
         { label: 'Perdido', value: t.perdido, color: '#ef4444' },
-        { label: 'Outros', value: t.outros, color: '#525252' },
+        { label: 'Outros',  value: t.outros,  color: '#525252' },
       ];
       const total = segs.reduce((s, x) => s + x.value, 0);
       const ctx = $('classDonut').getContext('2d');
@@ -481,26 +755,14 @@
         type: 'doughnut',
         data: {
           labels: segs.map(s => s.label),
-          datasets: [{
-            data: segs.map(s => s.value),
-            backgroundColor: segs.map(s => s.color),
-            borderColor: '#131313',
-            borderWidth: 2,
-          }],
+          datasets: [{ data: segs.map(s => s.value), backgroundColor: segs.map(s => s.color), borderColor: '#131313', borderWidth: 2 }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
+          responsive: true, maintainAspectRatio: false, cutout: '65%',
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15,15,15,0.97)',
-              borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 12,
-              titleColor: '#f5f5f5',
-              bodyColor: '#d4d4d4',
+              ...tooltipStyle,
               callbacks: {
                 label: (item) => {
                   const pct = (item.parsed / total * 100).toFixed(1).replace('.', ',') + '%';
@@ -511,77 +773,57 @@
           },
         },
       });
-
       $('classDonutLegend').innerHTML = segs.map(s => {
         const pct = total ? (s.value / total * 100).toFixed(1).replace('.', ',') + '%' : '—';
-        return `
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2"><span class="legend-dot" style="background:${s.color}"></span><span>${s.label}</span></div>
-            <div class="text-neutral-300"><span class="font-medium">${fmtInt(s.value)}</span> <span class="text-neutral-500">· ${pct}</span></div>
-          </div>`;
+        return `<div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2"><span class="legend-dot" style="background:${s.color}"></span><span>${s.label}</span></div>
+          <div class="text-neutral-300"><span class="font-medium">${fmtInt(s.value)}</span> <span class="text-neutral-500">· ${pct}</span></div>
+        </div>`;
       }).join('');
     }
 
     // ============================================================
-    // CHART: DONUT REVENUE SHARE
+    // REVENUE DONUT
     // ============================================================
     function renderRevenueDonut() {
       const data = DATA.utms.filter(d => d.faturamento > 0).sort((a, b) => b.faturamento - a.faturamento);
-      const palette = ['#facc15', '#fbbf24', '#f59e0b', '#a3a3a3', '#737373', '#525252', '#404040', '#262626'];
       const total = data.reduce((s, x) => s + x.faturamento, 0);
+      const palette = data.map(d => utmColor[d.utm]);
       const ctx = $('revenueDonut').getContext('2d');
       new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: data.map(d => d.label),
-          datasets: [{
-            data: data.map(d => d.faturamento),
-            backgroundColor: data.map((_, i) => palette[i % palette.length]),
-            borderColor: '#131313',
-            borderWidth: 2,
-          }],
+          datasets: [{ data: data.map(d => d.faturamento), backgroundColor: palette, borderColor: '#131313', borderWidth: 2 }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
+          responsive: true, maintainAspectRatio: false, cutout: '65%',
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15,15,15,0.97)',
-              borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 12,
-              titleColor: '#f5f5f5',
-              bodyColor: '#d4d4d4',
+              ...tooltipStyle,
               callbacks: {
                 label: (item) => {
                   const utm = data[item.dataIndex];
                   const pct = (item.parsed / total * 100).toFixed(1).replace('.', ',') + '%';
-                  return [
-                    `${utm.label}`,
-                    `  ${fmtBRLfull(item.parsed)} (${pct})`,
-                    `  ${utm.ganhos} ganhos · ticket ${fmtBRL(utm.ticket_medio)}`,
-                  ];
+                  return [`${utm.label}`, `  ${fmtBRLfull(item.parsed)} (${pct})`, `  ${utm.ganhos} ganhos · ticket ${fmtBRL(utm.ticket_medio)}`];
                 },
               },
             },
           },
         },
       });
-
       $('revenueDonutLegend').innerHTML = data.map((d, i) => {
         const pct = total ? (d.faturamento / total * 100).toFixed(1).replace('.', ',') + '%' : '—';
-        return `
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0"><span class="legend-dot flex-shrink-0" style="background:${palette[i % palette.length]}"></span><span class="truncate">${d.label}</span></div>
-            <div class="text-neutral-300 flex-shrink-0"><span class="font-medium">${fmtBRLShort(d.faturamento)}</span> <span class="text-neutral-500">· ${pct}</span></div>
-          </div>`;
+        return `<div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0"><span class="legend-dot flex-shrink-0" style="background:${palette[i]}"></span><span class="truncate">${d.label}</span></div>
+          <div class="text-neutral-300 flex-shrink-0"><span class="font-medium">${fmtBRLShort(d.faturamento)}</span> <span class="text-neutral-500">· ${pct}</span></div>
+        </div>`;
       }).join('');
     }
 
     // ============================================================
-    // CHART: TAXA DE CONVERSÃO
+    // CONVERSION BAR
     // ============================================================
     function renderConvBar() {
       const data = [...DATA.utms].filter(d => d.leads_total > 0).sort((a, b) => b.taxa_conv - a.taxa_conv);
@@ -594,32 +836,21 @@
             label: 'Conversão',
             data: data.map(d => d.taxa_conv),
             backgroundColor: data.map(d => d.taxa_conv > 0 ? 'rgba(245,245,245,0.85)' : 'rgba(82,82,82,0.5)'),
-            borderColor: 'rgba(245,245,245,1)',
             borderWidth: 0,
             borderRadius: 4,
           }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15,15,15,0.97)',
-              borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 12,
-              titleColor: '#f5f5f5',
-              bodyColor: '#d4d4d4',
+              ...tooltipStyle,
               callbacks: {
                 title: (items) => items[0].label,
                 label: (item) => {
                   const utm = data[item.dataIndex];
-                  return [
-                    `  Conv. lead → ganho: ${fmtPct(utm.taxa_conv)}`,
-                    `  ${fmtInt(utm.leads_total)} leads · ${fmtInt(utm.ganhos)} ganhos`,
-                    `  Faturamento: ${fmtBRL(utm.faturamento)}`,
-                  ];
+                  return [`  Conv. lead → ganho: ${fmtPct(utm.taxa_conv)}`, `  ${fmtInt(utm.leads_total)} leads · ${fmtInt(utm.ganhos)} ganhos`, `  Faturamento: ${fmtBRL(utm.faturamento)}`];
                 },
               },
             },
@@ -633,7 +864,7 @@
     }
 
     // ============================================================
-    // TABLE
+    // DETAIL TABLE
     // ============================================================
     const tableSort = { key: 'leads_total', dir: 'desc' };
 
@@ -645,7 +876,6 @@
         if (typeof a[k] === 'number') return dir * (b[k] - a[k]);
         return dir * String(b[k] || '').localeCompare(String(a[k] || ''), 'pt-BR');
       });
-
       tbody.innerHTML = data.map(d => {
         const pct = d.leads_total ? (d.leads_total / DATA.totals.leads_total * 100).toFixed(1).replace('.', ',') + '%' : '—';
         const tip = `${d.label} (${d.utm}) · ${pct} dos leads`;
@@ -662,19 +892,11 @@
           <td class="p-3 text-right text-neutral-300">${d.leads_total ? fmtPct(d.taxa_conv) : '—'}</td>
         </tr>`;
       }).join('');
-
-      // Update sort indicators
       document.querySelectorAll('#detailTable thead th[data-sort]').forEach(th => {
         const ind = th.querySelector('.sort-indicator');
-        if (th.dataset.sort === tableSort.key) {
-          ind.textContent = tableSort.dir === 'desc' ? '↓' : '↑';
-          ind.classList.add('sort-active');
-        } else {
-          ind.textContent = '↕';
-          ind.classList.remove('sort-active');
-        }
+        if (th.dataset.sort === tableSort.key) { ind.textContent = tableSort.dir === 'desc' ? '↓' : '↑'; ind.classList.add('sort-active'); }
+        else { ind.textContent = '↕'; ind.classList.remove('sort-active'); }
       });
-
       const t = DATA.totals;
       $('tableRowsCount').textContent = DATA.utms.length;
       $('tLeads').textContent = fmtInt(t.leads_total);
@@ -687,7 +909,6 @@
       $('tTicket').textContent = fmtBRL(t.ticket_medio);
       $('tConv').textContent = fmtPct(t.taxa_conv);
     }
-
     document.querySelectorAll('#detailTable thead th[data-sort]').forEach(th => {
       th.addEventListener('click', () => {
         const k = th.dataset.sort;
@@ -701,6 +922,11 @@
     // BOOT
     // ============================================================
     renderKPIs();
+    renderMonthlyOverview();
+    renderMonthMiniCards();
+    renderUtmMonthLine('leadsUtmMonthChart', 'leads_by_month', fmtInt, 'Leads');
+    renderUtmMonthLine('revUtmMonthChart',   'revenue_by_month', fmtBRLShort, 'Faturamento');
+    renderPivot();
     renderLeadsBar();
     renderRevenueBar();
     renderClassDonut();
