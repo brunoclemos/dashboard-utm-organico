@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard de Leads e Faturamento por UTM — Orgânico 2026</title>
+  <meta name="description" content="Análise de leads (Closer / SDR / Perdido) e faturamento por UTM no tráfego orgânico de 2026." />
+  <link rel="icon" type="image/png" href="assets/logo-light.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #131313;
+      --bg-card-hover: #1a1a1a;
+      --border: #262626;
+      --text: #f5f5f5;
+      --text-muted: #a3a3a3;
+      --text-dim: #737373;
+      --accent: #ffffff;
+      --c-closer: #f5f5f5;
+      --c-sdr: #a3a3a3;
+      --c-perdido: #ef4444;
+      --c-outros: #525252;
+      --c-revenue: #facc15;
+    }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-feature-settings: 'cv11', 'ss01';
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.15s ease;
+    }
+    .card:hover { border-color: #333; }
+
+    .kpi-value {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    table { font-variant-numeric: tabular-nums; }
+    table thead th {
+      background: var(--bg-card);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+    table thead th:hover { background: var(--bg-card-hover); }
+    table tbody tr {
+      transition: background 0.12s ease;
+      cursor: default;
+    }
+    table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+    .scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+    .scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+    .scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+    .sort-indicator { opacity: 0.4; margin-left: 4px; font-size: 10px; }
+    .sort-active { opacity: 1; color: var(--text); }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      color: var(--text-muted);
+    }
+
+    /* Custom Chart.js tooltip — bigger, more legible */
+    .chartjs-tooltip {
+      background: rgba(15, 15, 15, 0.97) !important;
+      border: 1px solid #2a2a2a !important;
+      border-radius: 8px !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- HEADER -->
+  <header class="border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="assets/logo-light.png" alt="Logo" class="h-9 w-9 object-contain" />
+        <div>
+          <h1 class="text-base sm:text-lg font-semibold tracking-tight">Dashboard de Leads e Faturamento</h1>
+          <p class="text-xs text-neutral-400">Tráfego Orgânico — Análise por UTM (2026)</p>
+        </div>
+      </div>
+      <div class="hidden sm:flex flex-col items-end text-right">
+        <span class="text-[10px] uppercase tracking-wider text-neutral-500">Dados de</span>
+        <span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- KPI ROW -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div class="card p-5" title="Soma de todos os negócios criados no pipeline em 2026">
+        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Total de Leads</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiLeads" class="kpi-value text-3xl font-bold">0</span>
+        </div>
+        <div class="text-xs text-neutral-500 mt-1">deals criados no pipeline</div>
+      </div>
+      <div class="card p-5" title="Leads qualificados pelo Typeform como Closer">
+        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Closer</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiCloser" class="kpi-value text-3xl font-bold" style="color: var(--c-closer)">0</span>
+          <span id="kpiCloserPct" class="text-xs text-neutral-500">—</span>
+        </div>
+        <div class="text-xs text-neutral-500 mt-1">qualificados</div>
+      </div>
+      <div class="card p-5" title="Leads médios — fase SDR">
+        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">SDR</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiSdr" class="kpi-value text-3xl font-bold" style="color: var(--c-sdr)">0</span>
+          <span id="kpiSdrPct" class="text-xs text-neutral-500">—</span>
+        </div>
+        <div class="text-xs text-neutral-500 mt-1">não tão qualificados</div>
+      </div>
+      <div class="card p-5" title="Soma do valor fechado dos negócios ganhos">
+        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Faturamento</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiRevenue" class="kpi-value text-3xl font-bold" style="color: var(--c-revenue)">R$ 0</span>
+        </div>
+        <div id="kpiRevenueSub" class="text-xs text-neutral-500 mt-1">— deals ganhos</div>
+      </div>
+      <div class="card p-5" title="Ticket médio: faturamento ÷ deals ganhos">
+        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Ticket Médio</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiTicket" class="kpi-value text-3xl font-bold">R$ 0</span>
+        </div>
+        <div id="kpiConv" class="text-xs text-neutral-500 mt-1">conv. — %</div>
+      </div>
+    </section>
+
+    <!-- STACKED BAR: LEADS POR UTM × CLASSIFICAÇÃO -->
+    <section class="card p-5">
+      <div class="flex items-start justify-between mb-2 flex-wrap gap-3">
+        <div>
+          <h2 class="text-base font-semibold">Leads por UTM × Classificação</h2>
+          <p class="text-xs text-neutral-500 mt-0.5">Distribuição dos leads em cada UTM por estágio do Typeform. Passe o mouse para ver o detalhe.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-400">
+          <span class="badge"><span class="legend-dot" style="background:var(--c-closer)"></span> Closer (qualificado)</span>
+          <span class="badge"><span class="legend-dot" style="background:var(--c-sdr)"></span> SDR (médio)</span>
+          <span class="badge"><span class="legend-dot" style="background:var(--c-perdido)"></span> Perdido</span>
+          <span class="badge"><span class="legend-dot" style="background:var(--c-outros)"></span> Outros / sem classif.</span>
+        </div>
+      </div>
+      <div class="relative mt-4" style="height: 360px;">
+        <canvas id="leadsBarChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ROW: REVENUE BAR + DONUTS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="card p-5 lg:col-span-2">
+        <h2 class="text-base font-semibold">Faturamento por UTM</h2>
+        <p class="text-xs text-neutral-500 mt-0.5 mb-4">Soma de "Valor fechado" dos negócios ganhos. Tooltip mostra ticket médio e quantidade de deals.</p>
+        <div class="relative" style="height: 320px;">
+          <canvas id="revenueBarChart"></canvas>
+        </div>
+      </div>
+      <div class="card p-5">
+        <h2 class="text-base font-semibold">Mix de Classificação</h2>
+        <p class="text-xs text-neutral-500 mt-0.5 mb-4">Composição geral dos 6.777 leads.</p>
+        <div class="relative" style="height: 240px;">
+          <canvas id="classDonut"></canvas>
+        </div>
+        <div id="classDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
+      </div>
+    </section>
+
+    <!-- ROW: SHARE OF REVENUE -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="card p-5">
+        <h2 class="text-base font-semibold">Share de Faturamento</h2>
+        <p class="text-xs text-neutral-500 mt-0.5 mb-4">% do faturamento por UTM.</p>
+        <div class="relative" style="height: 240px;">
+          <canvas id="revenueDonut"></canvas>
+        </div>
+        <div id="revenueDonutLegend" class="mt-4 space-y-1.5 text-xs"></div>
+      </div>
+      <div class="card p-5 lg:col-span-2">
+        <h2 class="text-base font-semibold">Taxa de Conversão por UTM</h2>
+        <p class="text-xs text-neutral-500 mt-0.5 mb-4">% de leads que viraram negócio ganho. Tooltip mostra leads e ganhos absolutos.</p>
+        <div class="relative" style="height: 240px;">
+          <canvas id="convBarChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETAILED TABLE -->
+    <section class="card p-5">
+      <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
+        <div>
+          <h2 class="text-base font-semibold">Detalhamento por UTM</h2>
+          <p class="text-xs text-neutral-500 mt-0.5">Clique nos cabeçalhos para ordenar. Passe o mouse na linha para destacar.</p>
+        </div>
+        <div class="text-xs text-neutral-500">
+          <span id="tableRowsCount">—</span> UTMs · ordenado por Leads
+        </div>
+      </div>
+      <div class="overflow-auto scrollbar" style="max-height: 540px;">
+        <table id="detailTable" class="w-full text-sm">
+          <thead class="text-xs text-neutral-400 border-b border-neutral-800">
+            <tr>
+              <th data-sort="label" class="text-left p-3 font-medium">UTM <span class="sort-indicator">↕</span></th>
+              <th data-sort="leads_total" class="text-right p-3 font-medium">Leads <span class="sort-indicator sort-active">↓</span></th>
+              <th data-sort="closer" class="text-right p-3 font-medium" style="color: var(--c-closer)">Closer <span class="sort-indicator">↕</span></th>
+              <th data-sort="sdr" class="text-right p-3 font-medium" style="color: var(--c-sdr)">SDR <span class="sort-indicator">↕</span></th>
+              <th data-sort="perdido" class="text-right p-3 font-medium" style="color: var(--c-perdido)">Perdido <span class="sort-indicator">↕</span></th>
+              <th data-sort="outros" class="text-right p-3 font-medium" style="color: var(--c-outros)">Outros <span class="sort-indicator">↕</span></th>
+              <th data-sort="ganhos" class="text-right p-3 font-medium">Ganhos <span class="sort-indicator">↕</span></th>
+              <th data-sort="faturamento" class="text-right p-3 font-medium" style="color: var(--c-revenue)">Faturamento <span class="sort-indicator">↕</span></th>
+              <th data-sort="ticket_medio" class="text-right p-3 font-medium">Ticket Médio <span class="sort-indicator">↕</span></th>
+              <th data-sort="taxa_conv" class="text-right p-3 font-medium">Conv. <span class="sort-indicator">↕</span></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot class="text-xs border-t border-neutral-800">
+            <tr id="totalsRow" class="font-semibold text-neutral-200">
+              <td class="p-3">Totais</td>
+              <td class="p-3 text-right" id="tLeads">0</td>
+              <td class="p-3 text-right" id="tCloser" style="color: var(--c-closer)">0</td>
+              <td class="p-3 text-right" id="tSdr" style="color: var(--c-sdr)">0</td>
+              <td class="p-3 text-right" id="tPerdido" style="color: var(--c-perdido)">0</td>
+              <td class="p-3 text-right" id="tOutros" style="color: var(--c-outros)">0</td>
+              <td class="p-3 text-right" id="tGanhos">0</td>
+              <td class="p-3 text-right" id="tFat" style="color: var(--c-revenue)">R$ 0</td>
+              <td class="p-3 text-right" id="tTicket">R$ 0</td>
+              <td class="p-3 text-right" id="tConv">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- FOOTER NOTE -->
+    <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
+      <div class="font-medium text-neutral-300 mb-2">Notas metodológicas</div>
+      <ul class="space-y-1 list-disc list-inside">
+        <li><strong>Leads</strong>: cada linha do relatório "Novos Negócios" do HubSpot (todos os deals criados no pipeline Funil High Ticket).</li>
+        <li><strong>Classificação</strong>: campo Typeform "Classificação inicial do Lead (%)". Quando o lead tem mais de uma marcação, a prioridade é: <span style="color: var(--c-closer)">Closer</span> &gt; <span style="color: var(--c-sdr)">SDR</span> &gt; <span style="color: var(--c-perdido)">Perdido</span> &gt; Outros.</li>
+        <li><strong>Faturamento</strong>: soma da coluna "Valor fechado" do relatório "Ganhos x UTM" (somente negócios ganhos).</li>
+        <li><strong>Normalização de UTMs</strong>: <code class="text-neutral-300">yt-org / yt_org / YT-ORG</code> agrupados em "YouTube Orgânico"; <code class="text-neutral-300">ig_org / ig-org / IG_ORG</code> em "Instagram Orgânico"; <code class="text-neutral-300">@@MISSING@@</code> em "Sem UTM".</li>
+        <li><strong>Quebra mensal</strong>: os relatórios exportados não contêm coluna de data. Para visão por mês, re-exportar do HubSpot incluindo a coluna "Data de criação" ou "Data de fechamento".</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    // ============================================================
+    // DATA (gerado a partir dos 2 CSVs do HubSpot — 2026-05-20)
+    // ============================================================
+    const DATA = {
+      "utms": [
+        {"utm":"yt-org","label":"YouTube Orgânico","leads_total":3681,"closer":1362,"sdr":2318,"perdido":0,"outros":1,"ganhos":241,"faturamento":2189375.24,"ticket_medio":9084.54,"taxa_conv":6.55},
+        {"utm":"ig-org","label":"Instagram Orgânico","leads_total":2568,"closer":979,"sdr":1584,"perdido":4,"outros":1,"ganhos":212,"faturamento":1862714.55,"ticket_medio":8786.39,"taxa_conv":8.26},
+        {"utm":"(sem utm)","label":"Sem UTM","leads_total":255,"closer":46,"sdr":21,"perdido":0,"outros":188,"ganhos":72,"faturamento":635128.5,"ticket_medio":8821.23,"taxa_conv":28.24},
+        {"utm":"org","label":"Orgânico (genérico)","leads_total":117,"closer":46,"sdr":70,"perdido":0,"outros":1,"ganhos":14,"faturamento":119487.94,"ticket_medio":8534.85,"taxa_conv":11.97},
+        {"utm":"social","label":"Social (genérico)","leads_total":91,"closer":0,"sdr":0,"perdido":0,"outros":91,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
+        {"utm":"fb-quente","label":"Facebook (Quente)","leads_total":34,"closer":25,"sdr":4,"perdido":5,"outros":0,"ganhos":4,"faturamento":39404.0,"ticket_medio":9851.0,"taxa_conv":11.76},
+        {"utm":"fb-adv","label":"Facebook (Avançado)","leads_total":11,"closer":10,"sdr":0,"perdido":1,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
+        {"utm":"fb-frio","label":"Facebook (Frio)","leads_total":6,"closer":5,"sdr":1,"perdido":0,"outros":0,"ganhos":1,"faturamento":9900.0,"ticket_medio":9900.0,"taxa_conv":16.67},
+        {"utm":"yt-quente","label":"YouTube (Quente)","leads_total":5,"closer":5,"sdr":0,"perdido":0,"outros":0,"ganhos":4,"faturamento":44300.0,"ticket_medio":11075.0,"taxa_conv":80.0},
+        {"utm":"search","label":"Search","leads_total":4,"closer":3,"sdr":1,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0},
+        {"utm":"p0-youtube-dhiego","label":"YouTube Dhiego","leads_total":4,"closer":0,"sdr":4,"perdido":0,"outros":0,"ganhos":1,"faturamento":11499.0,"ticket_medio":11499.0,"taxa_conv":25.0},
+        {"utm":"yt-frio","label":"YouTube (Frio)","leads_total":1,"closer":1,"sdr":0,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0}
+      ],
+      "totals": {"leads_total":6777,"closer":2482,"sdr":4003,"perdido":10,"outros":282,"ganhos":549,"faturamento":4911809.23,"ticket_medio":8946.83,"taxa_conv":8.1},
+      "generated_at": "2026-05-20"
+    };
+
+    // ============================================================
+    // FORMATTING
+    // ============================================================
+    const fmtInt = (n) => Number(n || 0).toLocaleString('pt-BR');
+    const fmtBRL = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    const fmtBRLfull = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const fmtPct = (n, d = 1) => `${Number(n || 0).toFixed(d).replace('.', ',')}%`;
+    const fmtBRLShort = (n) => {
+      const v = Number(n || 0);
+      if (v >= 1000000) return 'R$ ' + (v/1000000).toFixed(2).replace('.', ',') + 'M';
+      if (v >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k';
+      return fmtBRL(v);
+    };
+
+    // Chart.js global theme
+    Chart.defaults.color = '#a3a3a3';
+    Chart.defaults.borderColor = '#262626';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 11;
+
+    const $ = (id) => document.getElementById(id);
+
+    // ============================================================
+    // KPI ROW
+    // ============================================================
+    function renderKPIs() {
+      const t = DATA.totals;
+      $('kpiLeads').textContent = fmtInt(t.leads_total);
+      $('kpiCloser').textContent = fmtInt(t.closer);
+      $('kpiCloserPct').textContent = fmtPct(t.closer / t.leads_total * 100);
+      $('kpiSdr').textContent = fmtInt(t.sdr);
+      $('kpiSdrPct').textContent = fmtPct(t.sdr / t.leads_total * 100);
+      $('kpiRevenue').textContent = fmtBRLShort(t.faturamento);
+      $('kpiRevenueSub').textContent = `${fmtInt(t.ganhos)} deals ganhos · ${fmtBRLfull(t.faturamento)}`;
+      $('kpiTicket').textContent = fmtBRL(t.ticket_medio);
+      $('kpiConv').textContent = `conv. ${fmtPct(t.taxa_conv)} (leads → ganhos)`;
+      $('dataDate').textContent = new Date(DATA.generated_at).toLocaleDateString('pt-BR');
+    }
+
+    // ============================================================
+    // CHART: LEADS POR UTM × CLASSIFICAÇÃO (stacked bar)
+    // ============================================================
+    function renderLeadsBar() {
+      const data = [...DATA.utms].sort((a, b) => b.leads_total - a.leads_total);
+      const labels = data.map(d => d.label);
+      const ctx = $('leadsBarChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Closer',  data: data.map(d => d.closer),  backgroundColor: 'rgba(245,245,245,0.95)', borderColor: 'rgba(245,245,245,1)', borderWidth: 0, stack: 's' },
+            { label: 'SDR',     data: data.map(d => d.sdr),     backgroundColor: 'rgba(163,163,163,0.85)', borderColor: 'rgba(163,163,163,1)', borderWidth: 0, stack: 's' },
+            { label: 'Perdido', data: data.map(d => d.perdido), backgroundColor: 'rgba(239,68,68,0.85)',   borderColor: 'rgba(239,68,68,1)',   borderWidth: 0, stack: 's' },
+            { label: 'Outros',  data: data.map(d => d.outros),  backgroundColor: 'rgba(82,82,82,0.85)',    borderColor: 'rgba(82,82,82,1)',    borderWidth: 0, stack: 's' },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15,15,15,0.97)',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              titleColor: '#f5f5f5',
+              titleFont: { size: 12, weight: '600' },
+              bodyColor: '#d4d4d4',
+              bodyFont: { size: 11 },
+              footerColor: '#a3a3a3',
+              footerFont: { size: 11, weight: '600' },
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  const v = item.parsed.y;
+                  const utm = data[item.dataIndex];
+                  const pct = utm.leads_total ? (v / utm.leads_total * 100).toFixed(1).replace('.', ',') + '%' : '—';
+                  return `  ${item.dataset.label}: ${fmtInt(v)} (${pct})`;
+                },
+                footer: (items) => {
+                  const utm = data[items[0].dataIndex];
+                  const lines = [
+                    `Total: ${fmtInt(utm.leads_total)} leads`,
+                  ];
+                  if (utm.faturamento > 0) lines.push(`Faturamento: ${fmtBRL(utm.faturamento)} (${utm.ganhos} ganhos · ticket ${fmtBRL(utm.ticket_medio)})`);
+                  return lines;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, maxRotation: 30, minRotation: 0, color: '#a3a3a3' } },
+            y: { stacked: true, grid: { color: '#1f1f1f' }, ticks: { precision: 0, callback: (v) => fmtInt(v) }, beginAtZero: true },
+          },
+        },
+      });
+    }
+
+    // ============================================================
+    // CHART: FATURAMENTO POR UTM
+    // ============================================================
+    function renderRevenueBar() {
+      const data = DATA.utms.filter(d => d.faturamento > 0).sort((a, b) => b.faturamento - a.faturamento);
+      const labels = data.map(d => d.label);
+      const ctx = $('revenueBarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Faturamento',
+            data: data.map(d => d.faturamento),
+            backgroundColor: 'rgba(250,204,21,0.85)',
+            borderColor: 'rgba(250,204,21,1)',
+            borderWidth: 0,
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15,15,15,0.97)',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              titleColor: '#f5f5f5',
+              titleFont: { size: 12, weight: '600' },
+              bodyColor: '#d4d4d4',
+              bodyFont: { size: 11 },
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  const utm = data[item.dataIndex];
+                  const pct = (utm.faturamento / DATA.totals.faturamento * 100).toFixed(1).replace('.', ',') + '%';
+                  return [
+                    `  Faturamento: ${fmtBRLfull(utm.faturamento)}`,
+                    `  Share: ${pct} do total`,
+                    `  Deals ganhos: ${fmtInt(utm.ganhos)}`,
+                    `  Ticket médio: ${fmtBRL(utm.ticket_medio)}`,
+                    `  Leads originados: ${fmtInt(utm.leads_total)} · conv. ${fmtPct(utm.taxa_conv)}`,
+                  ];
+                },
+              },
+            },
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 30, minRotation: 0 } },
+            y: { grid: { color: '#1f1f1f' }, ticks: { callback: (v) => fmtBRLShort(v) }, beginAtZero: true },
+          },
+        },
+      });
+    }
+
+    // ============================================================
+    // CHART: DONUT CLASSIFICAÇÃO
+    // ============================================================
+    function renderClassDonut() {
+      const t = DATA.totals;
+      const segs = [
+        { label: 'Closer', value: t.closer, color: '#f5f5f5' },
+        { label: 'SDR', value: t.sdr, color: '#a3a3a3' },
+        { label: 'Perdido', value: t.perdido, color: '#ef4444' },
+        { label: 'Outros', value: t.outros, color: '#525252' },
+      ];
+      const total = segs.reduce((s, x) => s + x.value, 0);
+      const ctx = $('classDonut').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: segs.map(s => s.label),
+          datasets: [{
+            data: segs.map(s => s.value),
+            backgroundColor: segs.map(s => s.color),
+            borderColor: '#131313',
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15,15,15,0.97)',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              titleColor: '#f5f5f5',
+              bodyColor: '#d4d4d4',
+              callbacks: {
+                label: (item) => {
+                  const pct = (item.parsed / total * 100).toFixed(1).replace('.', ',') + '%';
+                  return `${item.label}: ${fmtInt(item.parsed)} (${pct})`;
+                },
+              },
+            },
+          },
+        },
+      });
+
+      $('classDonutLegend').innerHTML = segs.map(s => {
+        const pct = total ? (s.value / total * 100).toFixed(1).replace('.', ',') + '%' : '—';
+        return `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2"><span class="legend-dot" style="background:${s.color}"></span><span>${s.label}</span></div>
+            <div class="text-neutral-300"><span class="font-medium">${fmtInt(s.value)}</span> <span class="text-neutral-500">· ${pct}</span></div>
+          </div>`;
+      }).join('');
+    }
+
+    // ============================================================
+    // CHART: DONUT REVENUE SHARE
+    // ============================================================
+    function renderRevenueDonut() {
+      const data = DATA.utms.filter(d => d.faturamento > 0).sort((a, b) => b.faturamento - a.faturamento);
+      const palette = ['#facc15', '#fbbf24', '#f59e0b', '#a3a3a3', '#737373', '#525252', '#404040', '#262626'];
+      const total = data.reduce((s, x) => s + x.faturamento, 0);
+      const ctx = $('revenueDonut').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.map(d => d.label),
+          datasets: [{
+            data: data.map(d => d.faturamento),
+            backgroundColor: data.map((_, i) => palette[i % palette.length]),
+            borderColor: '#131313',
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15,15,15,0.97)',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              titleColor: '#f5f5f5',
+              bodyColor: '#d4d4d4',
+              callbacks: {
+                label: (item) => {
+                  const utm = data[item.dataIndex];
+                  const pct = (item.parsed / total * 100).toFixed(1).replace('.', ',') + '%';
+                  return [
+                    `${utm.label}`,
+                    `  ${fmtBRLfull(item.parsed)} (${pct})`,
+                    `  ${utm.ganhos} ganhos · ticket ${fmtBRL(utm.ticket_medio)}`,
+                  ];
+                },
+              },
+            },
+          },
+        },
+      });
+
+      $('revenueDonutLegend').innerHTML = data.map((d, i) => {
+        const pct = total ? (d.faturamento / total * 100).toFixed(1).replace('.', ',') + '%' : '—';
+        return `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0"><span class="legend-dot flex-shrink-0" style="background:${palette[i % palette.length]}"></span><span class="truncate">${d.label}</span></div>
+            <div class="text-neutral-300 flex-shrink-0"><span class="font-medium">${fmtBRLShort(d.faturamento)}</span> <span class="text-neutral-500">· ${pct}</span></div>
+          </div>`;
+      }).join('');
+    }
+
+    // ============================================================
+    // CHART: TAXA DE CONVERSÃO
+    // ============================================================
+    function renderConvBar() {
+      const data = [...DATA.utms].filter(d => d.leads_total > 0).sort((a, b) => b.taxa_conv - a.taxa_conv);
+      const ctx = $('convBarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.map(d => d.label),
+          datasets: [{
+            label: 'Conversão',
+            data: data.map(d => d.taxa_conv),
+            backgroundColor: data.map(d => d.taxa_conv > 0 ? 'rgba(245,245,245,0.85)' : 'rgba(82,82,82,0.5)'),
+            borderColor: 'rgba(245,245,245,1)',
+            borderWidth: 0,
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15,15,15,0.97)',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              padding: 12,
+              titleColor: '#f5f5f5',
+              bodyColor: '#d4d4d4',
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  const utm = data[item.dataIndex];
+                  return [
+                    `  Conv. lead → ganho: ${fmtPct(utm.taxa_conv)}`,
+                    `  ${fmtInt(utm.leads_total)} leads · ${fmtInt(utm.ganhos)} ganhos`,
+                    `  Faturamento: ${fmtBRL(utm.faturamento)}`,
+                  ];
+                },
+              },
+            },
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 30, minRotation: 0 } },
+            y: { grid: { color: '#1f1f1f' }, ticks: { callback: (v) => v + '%' }, beginAtZero: true },
+          },
+        },
+      });
+    }
+
+    // ============================================================
+    // TABLE
+    // ============================================================
+    const tableSort = { key: 'leads_total', dir: 'desc' };
+
+    function renderTable() {
+      const tbody = $('detailTable').querySelector('tbody');
+      const data = [...DATA.utms].sort((a, b) => {
+        const k = tableSort.key;
+        const dir = tableSort.dir === 'desc' ? -1 : 1;
+        if (typeof a[k] === 'number') return dir * (b[k] - a[k]);
+        return dir * String(b[k] || '').localeCompare(String(a[k] || ''), 'pt-BR');
+      });
+
+      tbody.innerHTML = data.map(d => {
+        const pct = d.leads_total ? (d.leads_total / DATA.totals.leads_total * 100).toFixed(1).replace('.', ',') + '%' : '—';
+        const tip = `${d.label} (${d.utm}) · ${pct} dos leads`;
+        return `<tr title="${tip}">
+          <td class="p-3"><div class="font-medium text-neutral-100">${d.label}</div><div class="text-[11px] text-neutral-500 font-mono">${d.utm}</div></td>
+          <td class="p-3 text-right"><div class="font-semibold">${fmtInt(d.leads_total)}</div><div class="text-[10px] text-neutral-500">${pct}</div></td>
+          <td class="p-3 text-right" style="color: var(--c-closer)">${fmtInt(d.closer)}</td>
+          <td class="p-3 text-right" style="color: var(--c-sdr)">${fmtInt(d.sdr)}</td>
+          <td class="p-3 text-right" style="color: ${d.perdido > 0 ? 'var(--c-perdido)' : 'var(--text-dim)'}">${fmtInt(d.perdido)}</td>
+          <td class="p-3 text-right" style="color: var(--c-outros)">${fmtInt(d.outros)}</td>
+          <td class="p-3 text-right text-neutral-100">${fmtInt(d.ganhos)}</td>
+          <td class="p-3 text-right" style="color: var(--c-revenue); font-weight: 600;">${d.faturamento > 0 ? fmtBRL(d.faturamento) : '—'}</td>
+          <td class="p-3 text-right text-neutral-300">${d.ticket_medio > 0 ? fmtBRL(d.ticket_medio) : '—'}</td>
+          <td class="p-3 text-right text-neutral-300">${d.leads_total ? fmtPct(d.taxa_conv) : '—'}</td>
+        </tr>`;
+      }).join('');
+
+      // Update sort indicators
+      document.querySelectorAll('#detailTable thead th[data-sort]').forEach(th => {
+        const ind = th.querySelector('.sort-indicator');
+        if (th.dataset.sort === tableSort.key) {
+          ind.textContent = tableSort.dir === 'desc' ? '↓' : '↑';
+          ind.classList.add('sort-active');
+        } else {
+          ind.textContent = '↕';
+          ind.classList.remove('sort-active');
+        }
+      });
+
+      const t = DATA.totals;
+      $('tableRowsCount').textContent = DATA.utms.length;
+      $('tLeads').textContent = fmtInt(t.leads_total);
+      $('tCloser').textContent = fmtInt(t.closer);
+      $('tSdr').textContent = fmtInt(t.sdr);
+      $('tPerdido').textContent = fmtInt(t.perdido);
+      $('tOutros').textContent = fmtInt(t.outros);
+      $('tGanhos').textContent = fmtInt(t.ganhos);
+      $('tFat').textContent = fmtBRL(t.faturamento);
+      $('tTicket').textContent = fmtBRL(t.ticket_medio);
+      $('tConv').textContent = fmtPct(t.taxa_conv);
+    }
+
+    document.querySelectorAll('#detailTable thead th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const k = th.dataset.sort;
+        if (tableSort.key === k) tableSort.dir = tableSort.dir === 'desc' ? 'asc' : 'desc';
+        else { tableSort.key = k; tableSort.dir = (k === 'label' ? 'asc' : 'desc'); }
+        renderTable();
+      });
+    });
+
+    // ============================================================
+    // BOOT
+    // ============================================================
+    renderKPIs();
+    renderLeadsBar();
+    renderRevenueBar();
+    renderClassDonut();
+    renderRevenueDonut();
+    renderConvBar();
+    renderTable();
+  </script>
+</body>
+</html>
