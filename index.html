@@ -114,28 +114,65 @@
     }
     .filter-preset:hover { background: var(--bg-card-hover); color: var(--text); border-color: #404040; }
     .filter-preset.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
-  </style>
+
+    /* Chart container heights — responsive */
+    .chart-h-overview { height: 340px; }
+    .chart-h-tall     { height: 360px; }
+    .chart-h-md       { height: 320px; }
+    .chart-h-sm       { height: 240px; }
+    .chart-h-xs       { height: 220px; }
+
+    @media (max-width: 640px) {
+      .chart-h-overview { height: 260px; }
+      .chart-h-tall     { height: 280px; }
+      .chart-h-md       { height: 240px; }
+      .chart-h-sm       { height: 200px; }
+      .chart-h-xs       { height: 200px; }
+
+      /* Compact paddings on mobile */
+      .card { border-radius: 10px; }
+      .filter-preset { padding: 6px 10px; font-size: 11px; }
+      .filter-date { padding: 7px 10px; font-size: 12px; flex: 1; min-width: 0; }
+
+      /* Stack filter bar items vertically on mobile */
+      #filterBar > div { flex-direction: column; align-items: stretch; gap: 10px; }
+      #filterBar > div > div { width: 100%; justify-content: flex-start; }
+      #filterStart, #filterEnd { width: 100%; }
+
+      /* Tighter table cells */
+      table th, table td { padding: 8px 6px !important; font-size: 12px; }
+      .month-mini-card { padding: 10px; }
+
+      /* Section spacing tighter */
+      main > section { margin-bottom: 0 !important; }
+      main { gap: 1.5rem !important; }
+
+      .section-title h2 { font-size: 1rem !important; }
+    }
+
+    /* Make all native scrollable areas touch-friendly */
+    .scrollbar { -webkit-overflow-scrolling: touch; }
 </head>
 <body class="min-h-screen">
 
   <!-- HEADER -->
   <header class="border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-20">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <img src="assets/logo-light.png" alt="Logo" class="h-9 w-9 object-contain" />
-        <div>
-          <h1 class="text-base sm:text-lg font-semibold tracking-tight">Dashboard de Leads e Faturamento</h1>
-          <p class="text-xs text-neutral-400">Tráfego Orgânico + Pago — Análise mensal por UTM (2026)</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="assets/logo-light.png" alt="Logo" class="h-8 w-8 sm:h-9 sm:w-9 object-contain flex-shrink-0" />
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-lg font-semibold tracking-tight truncate">Dashboard de Leads e Faturamento</h1>
+          <p class="text-[11px] sm:text-xs text-neutral-400 truncate">Tráfego Orgânico + Pago — 2026</p>
         </div>
       </div>
-      <div class="hidden sm:flex flex-col items-end text-right">
+      <div class="hidden sm:flex flex-col items-end text-right flex-shrink-0">
         <span class="text-[10px] uppercase tracking-wider text-neutral-500">Dados de</span>
         <span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-10">
 
     <!-- FILTER BAR -->
     <section class="card p-4" id="filterBar">
@@ -162,43 +199,43 @@
     </section>
 
     <!-- KPI ROW -->
-    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      <div class="card p-5">
-        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Total de Leads</div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span id="kpiLeads" class="kpi-value text-3xl font-bold">0</span>
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div class="card p-3 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-medium">Total de Leads</div>
+        <div class="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+          <span id="kpiLeads" class="kpi-value text-xl sm:text-3xl font-bold">0</span>
         </div>
-        <div class="text-xs text-neutral-500 mt-1">deals criados</div>
+        <div class="text-[10px] sm:text-xs text-neutral-500 mt-1">deals criados</div>
       </div>
-      <div class="card p-5">
-        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Closer</div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span id="kpiCloser" class="kpi-value text-3xl font-bold" style="color: var(--c-closer)">0</span>
-          <span id="kpiCloserPct" class="text-xs text-neutral-500">—</span>
+      <div class="card p-3 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-medium">Closer</div>
+        <div class="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+          <span id="kpiCloser" class="kpi-value text-xl sm:text-3xl font-bold" style="color: var(--c-closer)">0</span>
+          <span id="kpiCloserPct" class="text-[10px] sm:text-xs text-neutral-500">—</span>
         </div>
-        <div class="text-xs text-neutral-500 mt-1">qualificados</div>
+        <div class="text-[10px] sm:text-xs text-neutral-500 mt-1">qualificados</div>
       </div>
-      <div class="card p-5">
-        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">SDR</div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span id="kpiSdr" class="kpi-value text-3xl font-bold" style="color: var(--c-sdr)">0</span>
-          <span id="kpiSdrPct" class="text-xs text-neutral-500">—</span>
+      <div class="card p-3 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-medium">SDR</div>
+        <div class="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+          <span id="kpiSdr" class="kpi-value text-xl sm:text-3xl font-bold" style="color: var(--c-sdr)">0</span>
+          <span id="kpiSdrPct" class="text-[10px] sm:text-xs text-neutral-500">—</span>
         </div>
-        <div class="text-xs text-neutral-500 mt-1">não tão qualificados</div>
+        <div class="text-[10px] sm:text-xs text-neutral-500 mt-1">não tão qualificados</div>
       </div>
-      <div class="card p-5">
-        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Faturamento</div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span id="kpiRevenue" class="kpi-value text-3xl font-bold" style="color: var(--c-revenue)">R$ 0</span>
+      <div class="card p-3 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-medium">Faturamento</div>
+        <div class="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+          <span id="kpiRevenue" class="kpi-value text-xl sm:text-3xl font-bold" style="color: var(--c-revenue)">R$ 0</span>
         </div>
-        <div id="kpiRevenueSub" class="text-xs text-neutral-500 mt-1">—</div>
+        <div id="kpiRevenueSub" class="text-[10px] sm:text-xs text-neutral-500 mt-1 truncate">—</div>
       </div>
-      <div class="card p-5">
-        <div class="text-xs uppercase tracking-wider text-neutral-500 font-medium">Ticket Médio</div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span id="kpiTicket" class="kpi-value text-3xl font-bold">R$ 0</span>
+      <div class="card p-3 sm:p-5 col-span-2 md:col-span-1">
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 font-medium">Ticket Médio</div>
+        <div class="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+          <span id="kpiTicket" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span>
         </div>
-        <div id="kpiConv" class="text-xs text-neutral-500 mt-1">conv. — %</div>
+        <div id="kpiConv" class="text-[10px] sm:text-xs text-neutral-500 mt-1">conv. — %</div>
       </div>
     </section>
 
