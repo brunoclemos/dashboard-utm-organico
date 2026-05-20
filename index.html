@@ -9,6 +9,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -152,11 +153,76 @@
 
     /* Make all native scrollable areas touch-friendly */
     .scrollbar { -webkit-overflow-scrolling: touch; }
+
+    /* AUTH SCREENS */
+    .auth-overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+    .auth-card { background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px; max-width: 380px; width: 100%; }
+    .auth-input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 12px; border-radius: 8px;
+      font-size: 14px; font-family: inherit; margin-top: 6px;
+      transition: border-color 0.15s ease;
+    }
+    .auth-input:focus { outline: none; border-color: var(--text); }
+    .auth-submit {
+      width: 100%; padding: 10px 14px; border-radius: 8px;
+      background: var(--text); color: #0a0a0a; font-weight: 600; font-size: 14px;
+      border: none; cursor: pointer; transition: opacity 0.15s ease;
+    }
+    .auth-submit:hover:not(:disabled) { opacity: 0.85; }
+    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .logout-btn {
+      padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .logout-btn:hover { background: var(--bg-card-hover); color: var(--text); border-color: #404040; }
 </head>
 <body class="min-h-screen">
 
+  <!-- AUTH: loading overlay (shown until auth state is known) -->
+  <div id="authLoading" class="auth-overlay">
+    <div class="text-neutral-500 text-sm flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+      Verificando acesso…
+    </div>
+  </div>
+
+  <!-- AUTH: login screen -->
+  <div id="authLogin" class="auth-overlay hidden">
+    <div class="auth-card">
+      <div class="flex items-center gap-3 mb-6">
+        <img src="assets/logo-light.png" alt="Logo" class="h-10 w-10 object-contain" />
+        <div>
+          <div class="text-base font-semibold tracking-tight">Dashboard de UTM</div>
+          <div class="text-xs text-neutral-500">Faça login para continuar</div>
+        </div>
+      </div>
+      <form id="loginForm" class="space-y-4" autocomplete="on">
+        <div>
+          <label for="loginEmail" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Email</label>
+          <input type="email" id="loginEmail" required autocomplete="email" placeholder="voce@empresa.com" class="auth-input" />
+        </div>
+        <div>
+          <label for="loginPassword" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Senha</label>
+          <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" class="auth-input" />
+        </div>
+        <div id="loginError" class="hidden text-xs text-red-400 bg-red-500/5 border border-red-500/20 rounded px-3 py-2"></div>
+        <button type="submit" id="loginSubmit" class="auth-submit">Entrar</button>
+      </form>
+      <p class="text-[11px] text-neutral-500 mt-5 text-center">Acesso restrito · solicite a Bruno Lemos</p>
+    </div>
+  </div>
+
   <!-- HEADER -->
-  <header class="border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-20">
+  <header id="appHeader" class="hidden border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
         <img src="assets/logo-light.png" alt="Logo" class="h-8 w-8 sm:h-9 sm:w-9 object-contain flex-shrink-0" />
@@ -165,14 +231,20 @@
           <p class="text-[11px] sm:text-xs text-neutral-400 truncate">Tráfego Orgânico + Pago — 2026</p>
         </div>
       </div>
-      <div class="hidden sm:flex flex-col items-end text-right flex-shrink-0">
-        <span class="text-[10px] uppercase tracking-wider text-neutral-500">Dados de</span>
-        <span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span>
+      <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+        <div class="hidden sm:flex flex-col items-end text-right">
+          <span class="text-[10px] uppercase tracking-wider text-neutral-500">Dados de</span>
+          <span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span>
+        </div>
+        <button id="logoutBtn" class="logout-btn" title="Sair">
+          <span class="hidden sm:inline">Sair</span>
+          <svg class="sm:hidden" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-10">
+  <main id="appMain" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-10">
 
     <!-- FILTER BAR -->
     <section class="card p-4" id="filterBar">
@@ -1345,9 +1417,103 @@
     }
 
     // ============================================================
-    // BOOT
+    // AUTH GATE — Supabase email/password + allowlist
     // ============================================================
-    setPreset('all');
+    const SUPABASE_URL = 'https://mibohjsywvtrukfmphmv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pYm9oanN5d3Z0cnVrZm1waG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMTMzMTYsImV4cCI6MjA5NDg4OTMxNn0.e82F8sn-6W9lfYmD2vflDUe98aU9nUE70JC25SGn8vQ';
+    const ALLOWED_EMAILS = [
+      'brunoclemos1997@gmail.com',
+      'dhiego@grupoescalada.com.br',
+    ];
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+    });
+
+    let dashboardInitialized = false;
+
+    function showLoading()   { $('authLoading').classList.remove('hidden'); $('authLogin').classList.add('hidden');    $('appHeader').classList.add('hidden');    $('appMain').classList.add('hidden'); }
+    function showLogin()     { $('authLoading').classList.add('hidden');    $('authLogin').classList.remove('hidden'); $('appHeader').classList.add('hidden');    $('appMain').classList.add('hidden'); }
+    function showDashboard() {
+      $('authLoading').classList.add('hidden');
+      $('authLogin').classList.add('hidden');
+      $('appHeader').classList.remove('hidden');
+      $('appMain').classList.remove('hidden');
+      if (!dashboardInitialized) {
+        dashboardInitialized = true;
+        setPreset('all');
+      }
+    }
+
+    async function checkAuth() {
+      const { data } = await sb.auth.getSession();
+      const session = data?.session;
+      if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) {
+        showDashboard();
+      } else {
+        if (session) await sb.auth.signOut();
+        showLogin();
+      }
+    }
+
+    $('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('loginEmail').value.trim().toLowerCase();
+      const password = $('loginPassword').value;
+      const errEl = $('loginError');
+      const submitBtn = $('loginSubmit');
+
+      errEl.classList.add('hidden');
+      errEl.textContent = '';
+
+      if (!ALLOWED_EMAILS.includes(email)) {
+        errEl.textContent = 'Email não autorizado. Solicite acesso a Bruno Lemos.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Entrando…';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Entrar';
+
+      if (error) {
+        errEl.textContent = error.message === 'Invalid login credentials'
+          ? 'Email ou senha incorretos.'
+          : `Erro ao entrar: ${error.message}`;
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      $('loginPassword').value = '';
+      showDashboard();
+    });
+
+    $('logoutBtn').addEventListener('click', async () => {
+      await sb.auth.signOut();
+      // Clean up charts so they re-init on next login
+      destroyAllCharts();
+      dashboardInitialized = false;
+      showLogin();
+    });
+
+    // Auto-redirect on tab restore / token expiry
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        if (dashboardInitialized) {
+          destroyAllCharts();
+          dashboardInitialized = false;
+        }
+        // only show login if dashboard was previously visible (avoid race on boot)
+        if (!$('authLoading').classList.contains('hidden')) return;
+        showLogin();
+      }
+    });
+
+    // ============================================================
+    // BOOT — verify auth, then init dashboard if allowed
+    // ============================================================
+    checkAuth();
 
   </script>
 </body>
