@@ -192,7 +192,7 @@
     <section class="space-y-4">
       <div>
         <div class="section-title"><h2 class="text-lg font-semibold">Análise por UTM × Mês</h2></div>
-        <p class="text-xs text-neutral-500 ml-[15px]">Como cada UTM performou ao longo dos meses. Clique nas legendas para isolar uma UTM. Tooltip mostra valores absolutos e percentuais.</p>
+        <p class="text-xs text-neutral-500 ml-[15px]">Cada barra é um mês. Cada faixa colorida é uma UTM. A altura total mostra o volume do mês; cada faixa, o peso daquela UTM. Tooltip mostra valor absoluto e % no mês.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -537,57 +537,65 @@
     // ============================================================
     // UTM × MONTH multi-line charts
     // ============================================================
-    function renderUtmMonthLine(canvasId, field, fmt, ttlPrefix) {
+    function renderUtmMonthStack(canvasId, field, fmt, ttlPrefix) {
       const months = DATA.months;
-      const utms = [...DATA.utms].filter(u => {
-        return field === 'leads_by_month'
-          ? u.leads_total > 0
-          : (u.faturamento > 0);
-      });
+      const utms = [...DATA.utms]
+        .filter(u => (field === 'leads_by_month' ? u.leads_total : u.faturamento) > 0)
+        .sort((a, b) => {
+          const av = field === 'leads_by_month' ? a.leads_total : a.faturamento;
+          const bv = field === 'leads_by_month' ? b.leads_total : b.faturamento;
+          return av - bv;
+        });
 
       const datasets = utms.map(u => ({
         label: u.label,
         utm: u.utm,
         data: months.map(m => u[field][m] || 0),
-        borderColor: utmColor[u.utm],
         backgroundColor: utmColor[u.utm],
-        borderWidth: 2,
-        tension: 0.25,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-        fill: false,
-        hidden: false,
+        borderColor: 'rgba(19,19,19,0.8)',
+        borderWidth: 1,
+        borderRadius: 2,
+        stack: 'utm',
       }));
+
+      const monthTotals = months.map((m) => utms.reduce((s, u) => s + (u[field][m] || 0), 0));
 
       const ctx = $(canvasId).getContext('2d');
       new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: { labels: months.map(fmtMonth), datasets },
         options: {
           responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { position: 'bottom', labels: { color: '#a3a3a3', boxWidth: 10, padding: 10, font: { size: 11 }, usePointStyle: true } },
+            legend: {
+              position: 'bottom',
+              reverse: true,
+              labels: { color: '#a3a3a3', boxWidth: 10, padding: 10, font: { size: 11 }, usePointStyle: true },
+            },
             tooltip: {
               ...tooltipStyle,
+              itemSort: (a, b) => b.parsed.y - a.parsed.y,
+              filter: (item) => item.parsed.y > 0,
               callbacks: {
                 title: (items) => items[0].label,
                 label: (item) => {
                   const v = item.parsed.y;
-                  return `  ${item.dataset.label}: ${fmt(v)}`;
+                  const total = monthTotals[item.dataIndex];
+                  const pct = total ? (v / total * 100).toFixed(1).replace('.', ',') + '%' : '—';
+                  return `  ${item.dataset.label}: ${fmt(v)} (${pct})`;
                 },
                 footer: (items) => {
-                  if (items.length === 0) return '';
-                  const visible = items.filter(i => i.dataset && !i.dataset.hidden);
-                  const total = visible.reduce((s, i) => s + i.parsed.y, 0);
-                  return `${ttlPrefix} no mês (visíveis): ${fmt(total)}`;
+                  if (!items.length) return '';
+                  return `${ttlPrefix} no mês: ${fmt(monthTotals[items[0].dataIndex])}`;
                 },
               },
             },
           },
           scales: {
-            x: { grid: { display: false } },
-            y: { beginAtZero: true, grid: { color: '#1f1f1f' }, ticks: { callback: (v) => fmt(v).replace('R$ ','R$') } },
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, grid: { color: '#1f1f1f' },
+                 ticks: { callback: (v) => String(fmt(v)) } },
           },
         },
       });
@@ -1056,8 +1064,8 @@
     renderChannelMonthChart();
     renderMonthlyOverview();
     renderMonthMiniCards();
-    renderUtmMonthLine('leadsUtmMonthChart', 'leads_by_month', fmtInt, 'Leads');
-    renderUtmMonthLine('revUtmMonthChart',   'revenue_by_month', fmtBRLShort, 'Faturamento');
+    renderUtmMonthStack('leadsUtmMonthChart', 'leads_by_month', fmtInt, 'Leads');
+    renderUtmMonthStack('revUtmMonthChart',   'revenue_by_month', fmtBRLShort, 'Faturamento');
     renderPivot();
     renderLeadsBar();
     renderRevenueBar();
