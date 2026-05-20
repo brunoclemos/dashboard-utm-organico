@@ -1,54 +1,323 @@
 {
   "utms": [
     {
-      "utm": "yt-org",
-      "label": "YouTube Orgânico",
-      "leads_total": 3681,
-      "closer": 1362,
-      "sdr": 2318,
-      "perdido": 0,
-      "outros": 1,
-      "ganhos": 241,
-      "faturamento": 2189375.24,
-      "ticket_medio": 9084.54,
-      "taxa_conv": 6.55,
+      "utm": "fb-ads-frio",
+      "label": "Facebook Ads (Frio)",
+      "channel": "Pago",
+      "leads_total": 10189,
+      "closer": 659,
+      "sdr": 2031,
+      "perdido": 7456,
+      "outros": 43,
+      "ganhos": 21,
+      "faturamento": 187494.8,
+      "ticket_medio": 8928.32,
+      "taxa_conv": 0.21,
       "leads_by_month": {
-        "2026-01": 944,
-        "2026-02": 914,
-        "2026-03": 514,
-        "2026-04": 987,
-        "2026-05": 322
+        "2026-01": 2756,
+        "2026-02": 2610,
+        "2026-03": 1544,
+        "2026-04": 1988,
+        "2026-05": 1291
       },
       "class_by_month": {
         "2026-01": {
-          "closer": 346,
-          "sdr": 597,
-          "perdido": 0,
-          "outros": 1
+          "closer": 162,
+          "sdr": 537,
+          "perdido": 2052,
+          "outros": 5
         },
         "2026-02": {
-          "closer": 349,
-          "sdr": 565,
-          "perdido": 0,
-          "outros": 0
+          "closer": 161,
+          "sdr": 508,
+          "perdido": 1936,
+          "outros": 5
         },
         "2026-03": {
-          "closer": 287,
-          "sdr": 227,
-          "perdido": 0,
-          "outros": 0
+          "closer": 134,
+          "sdr": 418,
+          "perdido": 986,
+          "outros": 6
         },
         "2026-04": {
-          "closer": 275,
-          "sdr": 712,
-          "perdido": 0,
-          "outros": 0
+          "closer": 128,
+          "sdr": 440,
+          "perdido": 1403,
+          "outros": 17
         },
         "2026-05": {
-          "closer": 105,
-          "sdr": 217,
+          "closer": 74,
+          "sdr": 128,
+          "perdido": 1079,
+          "outros": 10
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 52398.8,
+        "2026-02": 55100.0,
+        "2026-03": 46499.0,
+        "2026-04": 32397.0,
+        "2026-05": 1100.0
+      },
+      "won_by_month": {
+        "2026-01": 6,
+        "2026-02": 6,
+        "2026-03": 4,
+        "2026-04": 4,
+        "2026-05": 1
+      }
+    },
+    {
+      "utm": "fb-ads-quente",
+      "label": "Facebook Ads (Quente)",
+      "channel": "Pago",
+      "leads_total": 9609,
+      "closer": 1143,
+      "sdr": 2748,
+      "perdido": 5625,
+      "outros": 93,
+      "ganhos": 70,
+      "faturamento": 640386.5,
+      "ticket_medio": 9148.38,
+      "taxa_conv": 0.73,
+      "leads_by_month": {
+        "2026-01": 4484,
+        "2026-02": 2554,
+        "2026-03": 1052,
+        "2026-04": 732,
+        "2026-05": 787
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 532,
+          "sdr": 1430,
+          "perdido": 2493,
+          "outros": 29
+        },
+        "2026-02": {
+          "closer": 297,
+          "sdr": 742,
+          "perdido": 1497,
+          "outros": 18
+        },
+        "2026-03": {
+          "closer": 164,
+          "sdr": 292,
+          "perdido": 580,
+          "outros": 16
+        },
+        "2026-04": {
+          "closer": 70,
+          "sdr": 176,
+          "perdido": 469,
+          "outros": 17
+        },
+        "2026-05": {
+          "closer": 80,
+          "sdr": 108,
+          "perdido": 586,
+          "outros": 13
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 288493.7,
+        "2026-02": 246042.8,
+        "2026-03": 49450.0,
+        "2026-04": 56400.0,
+        "2026-05": 0
+      },
+      "won_by_month": {
+        "2026-01": 34,
+        "2026-02": 25,
+        "2026-03": 6,
+        "2026-04": 5,
+        "2026-05": 0
+      }
+    },
+    {
+      "utm": "fb-ads-advantage",
+      "label": "Facebook Ads (Advantage)",
+      "channel": "Pago",
+      "leads_total": 5727,
+      "closer": 596,
+      "sdr": 1470,
+      "perdido": 3623,
+      "outros": 38,
+      "ganhos": 9,
+      "faturamento": 113704.0,
+      "ticket_medio": 12633.78,
+      "taxa_conv": 0.16,
+      "leads_by_month": {
+        "2026-01": 1481,
+        "2026-02": 1490,
+        "2026-03": 865,
+        "2026-04": 1025,
+        "2026-05": 866
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 183,
+          "sdr": 479,
+          "perdido": 812,
+          "outros": 7
+        },
+        "2026-02": {
+          "closer": 144,
+          "sdr": 378,
+          "perdido": 958,
+          "outros": 10
+        },
+        "2026-03": {
+          "closer": 110,
+          "sdr": 242,
+          "perdido": 510,
+          "outros": 3
+        },
+        "2026-04": {
+          "closer": 98,
+          "sdr": 265,
+          "perdido": 649,
+          "outros": 13
+        },
+        "2026-05": {
+          "closer": 61,
+          "sdr": 106,
+          "perdido": 694,
+          "outros": 5
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 19404.0,
+        "2026-02": 11000.0,
+        "2026-03": 66500.0,
+        "2026-04": 16800.0,
+        "2026-05": 0
+      },
+      "won_by_month": {
+        "2026-01": 2,
+        "2026-02": 1,
+        "2026-03": 5,
+        "2026-04": 1,
+        "2026-05": 0
+      }
+    },
+    {
+      "utm": "(sem utm)",
+      "label": "Sem UTM",
+      "channel": "Sem UTM",
+      "leads_total": 3984,
+      "closer": 682,
+      "sdr": 1146,
+      "perdido": 1626,
+      "outros": 530,
+      "ganhos": 253,
+      "faturamento": 2374790.1,
+      "ticket_medio": 9386.52,
+      "taxa_conv": 6.35,
+      "leads_by_month": {
+        "2026-01": 743,
+        "2026-02": 252,
+        "2026-03": 945,
+        "2026-04": 1717,
+        "2026-05": 327
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 86,
+          "sdr": 207,
+          "perdido": 303,
+          "outros": 147
+        },
+        "2026-02": {
+          "closer": 28,
+          "sdr": 61,
+          "perdido": 64,
+          "outros": 99
+        },
+        "2026-03": {
+          "closer": 164,
+          "sdr": 281,
+          "perdido": 336,
+          "outros": 164
+        },
+        "2026-04": {
+          "closer": 346,
+          "sdr": 532,
+          "perdido": 746,
+          "outros": 93
+        },
+        "2026-05": {
+          "closer": 58,
+          "sdr": 65,
+          "perdido": 177,
+          "outros": 27
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 541372.8,
+        "2026-02": 387307.6,
+        "2026-03": 770987.8,
+        "2026-04": 532030.9,
+        "2026-05": 143091.0
+      },
+      "won_by_month": {
+        "2026-01": 72,
+        "2026-02": 43,
+        "2026-03": 74,
+        "2026-04": 49,
+        "2026-05": 15
+      }
+    },
+    {
+      "utm": "yt-org",
+      "label": "YouTube Orgânico",
+      "channel": "Orgânico",
+      "leads_total": 3576,
+      "closer": 1212,
+      "sdr": 2068,
+      "perdido": 2,
+      "outros": 294,
+      "ganhos": 241,
+      "faturamento": 2189375.24,
+      "ticket_medio": 9084.54,
+      "taxa_conv": 6.74,
+      "leads_by_month": {
+        "2026-01": 1249,
+        "2026-02": 955,
+        "2026-03": 756,
+        "2026-04": 519,
+        "2026-05": 97
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 425,
+          "sdr": 760,
           "perdido": 0,
-          "outros": 0
+          "outros": 64
+        },
+        "2026-02": {
+          "closer": 342,
+          "sdr": 544,
+          "perdido": 0,
+          "outros": 69
+        },
+        "2026-03": {
+          "closer": 259,
+          "sdr": 439,
+          "perdido": 0,
+          "outros": 58
+        },
+        "2026-04": {
+          "closer": 148,
+          "sdr": 286,
+          "perdido": 0,
+          "outros": 85
+        },
+        "2026-05": {
+          "closer": 38,
+          "sdr": 39,
+          "perdido": 2,
+          "outros": 18
         }
       },
       "revenue_by_month": {
@@ -69,350 +338,423 @@
     {
       "utm": "ig-org",
       "label": "Instagram Orgânico",
-      "leads_total": 2568,
-      "closer": 979,
-      "sdr": 1584,
-      "perdido": 4,
-      "outros": 1,
-      "ganhos": 212,
-      "faturamento": 1862714.55,
-      "ticket_medio": 8786.39,
-      "taxa_conv": 8.26,
+      "channel": "Orgânico",
+      "leads_total": 3329,
+      "closer": 1150,
+      "sdr": 1684,
+      "perdido": 319,
+      "outros": 176,
+      "ganhos": 255,
+      "faturamento": 2296173.33,
+      "ticket_medio": 9004.6,
+      "taxa_conv": 7.66,
       "leads_by_month": {
-        "2026-01": 1217,
-        "2026-02": 711,
-        "2026-03": 176,
-        "2026-04": 372,
-        "2026-05": 92
+        "2026-01": 1465,
+        "2026-02": 1181,
+        "2026-03": 466,
+        "2026-04": 157,
+        "2026-05": 60
       },
       "class_by_month": {
         "2026-01": {
-          "closer": 423,
-          "sdr": 793,
+          "closer": 514,
+          "sdr": 892,
           "perdido": 0,
-          "outros": 1
+          "outros": 59
         },
         "2026-02": {
-          "closer": 276,
-          "sdr": 433,
-          "perdido": 2,
-          "outros": 0
+          "closer": 366,
+          "sdr": 501,
+          "perdido": 265,
+          "outros": 49
         },
         "2026-03": {
-          "closer": 120,
-          "sdr": 55,
-          "perdido": 1,
-          "outros": 0
+          "closer": 202,
+          "sdr": 203,
+          "perdido": 35,
+          "outros": 26
         },
         "2026-04": {
-          "closer": 130,
-          "sdr": 241,
-          "perdido": 1,
-          "outros": 0
+          "closer": 50,
+          "sdr": 70,
+          "perdido": 0,
+          "outros": 37
         },
         "2026-05": {
-          "closer": 30,
-          "sdr": 62,
-          "perdido": 0,
-          "outros": 0
+          "closer": 18,
+          "sdr": 18,
+          "perdido": 19,
+          "outros": 5
         }
       },
       "revenue_by_month": {
         "2026-01": 939829.1,
-        "2026-02": 510395.59,
-        "2026-03": 213998.86,
-        "2026-04": 189591.0,
-        "2026-05": 8900.0
+        "2026-02": 605361.37,
+        "2026-03": 450644.86,
+        "2026-04": 282538.0,
+        "2026-05": 17800.0
       },
       "won_by_month": {
         "2026-01": 117,
-        "2026-02": 57,
-        "2026-03": 19,
-        "2026-04": 18,
-        "2026-05": 1
+        "2026-02": 66,
+        "2026-03": 43,
+        "2026-04": 27,
+        "2026-05": 2
       }
     },
     {
-      "utm": "(sem utm)",
-      "label": "Sem UTM",
-      "leads_total": 255,
-      "closer": 46,
-      "sdr": 21,
-      "perdido": 0,
-      "outros": 188,
-      "ganhos": 72,
-      "faturamento": 635128.5,
-      "ticket_medio": 8821.23,
-      "taxa_conv": 28.24,
+      "utm": "yt-ads-quente",
+      "label": "YouTube Ads (Quente)",
+      "channel": "Pago",
+      "leads_total": 2165,
+      "closer": 295,
+      "sdr": 734,
+      "perdido": 1083,
+      "outros": 53,
+      "ganhos": 30,
+      "faturamento": 329202.8,
+      "ticket_medio": 10973.43,
+      "taxa_conv": 1.39,
       "leads_by_month": {
-        "2026-01": 49,
-        "2026-02": 31,
-        "2026-03": 96,
-        "2026-04": 61,
-        "2026-05": 18
+        "2026-01": 416,
+        "2026-02": 338,
+        "2026-03": 692,
+        "2026-04": 496,
+        "2026-05": 223
       },
       "class_by_month": {
         "2026-01": {
-          "closer": 13,
-          "sdr": 6,
-          "perdido": 0,
-          "outros": 30
+          "closer": 63,
+          "sdr": 170,
+          "perdido": 175,
+          "outros": 8
         },
         "2026-02": {
-          "closer": 11,
-          "sdr": 7,
-          "perdido": 0,
-          "outros": 13
+          "closer": 52,
+          "sdr": 127,
+          "perdido": 150,
+          "outros": 9
         },
         "2026-03": {
-          "closer": 11,
-          "sdr": 2,
-          "perdido": 0,
-          "outros": 83
+          "closer": 112,
+          "sdr": 238,
+          "perdido": 335,
+          "outros": 7
         },
         "2026-04": {
-          "closer": 8,
-          "sdr": 4,
-          "perdido": 0,
-          "outros": 49
+          "closer": 49,
+          "sdr": 165,
+          "perdido": 262,
+          "outros": 20
         },
         "2026-05": {
-          "closer": 3,
-          "sdr": 2,
-          "perdido": 0,
-          "outros": 13
+          "closer": 19,
+          "sdr": 34,
+          "perdido": 161,
+          "outros": 9
         }
       },
       "revenue_by_month": {
-        "2026-01": 163837.6,
-        "2026-02": 84697.0,
-        "2026-03": 230694.0,
-        "2026-04": 136999.9,
-        "2026-05": 18900.0
+        "2026-01": 64298.8,
+        "2026-02": 75204.0,
+        "2026-03": 110800.0,
+        "2026-04": 78900.0,
+        "2026-05": 0
       },
       "won_by_month": {
-        "2026-01": 24,
-        "2026-02": 9,
-        "2026-03": 21,
-        "2026-04": 11,
-        "2026-05": 7
+        "2026-01": 7,
+        "2026-02": 8,
+        "2026-03": 9,
+        "2026-04": 6,
+        "2026-05": 0
       }
     },
     {
-      "utm": "org",
-      "label": "Orgânico (genérico)",
-      "leads_total": 117,
-      "closer": 46,
-      "sdr": 70,
-      "perdido": 0,
-      "outros": 1,
-      "ganhos": 14,
-      "faturamento": 119487.94,
-      "ticket_medio": 8534.85,
-      "taxa_conv": 11.97,
+      "utm": "yt-ads-frio",
+      "label": "YouTube Ads (Frio)",
+      "channel": "Pago",
+      "leads_total": 934,
+      "closer": 131,
+      "sdr": 290,
+      "perdido": 495,
+      "outros": 18,
+      "ganhos": 8,
+      "faturamento": 69395.8,
+      "ticket_medio": 8674.48,
+      "taxa_conv": 0.86,
       "leads_by_month": {
-        "2026-01": 41,
-        "2026-02": 29,
-        "2026-03": 7,
-        "2026-04": 32,
-        "2026-05": 8
+        "2026-01": 136,
+        "2026-02": 120,
+        "2026-03": 258,
+        "2026-04": 293,
+        "2026-05": 127
       },
       "class_by_month": {
         "2026-01": {
-          "closer": 15,
-          "sdr": 25,
-          "perdido": 0,
-          "outros": 1
+          "closer": 27,
+          "sdr": 42,
+          "perdido": 63,
+          "outros": 4
         },
         "2026-02": {
+          "closer": 23,
+          "sdr": 38,
+          "perdido": 57,
+          "outros": 2
+        },
+        "2026-03": {
+          "closer": 35,
+          "sdr": 93,
+          "perdido": 128,
+          "outros": 2
+        },
+        "2026-04": {
+          "closer": 35,
+          "sdr": 100,
+          "perdido": 152,
+          "outros": 6
+        },
+        "2026-05": {
           "closer": 11,
-          "sdr": 18,
-          "perdido": 0,
+          "sdr": 17,
+          "perdido": 95,
+          "outros": 4
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 8998.8,
+        "2026-02": 8000.0,
+        "2026-03": 9397.0,
+        "2026-04": 24000.0,
+        "2026-05": 19000.0
+      },
+      "won_by_month": {
+        "2026-01": 1,
+        "2026-02": 1,
+        "2026-03": 2,
+        "2026-04": 2,
+        "2026-05": 2
+      }
+    },
+    {
+      "utm": "search-ads",
+      "label": "Google Search Ads",
+      "channel": "Pago",
+      "leads_total": 677,
+      "closer": 133,
+      "sdr": 192,
+      "perdido": 332,
+      "outros": 20,
+      "ganhos": 22,
+      "faturamento": 235674.0,
+      "ticket_medio": 10712.45,
+      "taxa_conv": 3.25,
+      "leads_by_month": {
+        "2026-01": 65,
+        "2026-02": 93,
+        "2026-03": 209,
+        "2026-04": 212,
+        "2026-05": 98
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 17,
+          "sdr": 20,
+          "perdido": 24,
+          "outros": 4
+        },
+        "2026-02": {
+          "closer": 31,
+          "sdr": 34,
+          "perdido": 24,
+          "outros": 4
+        },
+        "2026-03": {
+          "closer": 37,
+          "sdr": 63,
+          "perdido": 105,
+          "outros": 4
+        },
+        "2026-04": {
+          "closer": 34,
+          "sdr": 63,
+          "perdido": 107,
+          "outros": 8
+        },
+        "2026-05": {
+          "closer": 14,
+          "sdr": 12,
+          "perdido": 72,
           "outros": 0
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 8000.0,
+        "2026-02": 111777.0,
+        "2026-03": 45497.0,
+        "2026-04": 51900.0,
+        "2026-05": 18500.0
+      },
+      "won_by_month": {
+        "2026-01": 1,
+        "2026-02": 10,
+        "2026-03": 4,
+        "2026-04": 5,
+        "2026-05": 2
+      }
+    },
+    {
+      "utm": "paid-generico",
+      "label": "Pago (genérico)",
+      "channel": "Pago",
+      "leads_total": 361,
+      "closer": 26,
+      "sdr": 58,
+      "perdido": 275,
+      "outros": 2,
+      "ganhos": 1,
+      "faturamento": 12000.0,
+      "ticket_medio": 12000.0,
+      "taxa_conv": 0.28,
+      "leads_by_month": {
+        "2026-01": 97,
+        "2026-02": 65,
+        "2026-03": 49,
+        "2026-04": 84,
+        "2026-05": 66
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 6,
+          "sdr": 23,
+          "perdido": 68,
+          "outros": 0
+        },
+        "2026-02": {
+          "closer": 8,
+          "sdr": 12,
+          "perdido": 43,
+          "outros": 2
         },
         "2026-03": {
           "closer": 5,
-          "sdr": 2,
-          "perdido": 0,
+          "sdr": 8,
+          "perdido": 36,
           "outros": 0
         },
         "2026-04": {
-          "closer": 11,
-          "sdr": 21,
-          "perdido": 0,
+          "closer": 3,
+          "sdr": 11,
+          "perdido": 70,
           "outros": 0
         },
         "2026-05": {
           "closer": 4,
           "sdr": 4,
-          "perdido": 0,
+          "perdido": 58,
           "outros": 0
         }
       },
       "revenue_by_month": {
-        "2026-01": 42187.94,
-        "2026-02": 28900.0,
-        "2026-03": 26400.0,
+        "2026-01": 0,
+        "2026-02": 12000.0,
+        "2026-03": 0,
         "2026-04": 0,
+        "2026-05": 0
+      },
+      "won_by_month": {
+        "2026-01": 0,
+        "2026-02": 1,
+        "2026-03": 0,
+        "2026-04": 0,
+        "2026-05": 0
+      }
+    },
+    {
+      "utm": "org",
+      "label": "Orgânico (genérico)",
+      "channel": "Orgânico",
+      "leads_total": 123,
+      "closer": 48,
+      "sdr": 61,
+      "perdido": 7,
+      "outros": 7,
+      "ganhos": 18,
+      "faturamento": 163986.74,
+      "ticket_medio": 9110.37,
+      "taxa_conv": 14.63,
+      "leads_by_month": {
+        "2026-01": 49,
+        "2026-02": 29,
+        "2026-03": 20,
+        "2026-04": 22,
+        "2026-05": 3
+      },
+      "class_by_month": {
+        "2026-01": {
+          "closer": 17,
+          "sdr": 25,
+          "perdido": 4,
+          "outros": 3
+        },
+        "2026-02": {
+          "closer": 11,
+          "sdr": 15,
+          "perdido": 1,
+          "outros": 2
+        },
+        "2026-03": {
+          "closer": 10,
+          "sdr": 10,
+          "perdido": 0,
+          "outros": 0
+        },
+        "2026-04": {
+          "closer": 9,
+          "sdr": 10,
+          "perdido": 1,
+          "outros": 2
+        },
+        "2026-05": {
+          "closer": 1,
+          "sdr": 1,
+          "perdido": 1,
+          "outros": 0
+        }
+      },
+      "revenue_by_month": {
+        "2026-01": 51186.74,
+        "2026-02": 40400.0,
+        "2026-03": 38400.0,
+        "2026-04": 12000.0,
         "2026-05": 22000.0
       },
       "won_by_month": {
-        "2026-01": 6,
-        "2026-02": 3,
-        "2026-03": 3,
-        "2026-04": 0,
+        "2026-01": 7,
+        "2026-02": 4,
+        "2026-03": 4,
+        "2026-04": 1,
         "2026-05": 2
       }
     },
     {
       "utm": "social",
       "label": "Social (genérico)",
-      "leads_total": 91,
-      "closer": 0,
-      "sdr": 0,
-      "perdido": 0,
-      "outros": 91,
-      "ganhos": 0,
-      "faturamento": 0.0,
-      "ticket_medio": 0,
-      "taxa_conv": 0.0,
-      "leads_by_month": {
-        "2026-01": 19,
-        "2026-02": 16,
-        "2026-03": 24,
-        "2026-04": 17,
-        "2026-05": 15
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 19
-        },
-        "2026-02": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 16
-        },
-        "2026-03": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 24
-        },
-        "2026-04": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 17
-        },
-        "2026-05": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 15
-        }
-      },
-      "revenue_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "won_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "fb-quente",
-      "label": "Facebook (Quente)",
-      "leads_total": 34,
-      "closer": 25,
-      "sdr": 4,
-      "perdido": 5,
-      "outros": 0,
-      "ganhos": 4,
-      "faturamento": 39404.0,
-      "ticket_medio": 9851.0,
-      "taxa_conv": 11.76,
-      "leads_by_month": {
-        "2026-01": 3,
-        "2026-02": 15,
-        "2026-03": 10,
-        "2026-04": 5,
-        "2026-05": 1
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 2,
-          "sdr": 1,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-02": {
-          "closer": 14,
-          "sdr": 1,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-03": {
-          "closer": 6,
-          "sdr": 2,
-          "perdido": 2,
-          "outros": 0
-        },
-        "2026-04": {
-          "closer": 2,
-          "sdr": 0,
-          "perdido": 3,
-          "outros": 0
-        },
-        "2026-05": {
-          "closer": 1,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        }
-      },
-      "revenue_by_month": {
-        "2026-01": 17900.0,
-        "2026-02": 11004.0,
-        "2026-03": 10500.0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "won_by_month": {
-        "2026-01": 2,
-        "2026-02": 1,
-        "2026-03": 1,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "fb-adv",
-      "label": "Facebook (Avançado)",
-      "leads_total": 11,
-      "closer": 10,
-      "sdr": 0,
+      "channel": "Orgânico",
+      "leads_total": 89,
+      "closer": 1,
+      "sdr": 2,
       "perdido": 1,
-      "outros": 0,
-      "ganhos": 0,
-      "faturamento": 0.0,
-      "ticket_medio": 0,
-      "taxa_conv": 0.0,
+      "outros": 85,
+      "ganhos": 1,
+      "faturamento": 12000.0,
+      "ticket_medio": 12000.0,
+      "taxa_conv": 1.12,
       "leads_by_month": {
-        "2026-01": 0,
-        "2026-02": 5,
-        "2026-03": 0,
-        "2026-04": 3,
+        "2026-01": 21,
+        "2026-02": 14,
+        "2026-03": 25,
+        "2026-04": 26,
         "2026-05": 3
       },
       "class_by_month": {
@@ -420,269 +762,72 @@
           "closer": 0,
           "sdr": 0,
           "perdido": 0,
-          "outros": 0
+          "outros": 21
         },
         "2026-02": {
-          "closer": 5,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-03": {
           "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-04": {
-          "closer": 3,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-05": {
-          "closer": 2,
-          "sdr": 0,
-          "perdido": 1,
-          "outros": 0
-        }
-      },
-      "revenue_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "won_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "fb-frio",
-      "label": "Facebook (Frio)",
-      "leads_total": 6,
-      "closer": 5,
-      "sdr": 1,
-      "perdido": 0,
-      "outros": 0,
-      "ganhos": 1,
-      "faturamento": 9900.0,
-      "ticket_medio": 9900.0,
-      "taxa_conv": 16.67,
-      "leads_by_month": {
-        "2026-01": 0,
-        "2026-02": 5,
-        "2026-03": 1,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-02": {
-          "closer": 4,
           "sdr": 1,
           "perdido": 0,
-          "outros": 0
+          "outros": 13
         },
         "2026-03": {
-          "closer": 1,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-04": {
           "closer": 0,
           "sdr": 0,
+          "perdido": 1,
+          "outros": 24
+        },
+        "2026-04": {
+          "closer": 1,
+          "sdr": 1,
           "perdido": 0,
-          "outros": 0
+          "outros": 24
         },
         "2026-05": {
           "closer": 0,
           "sdr": 0,
           "perdido": 0,
-          "outros": 0
+          "outros": 3
         }
       },
       "revenue_by_month": {
         "2026-01": 0,
-        "2026-02": 9900.0,
+        "2026-02": 0,
         "2026-03": 0,
-        "2026-04": 0,
+        "2026-04": 12000.0,
         "2026-05": 0
       },
       "won_by_month": {
         "2026-01": 0,
-        "2026-02": 1,
+        "2026-02": 0,
         "2026-03": 0,
-        "2026-04": 0,
+        "2026-04": 1,
         "2026-05": 0
       }
     },
     {
-      "utm": "yt-quente",
-      "label": "YouTube (Quente)",
-      "leads_total": 5,
-      "closer": 5,
+      "utm": "yt-ads-dhiego",
+      "label": "YouTube Ads (Dhiego)",
+      "channel": "Pago",
+      "leads_total": 0,
+      "closer": 0,
       "sdr": 0,
       "perdido": 0,
       "outros": 0,
-      "ganhos": 4,
-      "faturamento": 44300.0,
-      "ticket_medio": 11075.0,
-      "taxa_conv": 80.0,
+      "ganhos": 2,
+      "faturamento": 18299.0,
+      "ticket_medio": 9149.5,
+      "taxa_conv": 0,
       "leads_by_month": {
-        "2026-01": 1,
-        "2026-02": 2,
-        "2026-03": 2,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 1,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-02": {
-          "closer": 2,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-03": {
-          "closer": 2,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-04": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-05": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        }
-      },
-      "revenue_by_month": {
-        "2026-01": 12000.0,
-        "2026-02": 8400.0,
-        "2026-03": 23900.0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "won_by_month": {
-        "2026-01": 1,
-        "2026-02": 1,
-        "2026-03": 2,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "search",
-      "label": "Search",
-      "leads_total": 4,
-      "closer": 3,
-      "sdr": 1,
-      "perdido": 0,
-      "outros": 0,
-      "ganhos": 0,
-      "faturamento": 0.0,
-      "ticket_medio": 0,
-      "taxa_conv": 0.0,
-      "leads_by_month": {
-        "2026-01": 0,
-        "2026-02": 2,
-        "2026-03": 1,
-        "2026-04": 1,
-        "2026-05": 0
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-02": {
-          "closer": 2,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-03": {
-          "closer": 1,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-04": {
-          "closer": 0,
-          "sdr": 1,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-05": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        }
-      },
-      "revenue_by_month": {
         "2026-01": 0,
         "2026-02": 0,
         "2026-03": 0,
         "2026-04": 0,
         "2026-05": 0
       },
-      "won_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "p0-youtube-dhiego",
-      "label": "YouTube Dhiego",
-      "leads_total": 4,
-      "closer": 0,
-      "sdr": 4,
-      "perdido": 0,
-      "outros": 0,
-      "ganhos": 1,
-      "faturamento": 11499.0,
-      "ticket_medio": 11499.0,
-      "taxa_conv": 25.0,
-      "leads_by_month": {
-        "2026-01": 2,
-        "2026-02": 0,
-        "2026-03": 1,
-        "2026-04": 1,
-        "2026-05": 0
-      },
       "class_by_month": {
         "2026-01": {
           "closer": 0,
-          "sdr": 2,
+          "sdr": 0,
           "perdido": 0,
           "outros": 0
         },
@@ -694,13 +839,13 @@
         },
         "2026-03": {
           "closer": 0,
-          "sdr": 1,
+          "sdr": 0,
           "perdido": 0,
           "outros": 0
         },
         "2026-04": {
           "closer": 0,
-          "sdr": 1,
+          "sdr": 0,
           "perdido": 0,
           "outros": 0
         },
@@ -712,97 +857,31 @@
         }
       },
       "revenue_by_month": {
-        "2026-01": 0,
+        "2026-01": 6800.0,
         "2026-02": 0,
         "2026-03": 11499.0,
         "2026-04": 0,
         "2026-05": 0
       },
       "won_by_month": {
-        "2026-01": 0,
+        "2026-01": 1,
         "2026-02": 0,
         "2026-03": 1,
-        "2026-04": 0,
-        "2026-05": 0
-      }
-    },
-    {
-      "utm": "yt-frio",
-      "label": "YouTube (Frio)",
-      "leads_total": 1,
-      "closer": 1,
-      "sdr": 0,
-      "perdido": 0,
-      "outros": 0,
-      "ganhos": 0,
-      "faturamento": 0.0,
-      "ticket_medio": 0,
-      "taxa_conv": 0.0,
-      "leads_by_month": {
-        "2026-01": 0,
-        "2026-02": 1,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "class_by_month": {
-        "2026-01": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-02": {
-          "closer": 1,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-03": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-04": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        },
-        "2026-05": {
-          "closer": 0,
-          "sdr": 0,
-          "perdido": 0,
-          "outros": 0
-        }
-      },
-      "revenue_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
-        "2026-04": 0,
-        "2026-05": 0
-      },
-      "won_by_month": {
-        "2026-01": 0,
-        "2026-02": 0,
-        "2026-03": 0,
         "2026-04": 0,
         "2026-05": 0
       }
     }
   ],
   "totals": {
-    "leads_total": 6777,
-    "closer": 2482,
-    "sdr": 4003,
-    "perdido": 10,
-    "outros": 282,
-    "ganhos": 549,
-    "faturamento": 4911809.23,
-    "ticket_medio": 8946.83,
-    "taxa_conv": 8.1
+    "leads_total": 40763,
+    "closer": 6076,
+    "sdr": 12484,
+    "perdido": 20844,
+    "outros": 1359,
+    "ganhos": 931,
+    "faturamento": 8642482.31,
+    "ticket_medio": 9283.01,
+    "taxa_conv": 2.28
   },
   "months": [
     "2026-01",
@@ -813,51 +892,159 @@
   ],
   "totals_by_month": {
     "2026-01": {
-      "leads": 2276,
-      "closer": 800,
-      "sdr": 1424,
-      "perdido": 0,
-      "outros": 52,
-      "faturamento": 1913803.86,
-      "ganhos": 237
+      "leads": 12962,
+      "closer": 2032,
+      "sdr": 4585,
+      "perdido": 5994,
+      "outros": 351,
+      "faturamento": 2718831.96,
+      "ganhos": 335
     },
     "2026-02": {
-      "leads": 1731,
-      "closer": 675,
-      "sdr": 1025,
-      "perdido": 2,
-      "outros": 29,
-      "faturamento": 1227526.61,
-      "ganhos": 131
+      "leads": 9701,
+      "closer": 1463,
+      "sdr": 2961,
+      "perdido": 4995,
+      "outros": 282,
+      "faturamento": 2126422.79,
+      "ganhos": 224
     },
     "2026-03": {
-      "leads": 832,
-      "closer": 433,
-      "sdr": 289,
-      "perdido": 3,
-      "outros": 107,
-      "faturamento": 1003367.86,
-      "ganhos": 96
+      "leads": 6881,
+      "closer": 1232,
+      "sdr": 2287,
+      "perdido": 3052,
+      "outros": 310,
+      "faturamento": 2086050.66,
+      "ganhos": 201
     },
     "2026-04": {
-      "leads": 1479,
-      "closer": 429,
-      "sdr": 980,
-      "perdido": 4,
-      "outros": 66,
-      "faturamento": 645922.9,
-      "ganhos": 65
+      "leads": 7271,
+      "closer": 971,
+      "sdr": 2119,
+      "perdido": 3859,
+      "outros": 322,
+      "faturamento": 1418297.9,
+      "ganhos": 137
     },
     "2026-05": {
-      "leads": 459,
-      "closer": 145,
-      "sdr": 285,
-      "perdido": 1,
-      "outros": 28,
-      "faturamento": 121188.0,
-      "ganhos": 20
+      "leads": 3948,
+      "closer": 378,
+      "sdr": 532,
+      "perdido": 2944,
+      "outros": 94,
+      "faturamento": 292879.0,
+      "ganhos": 34
+    }
+  },
+  "channels": {
+    "Pago": {
+      "leads": 29662,
+      "faturamento": 1606156.9,
+      "ganhos": 163
+    },
+    "Sem UTM": {
+      "leads": 3984,
+      "faturamento": 2374790.1,
+      "ganhos": 253
+    },
+    "Orgânico": {
+      "leads": 7117,
+      "faturamento": 4661535.31,
+      "ganhos": 515
+    }
+  },
+  "channels_by_month": {
+    "2026-01": {
+      "Pago": {
+        "leads": 9435,
+        "faturamento": 448394.1,
+        "ganhos": 52
+      },
+      "Sem UTM": {
+        "leads": 743,
+        "faturamento": 541372.8,
+        "ganhos": 72
+      },
+      "Orgânico": {
+        "leads": 2784,
+        "faturamento": 1729065.06,
+        "ganhos": 211
+      }
+    },
+    "2026-02": {
+      "Pago": {
+        "leads": 7270,
+        "faturamento": 519123.8,
+        "ganhos": 52
+      },
+      "Sem UTM": {
+        "leads": 252,
+        "faturamento": 387307.6,
+        "ganhos": 43
+      },
+      "Orgânico": {
+        "leads": 2179,
+        "faturamento": 1219991.39,
+        "ganhos": 129
+      }
+    },
+    "2026-03": {
+      "Pago": {
+        "leads": 4669,
+        "faturamento": 339642.0,
+        "ganhos": 31
+      },
+      "Sem UTM": {
+        "leads": 945,
+        "faturamento": 770987.8,
+        "ganhos": 74
+      },
+      "Orgânico": {
+        "leads": 1267,
+        "faturamento": 975420.86,
+        "ganhos": 96
+      }
+    },
+    "2026-04": {
+      "Pago": {
+        "leads": 4830,
+        "faturamento": 260397.0,
+        "ganhos": 23
+      },
+      "Sem UTM": {
+        "leads": 1717,
+        "faturamento": 532030.9,
+        "ganhos": 49
+      },
+      "Orgânico": {
+        "leads": 724,
+        "faturamento": 625870.0,
+        "ganhos": 65
+      }
+    },
+    "2026-05": {
+      "Pago": {
+        "leads": 3458,
+        "faturamento": 38600.0,
+        "ganhos": 5
+      },
+      "Sem UTM": {
+        "leads": 327,
+        "faturamento": 143091.0,
+        "ganhos": 15
+      },
+      "Orgânico": {
+        "leads": 163,
+        "faturamento": 111188.0,
+        "ganhos": 14
+      }
     }
   },
   "generated_at": "2026-05-20",
-  "date_field": "Data de fechamento (HubSpot)"
+  "scope": "Orgânico + Pago — 2026",
+  "date_fields": {
+    "leads": "Data de criação",
+    "revenue": "Data de fechamento"
+  }
 }

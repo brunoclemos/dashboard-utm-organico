@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard de Leads e Faturamento por UTM — Orgânico 2026</title>
-  <meta name="description" content="Análise mensal de leads (Closer / SDR / Perdido) e faturamento por UTM no tráfego orgânico de 2026." />
+  <title>Dashboard de Leads e Faturamento por UTM — Orgânico + Pago 2026</title>
+  <meta name="description" content="Análise mensal de leads (Closer / SDR / Perdido) e faturamento por UTM no tráfego orgânico e pago de 2026." />
   <link rel="icon" type="image/png" href="assets/logo-light.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -97,7 +97,7 @@
         <img src="assets/logo-light.png" alt="Logo" class="h-9 w-9 object-contain" />
         <div>
           <h1 class="text-base sm:text-lg font-semibold tracking-tight">Dashboard de Leads e Faturamento</h1>
-          <p class="text-xs text-neutral-400">Tráfego Orgânico — Análise mensal por UTM (2026)</p>
+          <p class="text-xs text-neutral-400">Tráfego Orgânico + Pago — Análise mensal por UTM (2026)</p>
         </div>
       </div>
       <div class="hidden sm:flex flex-col items-end text-right">
@@ -147,6 +147,24 @@
           <span id="kpiTicket" class="kpi-value text-3xl font-bold">R$ 0</span>
         </div>
         <div id="kpiConv" class="text-xs text-neutral-500 mt-1">conv. — %</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION: ORGÂNICO vs PAGO                                      -->
+    <!-- ============================================================ -->
+    <section class="space-y-4">
+      <div>
+        <div class="section-title"><h2 class="text-lg font-semibold">Orgânico vs Pago</h2></div>
+        <p class="text-xs text-neutral-500 ml-[15px]">Comparativo direto. Orgânico tipicamente entrega menos volume mas converte muito mais. Tooltip mostra detalhes por canal.</p>
+      </div>
+      <div id="channelCards" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      <div class="card p-5">
+        <h3 class="text-base font-semibold mb-1">Leads e faturamento por canal × mês</h3>
+        <p class="text-xs text-neutral-500 mb-4">Barras empilhadas = leads (criados no mês) · Linhas = faturamento (fechado no mês).</p>
+        <div class="relative" style="height: 320px;">
+          <canvas id="channelMonthChart"></canvas>
+        </div>
       </div>
     </section>
 
@@ -340,11 +358,11 @@
     <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
       <div class="font-medium text-neutral-300 mb-2">Notas metodológicas</div>
       <ul class="space-y-1 list-disc list-inside">
-        <li><strong>Leads</strong>: cada linha do relatório "Novos Negócios" do HubSpot (todos os deals criados no pipeline Funil High Ticket/Low Ticket).</li>
+        <li><strong>Escopo</strong>: tráfego Orgânico + Pago de 2026 (Jan a Mai). Inclui Funil High Ticket, Funil Low Ticket e Registro de Marca.</li>
+        <li><strong>Leads</strong>: contados pelo campo <code class="text-neutral-300">Data de criação</code> do HubSpot — o mês representa quando o lead entrou no pipeline.</li>
+        <li><strong>Faturamento</strong>: soma de <code class="text-neutral-300">Valor fechado</code> dos deals em estágio "Negócio ganho", contado por <code class="text-neutral-300">Data de fechamento</code> — o mês representa quando a venda foi efetivada.</li>
         <li><strong>Classificação</strong>: campo Typeform "Classificação inicial do Lead (%)". Quando há mais de uma marcação, a prioridade é <span style="color: var(--c-closer)">Closer</span> &gt; <span style="color: var(--c-sdr)">SDR</span> &gt; <span style="color: var(--c-perdido)">Perdido</span> &gt; Outros.</li>
-        <li><strong>Faturamento</strong>: soma da coluna "Valor fechado" do relatório "Negócios ganhos" (somente deals em estágio "Negócio ganho").</li>
-        <li><strong>Mês</strong>: derivado da coluna "Data de fechamento" do HubSpot.</li>
-        <li><strong>Normalização de UTMs</strong>: <code class="text-neutral-300">yt-org / yt_org / YT-ORG</code> agrupados em "YouTube Orgânico"; <code class="text-neutral-300">ig_org / ig-org / IG_ORG</code> em "Instagram Orgânico"; <code class="text-neutral-300">@@MISSING@@</code> em "Sem UTM".</li>
+        <li><strong>Canais</strong>: <span style="color: #10b981">Orgânico</span> = <code>yt-org, ig-org, org, social</code> · <span style="color: #facc15">Pago</span> = <code>fb_quente, fb_frio, fb_adv, fb_advantage, yt_quente, yt_frio, search, paid, p0-youtube-dhiego</code> · <span style="color: #22d3ee">Sem UTM</span> = leads sem origem rastreável (entrada manual, indicações, links diretos).</li>
       </ul>
     </section>
   </main>
@@ -353,7 +371,7 @@
     // ============================================================
     // DATA — gerado a partir dos 2 CSVs do HubSpot (2026-05-20)
     // ============================================================
-    const DATA = {"utms":[{"utm":"yt-org","label":"YouTube Orgânico","leads_total":3681,"closer":1362,"sdr":2318,"perdido":0,"outros":1,"ganhos":241,"faturamento":2189375.24,"ticket_medio":9084.54,"taxa_conv":6.55,"leads_by_month":{"2026-01":944,"2026-02":914,"2026-03":514,"2026-04":987,"2026-05":322},"class_by_month":{"2026-01":{"closer":346,"sdr":597,"perdido":0,"outros":1},"2026-02":{"closer":349,"sdr":565,"perdido":0,"outros":0},"2026-03":{"closer":287,"sdr":227,"perdido":0,"outros":0},"2026-04":{"closer":275,"sdr":712,"perdido":0,"outros":0},"2026-05":{"closer":105,"sdr":217,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":738049.22,"2026-02":574230.02,"2026-03":486376.0,"2026-04":319332.0,"2026-05":71388.0},"won_by_month":{"2026-01":87,"2026-02":59,"2026-03":49,"2026-04":36,"2026-05":10}},{"utm":"ig-org","label":"Instagram Orgânico","leads_total":2568,"closer":979,"sdr":1584,"perdido":4,"outros":1,"ganhos":212,"faturamento":1862714.55,"ticket_medio":8786.39,"taxa_conv":8.26,"leads_by_month":{"2026-01":1217,"2026-02":711,"2026-03":176,"2026-04":372,"2026-05":92},"class_by_month":{"2026-01":{"closer":423,"sdr":793,"perdido":0,"outros":1},"2026-02":{"closer":276,"sdr":433,"perdido":2,"outros":0},"2026-03":{"closer":120,"sdr":55,"perdido":1,"outros":0},"2026-04":{"closer":130,"sdr":241,"perdido":1,"outros":0},"2026-05":{"closer":30,"sdr":62,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":939829.1,"2026-02":510395.59,"2026-03":213998.86,"2026-04":189591.0,"2026-05":8900.0},"won_by_month":{"2026-01":117,"2026-02":57,"2026-03":19,"2026-04":18,"2026-05":1}},{"utm":"(sem utm)","label":"Sem UTM","leads_total":255,"closer":46,"sdr":21,"perdido":0,"outros":188,"ganhos":72,"faturamento":635128.5,"ticket_medio":8821.23,"taxa_conv":28.24,"leads_by_month":{"2026-01":49,"2026-02":31,"2026-03":96,"2026-04":61,"2026-05":18},"class_by_month":{"2026-01":{"closer":13,"sdr":6,"perdido":0,"outros":30},"2026-02":{"closer":11,"sdr":7,"perdido":0,"outros":13},"2026-03":{"closer":11,"sdr":2,"perdido":0,"outros":83},"2026-04":{"closer":8,"sdr":4,"perdido":0,"outros":49},"2026-05":{"closer":3,"sdr":2,"perdido":0,"outros":13}},"revenue_by_month":{"2026-01":163837.6,"2026-02":84697.0,"2026-03":230694.0,"2026-04":136999.9,"2026-05":18900.0},"won_by_month":{"2026-01":24,"2026-02":9,"2026-03":21,"2026-04":11,"2026-05":7}},{"utm":"org","label":"Orgânico (genérico)","leads_total":117,"closer":46,"sdr":70,"perdido":0,"outros":1,"ganhos":14,"faturamento":119487.94,"ticket_medio":8534.85,"taxa_conv":11.97,"leads_by_month":{"2026-01":41,"2026-02":29,"2026-03":7,"2026-04":32,"2026-05":8},"class_by_month":{"2026-01":{"closer":15,"sdr":25,"perdido":0,"outros":1},"2026-02":{"closer":11,"sdr":18,"perdido":0,"outros":0},"2026-03":{"closer":5,"sdr":2,"perdido":0,"outros":0},"2026-04":{"closer":11,"sdr":21,"perdido":0,"outros":0},"2026-05":{"closer":4,"sdr":4,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":42187.94,"2026-02":28900.0,"2026-03":26400.0,"2026-04":0,"2026-05":22000.0},"won_by_month":{"2026-01":6,"2026-02":3,"2026-03":3,"2026-04":0,"2026-05":2}},{"utm":"social","label":"Social (genérico)","leads_total":91,"closer":0,"sdr":0,"perdido":0,"outros":91,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":19,"2026-02":16,"2026-03":24,"2026-04":17,"2026-05":15},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":19},"2026-02":{"closer":0,"sdr":0,"perdido":0,"outros":16},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":24},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":17},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":15}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"fb-quente","label":"Facebook (Quente)","leads_total":34,"closer":25,"sdr":4,"perdido":5,"outros":0,"ganhos":4,"faturamento":39404.0,"ticket_medio":9851.0,"taxa_conv":11.76,"leads_by_month":{"2026-01":3,"2026-02":15,"2026-03":10,"2026-04":5,"2026-05":1},"class_by_month":{"2026-01":{"closer":2,"sdr":1,"perdido":0,"outros":0},"2026-02":{"closer":14,"sdr":1,"perdido":0,"outros":0},"2026-03":{"closer":6,"sdr":2,"perdido":2,"outros":0},"2026-04":{"closer":2,"sdr":0,"perdido":3,"outros":0},"2026-05":{"closer":1,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":17900.0,"2026-02":11004.0,"2026-03":10500.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":2,"2026-02":1,"2026-03":1,"2026-04":0,"2026-05":0}},{"utm":"fb-adv","label":"Facebook (Avançado)","leads_total":11,"closer":10,"sdr":0,"perdido":1,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":5,"2026-03":0,"2026-04":3,"2026-05":3},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":5,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":3,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":2,"sdr":0,"perdido":1,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"fb-frio","label":"Facebook (Frio)","leads_total":6,"closer":5,"sdr":1,"perdido":0,"outros":0,"ganhos":1,"faturamento":9900.0,"ticket_medio":9900.0,"taxa_conv":16.67,"leads_by_month":{"2026-01":0,"2026-02":5,"2026-03":1,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":4,"sdr":1,"perdido":0,"outros":0},"2026-03":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":9900.0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":1,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"yt-quente","label":"YouTube (Quente)","leads_total":5,"closer":5,"sdr":0,"perdido":0,"outros":0,"ganhos":4,"faturamento":44300.0,"ticket_medio":11075.0,"taxa_conv":80.0,"leads_by_month":{"2026-01":1,"2026-02":2,"2026-03":2,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":12000.0,"2026-02":8400.0,"2026-03":23900.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":1,"2026-02":1,"2026-03":2,"2026-04":0,"2026-05":0}},{"utm":"search","label":"Search","leads_total":4,"closer":3,"sdr":1,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":2,"2026-03":1,"2026-04":1,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":2,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"p0-youtube-dhiego","label":"YouTube Dhiego","leads_total":4,"closer":0,"sdr":4,"perdido":0,"outros":0,"ganhos":1,"faturamento":11499.0,"ticket_medio":11499.0,"taxa_conv":25.0,"leads_by_month":{"2026-01":2,"2026-02":0,"2026-03":1,"2026-04":1,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":2,"perdido":0,"outros":0},"2026-02":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":1,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":11499.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":1,"2026-04":0,"2026-05":0}},{"utm":"yt-frio","label":"YouTube (Frio)","leads_total":1,"closer":1,"sdr":0,"perdido":0,"outros":0,"ganhos":0,"faturamento":0.0,"ticket_medio":0,"taxa_conv":0.0,"leads_by_month":{"2026-01":0,"2026-02":1,"2026-03":0,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":1,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0}}],"totals":{"leads_total":6777,"closer":2482,"sdr":4003,"perdido":10,"outros":282,"ganhos":549,"faturamento":4911809.23,"ticket_medio":8946.83,"taxa_conv":8.1},"months":["2026-01","2026-02","2026-03","2026-04","2026-05"],"totals_by_month":{"2026-01":{"leads":2276,"closer":800,"sdr":1424,"perdido":0,"outros":52,"faturamento":1913803.86,"ganhos":237},"2026-02":{"leads":1731,"closer":675,"sdr":1025,"perdido":2,"outros":29,"faturamento":1227526.61,"ganhos":131},"2026-03":{"leads":832,"closer":433,"sdr":289,"perdido":3,"outros":107,"faturamento":1003367.86,"ganhos":96},"2026-04":{"leads":1479,"closer":429,"sdr":980,"perdido":4,"outros":66,"faturamento":645922.9,"ganhos":65},"2026-05":{"leads":459,"closer":145,"sdr":285,"perdido":1,"outros":28,"faturamento":121188.0,"ganhos":20}},"generated_at":"2026-05-20","date_field":"Data de fechamento (HubSpot)"};
+    const DATA = {"utms":[{"utm":"fb-ads-frio","label":"Facebook Ads (Frio)","channel":"Pago","leads_total":10189,"closer":659,"sdr":2031,"perdido":7456,"outros":43,"ganhos":21,"faturamento":187494.8,"ticket_medio":8928.32,"taxa_conv":0.21,"leads_by_month":{"2026-01":2756,"2026-02":2610,"2026-03":1544,"2026-04":1988,"2026-05":1291},"class_by_month":{"2026-01":{"closer":162,"sdr":537,"perdido":2052,"outros":5},"2026-02":{"closer":161,"sdr":508,"perdido":1936,"outros":5},"2026-03":{"closer":134,"sdr":418,"perdido":986,"outros":6},"2026-04":{"closer":128,"sdr":440,"perdido":1403,"outros":17},"2026-05":{"closer":74,"sdr":128,"perdido":1079,"outros":10}},"revenue_by_month":{"2026-01":52398.8,"2026-02":55100.0,"2026-03":46499.0,"2026-04":32397.0,"2026-05":1100.0},"won_by_month":{"2026-01":6,"2026-02":6,"2026-03":4,"2026-04":4,"2026-05":1}},{"utm":"fb-ads-quente","label":"Facebook Ads (Quente)","channel":"Pago","leads_total":9609,"closer":1143,"sdr":2748,"perdido":5625,"outros":93,"ganhos":70,"faturamento":640386.5,"ticket_medio":9148.38,"taxa_conv":0.73,"leads_by_month":{"2026-01":4484,"2026-02":2554,"2026-03":1052,"2026-04":732,"2026-05":787},"class_by_month":{"2026-01":{"closer":532,"sdr":1430,"perdido":2493,"outros":29},"2026-02":{"closer":297,"sdr":742,"perdido":1497,"outros":18},"2026-03":{"closer":164,"sdr":292,"perdido":580,"outros":16},"2026-04":{"closer":70,"sdr":176,"perdido":469,"outros":17},"2026-05":{"closer":80,"sdr":108,"perdido":586,"outros":13}},"revenue_by_month":{"2026-01":288493.7,"2026-02":246042.8,"2026-03":49450.0,"2026-04":56400.0,"2026-05":0},"won_by_month":{"2026-01":34,"2026-02":25,"2026-03":6,"2026-04":5,"2026-05":0}},{"utm":"fb-ads-advantage","label":"Facebook Ads (Advantage)","channel":"Pago","leads_total":5727,"closer":596,"sdr":1470,"perdido":3623,"outros":38,"ganhos":9,"faturamento":113704.0,"ticket_medio":12633.78,"taxa_conv":0.16,"leads_by_month":{"2026-01":1481,"2026-02":1490,"2026-03":865,"2026-04":1025,"2026-05":866},"class_by_month":{"2026-01":{"closer":183,"sdr":479,"perdido":812,"outros":7},"2026-02":{"closer":144,"sdr":378,"perdido":958,"outros":10},"2026-03":{"closer":110,"sdr":242,"perdido":510,"outros":3},"2026-04":{"closer":98,"sdr":265,"perdido":649,"outros":13},"2026-05":{"closer":61,"sdr":106,"perdido":694,"outros":5}},"revenue_by_month":{"2026-01":19404.0,"2026-02":11000.0,"2026-03":66500.0,"2026-04":16800.0,"2026-05":0},"won_by_month":{"2026-01":2,"2026-02":1,"2026-03":5,"2026-04":1,"2026-05":0}},{"utm":"(sem utm)","label":"Sem UTM","channel":"Sem UTM","leads_total":3984,"closer":682,"sdr":1146,"perdido":1626,"outros":530,"ganhos":253,"faturamento":2374790.1,"ticket_medio":9386.52,"taxa_conv":6.35,"leads_by_month":{"2026-01":743,"2026-02":252,"2026-03":945,"2026-04":1717,"2026-05":327},"class_by_month":{"2026-01":{"closer":86,"sdr":207,"perdido":303,"outros":147},"2026-02":{"closer":28,"sdr":61,"perdido":64,"outros":99},"2026-03":{"closer":164,"sdr":281,"perdido":336,"outros":164},"2026-04":{"closer":346,"sdr":532,"perdido":746,"outros":93},"2026-05":{"closer":58,"sdr":65,"perdido":177,"outros":27}},"revenue_by_month":{"2026-01":541372.8,"2026-02":387307.6,"2026-03":770987.8,"2026-04":532030.9,"2026-05":143091.0},"won_by_month":{"2026-01":72,"2026-02":43,"2026-03":74,"2026-04":49,"2026-05":15}},{"utm":"yt-org","label":"YouTube Orgânico","channel":"Orgânico","leads_total":3576,"closer":1212,"sdr":2068,"perdido":2,"outros":294,"ganhos":241,"faturamento":2189375.24,"ticket_medio":9084.54,"taxa_conv":6.74,"leads_by_month":{"2026-01":1249,"2026-02":955,"2026-03":756,"2026-04":519,"2026-05":97},"class_by_month":{"2026-01":{"closer":425,"sdr":760,"perdido":0,"outros":64},"2026-02":{"closer":342,"sdr":544,"perdido":0,"outros":69},"2026-03":{"closer":259,"sdr":439,"perdido":0,"outros":58},"2026-04":{"closer":148,"sdr":286,"perdido":0,"outros":85},"2026-05":{"closer":38,"sdr":39,"perdido":2,"outros":18}},"revenue_by_month":{"2026-01":738049.22,"2026-02":574230.02,"2026-03":486376.0,"2026-04":319332.0,"2026-05":71388.0},"won_by_month":{"2026-01":87,"2026-02":59,"2026-03":49,"2026-04":36,"2026-05":10}},{"utm":"ig-org","label":"Instagram Orgânico","channel":"Orgânico","leads_total":3329,"closer":1150,"sdr":1684,"perdido":319,"outros":176,"ganhos":255,"faturamento":2296173.33,"ticket_medio":9004.6,"taxa_conv":7.66,"leads_by_month":{"2026-01":1465,"2026-02":1181,"2026-03":466,"2026-04":157,"2026-05":60},"class_by_month":{"2026-01":{"closer":514,"sdr":892,"perdido":0,"outros":59},"2026-02":{"closer":366,"sdr":501,"perdido":265,"outros":49},"2026-03":{"closer":202,"sdr":203,"perdido":35,"outros":26},"2026-04":{"closer":50,"sdr":70,"perdido":0,"outros":37},"2026-05":{"closer":18,"sdr":18,"perdido":19,"outros":5}},"revenue_by_month":{"2026-01":939829.1,"2026-02":605361.37,"2026-03":450644.86,"2026-04":282538.0,"2026-05":17800.0},"won_by_month":{"2026-01":117,"2026-02":66,"2026-03":43,"2026-04":27,"2026-05":2}},{"utm":"yt-ads-quente","label":"YouTube Ads (Quente)","channel":"Pago","leads_total":2165,"closer":295,"sdr":734,"perdido":1083,"outros":53,"ganhos":30,"faturamento":329202.8,"ticket_medio":10973.43,"taxa_conv":1.39,"leads_by_month":{"2026-01":416,"2026-02":338,"2026-03":692,"2026-04":496,"2026-05":223},"class_by_month":{"2026-01":{"closer":63,"sdr":170,"perdido":175,"outros":8},"2026-02":{"closer":52,"sdr":127,"perdido":150,"outros":9},"2026-03":{"closer":112,"sdr":238,"perdido":335,"outros":7},"2026-04":{"closer":49,"sdr":165,"perdido":262,"outros":20},"2026-05":{"closer":19,"sdr":34,"perdido":161,"outros":9}},"revenue_by_month":{"2026-01":64298.8,"2026-02":75204.0,"2026-03":110800.0,"2026-04":78900.0,"2026-05":0},"won_by_month":{"2026-01":7,"2026-02":8,"2026-03":9,"2026-04":6,"2026-05":0}},{"utm":"yt-ads-frio","label":"YouTube Ads (Frio)","channel":"Pago","leads_total":934,"closer":131,"sdr":290,"perdido":495,"outros":18,"ganhos":8,"faturamento":69395.8,"ticket_medio":8674.48,"taxa_conv":0.86,"leads_by_month":{"2026-01":136,"2026-02":120,"2026-03":258,"2026-04":293,"2026-05":127},"class_by_month":{"2026-01":{"closer":27,"sdr":42,"perdido":63,"outros":4},"2026-02":{"closer":23,"sdr":38,"perdido":57,"outros":2},"2026-03":{"closer":35,"sdr":93,"perdido":128,"outros":2},"2026-04":{"closer":35,"sdr":100,"perdido":152,"outros":6},"2026-05":{"closer":11,"sdr":17,"perdido":95,"outros":4}},"revenue_by_month":{"2026-01":8998.8,"2026-02":8000.0,"2026-03":9397.0,"2026-04":24000.0,"2026-05":19000.0},"won_by_month":{"2026-01":1,"2026-02":1,"2026-03":2,"2026-04":2,"2026-05":2}},{"utm":"search-ads","label":"Google Search Ads","channel":"Pago","leads_total":677,"closer":133,"sdr":192,"perdido":332,"outros":20,"ganhos":22,"faturamento":235674.0,"ticket_medio":10712.45,"taxa_conv":3.25,"leads_by_month":{"2026-01":65,"2026-02":93,"2026-03":209,"2026-04":212,"2026-05":98},"class_by_month":{"2026-01":{"closer":17,"sdr":20,"perdido":24,"outros":4},"2026-02":{"closer":31,"sdr":34,"perdido":24,"outros":4},"2026-03":{"closer":37,"sdr":63,"perdido":105,"outros":4},"2026-04":{"closer":34,"sdr":63,"perdido":107,"outros":8},"2026-05":{"closer":14,"sdr":12,"perdido":72,"outros":0}},"revenue_by_month":{"2026-01":8000.0,"2026-02":111777.0,"2026-03":45497.0,"2026-04":51900.0,"2026-05":18500.0},"won_by_month":{"2026-01":1,"2026-02":10,"2026-03":4,"2026-04":5,"2026-05":2}},{"utm":"paid-generico","label":"Pago (genérico)","channel":"Pago","leads_total":361,"closer":26,"sdr":58,"perdido":275,"outros":2,"ganhos":1,"faturamento":12000.0,"ticket_medio":12000.0,"taxa_conv":0.28,"leads_by_month":{"2026-01":97,"2026-02":65,"2026-03":49,"2026-04":84,"2026-05":66},"class_by_month":{"2026-01":{"closer":6,"sdr":23,"perdido":68,"outros":0},"2026-02":{"closer":8,"sdr":12,"perdido":43,"outros":2},"2026-03":{"closer":5,"sdr":8,"perdido":36,"outros":0},"2026-04":{"closer":3,"sdr":11,"perdido":70,"outros":0},"2026-05":{"closer":4,"sdr":4,"perdido":58,"outros":0}},"revenue_by_month":{"2026-01":0,"2026-02":12000.0,"2026-03":0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":1,"2026-03":0,"2026-04":0,"2026-05":0}},{"utm":"org","label":"Orgânico (genérico)","channel":"Orgânico","leads_total":123,"closer":48,"sdr":61,"perdido":7,"outros":7,"ganhos":18,"faturamento":163986.74,"ticket_medio":9110.37,"taxa_conv":14.63,"leads_by_month":{"2026-01":49,"2026-02":29,"2026-03":20,"2026-04":22,"2026-05":3},"class_by_month":{"2026-01":{"closer":17,"sdr":25,"perdido":4,"outros":3},"2026-02":{"closer":11,"sdr":15,"perdido":1,"outros":2},"2026-03":{"closer":10,"sdr":10,"perdido":0,"outros":0},"2026-04":{"closer":9,"sdr":10,"perdido":1,"outros":2},"2026-05":{"closer":1,"sdr":1,"perdido":1,"outros":0}},"revenue_by_month":{"2026-01":51186.74,"2026-02":40400.0,"2026-03":38400.0,"2026-04":12000.0,"2026-05":22000.0},"won_by_month":{"2026-01":7,"2026-02":4,"2026-03":4,"2026-04":1,"2026-05":2}},{"utm":"social","label":"Social (genérico)","channel":"Orgânico","leads_total":89,"closer":1,"sdr":2,"perdido":1,"outros":85,"ganhos":1,"faturamento":12000.0,"ticket_medio":12000.0,"taxa_conv":1.12,"leads_by_month":{"2026-01":21,"2026-02":14,"2026-03":25,"2026-04":26,"2026-05":3},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":21},"2026-02":{"closer":0,"sdr":1,"perdido":0,"outros":13},"2026-03":{"closer":0,"sdr":0,"perdido":1,"outros":24},"2026-04":{"closer":1,"sdr":1,"perdido":0,"outros":24},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":3}},"revenue_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":12000.0,"2026-05":0},"won_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":1,"2026-05":0}},{"utm":"yt-ads-dhiego","label":"YouTube Ads (Dhiego)","channel":"Pago","leads_total":0,"closer":0,"sdr":0,"perdido":0,"outros":0,"ganhos":2,"faturamento":18299.0,"ticket_medio":9149.5,"taxa_conv":0,"leads_by_month":{"2026-01":0,"2026-02":0,"2026-03":0,"2026-04":0,"2026-05":0},"class_by_month":{"2026-01":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-02":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-03":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-04":{"closer":0,"sdr":0,"perdido":0,"outros":0},"2026-05":{"closer":0,"sdr":0,"perdido":0,"outros":0}},"revenue_by_month":{"2026-01":6800.0,"2026-02":0,"2026-03":11499.0,"2026-04":0,"2026-05":0},"won_by_month":{"2026-01":1,"2026-02":0,"2026-03":1,"2026-04":0,"2026-05":0}}],"totals":{"leads_total":40763,"closer":6076,"sdr":12484,"perdido":20844,"outros":1359,"ganhos":931,"faturamento":8642482.31,"ticket_medio":9283.01,"taxa_conv":2.28},"months":["2026-01","2026-02","2026-03","2026-04","2026-05"],"totals_by_month":{"2026-01":{"leads":12962,"closer":2032,"sdr":4585,"perdido":5994,"outros":351,"faturamento":2718831.96,"ganhos":335},"2026-02":{"leads":9701,"closer":1463,"sdr":2961,"perdido":4995,"outros":282,"faturamento":2126422.79,"ganhos":224},"2026-03":{"leads":6881,"closer":1232,"sdr":2287,"perdido":3052,"outros":310,"faturamento":2086050.66,"ganhos":201},"2026-04":{"leads":7271,"closer":971,"sdr":2119,"perdido":3859,"outros":322,"faturamento":1418297.9,"ganhos":137},"2026-05":{"leads":3948,"closer":378,"sdr":532,"perdido":2944,"outros":94,"faturamento":292879.0,"ganhos":34}},"channels":{"Pago":{"leads":29662,"faturamento":1606156.9,"ganhos":163},"Sem UTM":{"leads":3984,"faturamento":2374790.1,"ganhos":253},"Orgânico":{"leads":7117,"faturamento":4661535.31,"ganhos":515}},"channels_by_month":{"2026-01":{"Pago":{"leads":9435,"faturamento":448394.1,"ganhos":52},"Sem UTM":{"leads":743,"faturamento":541372.8,"ganhos":72},"Orgânico":{"leads":2784,"faturamento":1729065.06,"ganhos":211}},"2026-02":{"Pago":{"leads":7270,"faturamento":519123.8,"ganhos":52},"Sem UTM":{"leads":252,"faturamento":387307.6,"ganhos":43},"Orgânico":{"leads":2179,"faturamento":1219991.39,"ganhos":129}},"2026-03":{"Pago":{"leads":4669,"faturamento":339642.0,"ganhos":31},"Sem UTM":{"leads":945,"faturamento":770987.8,"ganhos":74},"Orgânico":{"leads":1267,"faturamento":975420.86,"ganhos":96}},"2026-04":{"Pago":{"leads":4830,"faturamento":260397.0,"ganhos":23},"Sem UTM":{"leads":1717,"faturamento":532030.9,"ganhos":49},"Orgânico":{"leads":724,"faturamento":625870.0,"ganhos":65}},"2026-05":{"Pago":{"leads":3458,"faturamento":38600.0,"ganhos":5},"Sem UTM":{"leads":327,"faturamento":143091.0,"ganhos":15},"Orgânico":{"leads":163,"faturamento":111188.0,"ganhos":14}}},"generated_at":"2026-05-20","scope":"Orgânico + Pago — 2026","date_fields":{"leads":"Data de criação","revenue":"Data de fechamento"}};
 
     // ============================================================
     // FORMATTING
@@ -384,11 +402,30 @@
     const $ = (id) => document.getElementById(id);
 
     // ============================================================
-    // COLOR PALETTE FOR UTMs (consistent across charts)
+    // COLOR PALETTE — colored by channel for visual separation
+    // Orgânico: emerald shades · Pago: yellow/orange · Sem UTM: cyan
     // ============================================================
-    const UTM_PALETTE = ['#facc15', '#3b82f6', '#a78bfa', '#34d399', '#fb923c', '#ec4899', '#22d3ee', '#a3a3a3', '#737373', '#525252', '#404040', '#262626'];
+    const CHANNEL_COLORS = {
+      'Orgânico': '#10b981',
+      'Pago':     '#facc15',
+      'Sem UTM':  '#22d3ee',
+      'Outros':   '#a3a3a3',
+    };
+    const ORG_SHADES     = ['#34d399', '#10b981', '#059669', '#047857', '#065f46'];
+    const PAID_SHADES    = ['#facc15', '#fb923c', '#f59e0b', '#fbbf24', '#ea580c', '#f97316', '#dc2626'];
+    const NEUTRAL_SHADES = ['#22d3ee', '#0ea5e9', '#0284c7'];
     const utmColor = {};
-    DATA.utms.forEach((u, i) => { utmColor[u.utm] = UTM_PALETTE[i % UTM_PALETTE.length]; });
+    (() => {
+      const buckets = {};
+      const sorted = [...DATA.utms].sort((a, b) => b.leads_total - a.leads_total);
+      for (const u of sorted) {
+        const ch = u.channel || 'Outros';
+        const i = buckets[ch] || 0;
+        const palette = ch === 'Orgânico' ? ORG_SHADES : ch === 'Pago' ? PAID_SHADES : NEUTRAL_SHADES;
+        utmColor[u.utm] = palette[i % palette.length];
+        buckets[ch] = i + 1;
+      }
+    })();
 
     const tooltipStyle = {
       backgroundColor: 'rgba(15,15,15,0.97)',
@@ -919,9 +956,126 @@
     });
 
     // ============================================================
+    // CHANNEL: cards + chart
+    // ============================================================
+    function renderChannelCards() {
+      const order = ['Orgânico', 'Pago', 'Sem UTM'];
+      const T = DATA.totals;
+      const wrap = $('channelCards');
+      wrap.innerHTML = order.filter(c => DATA.channels[c]).map(c => {
+        const v = DATA.channels[c];
+        const pctLeads = (v.leads / T.leads_total * 100);
+        const pctRev = (v.faturamento / T.faturamento * 100);
+        const conv = v.leads ? (v.ganhos / v.leads * 100) : 0;
+        const ticket = v.ganhos ? v.faturamento / v.ganhos : 0;
+        const color = CHANNEL_COLORS[c];
+        return `
+          <div class="card p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="legend-dot" style="background:${color}; width:12px; height:12px;"></span>
+              <div class="text-sm font-semibold tracking-tight">${c}</div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-3">
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-neutral-500">Leads</div>
+                <div class="kpi-value text-xl font-bold mt-1">${fmtInt(v.leads)}</div>
+                <div class="text-[11px] text-neutral-500">${fmtPct(pctLeads)} do total</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-neutral-500">Faturamento</div>
+                <div class="kpi-value text-xl font-bold mt-1" style="color: ${color}">${fmtBRLShort(v.faturamento)}</div>
+                <div class="text-[11px] text-neutral-500">${fmtPct(pctRev)} do total</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-neutral-500">Ganhos</div>
+                <div class="text-sm font-semibold mt-1">${fmtInt(v.ganhos)}</div>
+                <div class="text-[11px] text-neutral-500">conv. ${fmtPct(conv, 2)}</div>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-neutral-500">Ticket médio</div>
+                <div class="text-sm font-semibold mt-1">${ticket > 0 ? fmtBRL(ticket) : '—'}</div>
+                <div class="text-[11px] text-neutral-500">${v.ganhos ? `R$ ${(v.faturamento/v.leads).toLocaleString('pt-BR',{maximumFractionDigits:0})} / lead` : '—'}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderChannelMonthChart() {
+      const months = DATA.months;
+      const labels = months.map(fmtMonth);
+      const channels = ['Orgânico', 'Pago', 'Sem UTM'].filter(c => DATA.channels[c]);
+
+      const datasets = [];
+      // Bars: leads per channel (stacked)
+      channels.forEach(c => {
+        datasets.push({
+          type: 'bar',
+          label: `Leads · ${c}`,
+          data: months.map(m => (DATA.channels_by_month[m] && DATA.channels_by_month[m][c]) ? DATA.channels_by_month[m][c].leads : 0),
+          backgroundColor: CHANNEL_COLORS[c] + 'cc',
+          borderWidth: 0,
+          stack: 'leads',
+          yAxisID: 'y',
+          order: 3,
+        });
+      });
+      // Lines: revenue per channel
+      channels.forEach(c => {
+        datasets.push({
+          type: 'line',
+          label: `Faturamento · ${c}`,
+          data: months.map(m => (DATA.channels_by_month[m] && DATA.channels_by_month[m][c]) ? DATA.channels_by_month[m][c].faturamento : 0),
+          borderColor: CHANNEL_COLORS[c],
+          backgroundColor: CHANNEL_COLORS[c],
+          borderWidth: 2.5,
+          tension: 0.25,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: false,
+          yAxisID: 'y1',
+          order: 1,
+        });
+      });
+
+      const ctx = $('channelMonthChart').getContext('2d');
+      new Chart(ctx, {
+        data: { labels, datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a3a3a3', boxWidth: 10, padding: 12, font: { size: 11 }, usePointStyle: true } },
+            tooltip: {
+              ...tooltipStyle,
+              callbacks: {
+                title: (items) => items[0].label,
+                label: (item) => {
+                  if (item.dataset.type === 'line') return `  ${item.dataset.label}: ${fmtBRLfull(item.parsed.y)}`;
+                  return `  ${item.dataset.label}: ${fmtInt(item.parsed.y)}`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, position: 'left', beginAtZero: true, grid: { color: '#1f1f1f' },
+                 title: { display: true, text: 'Leads (criados)', color: '#737373', font: { size: 10 } },
+                 ticks: { callback: (v) => fmtInt(v) } },
+            y1: { position: 'right', beginAtZero: true, grid: { display: false },
+                  title: { display: true, text: 'Faturamento (fechado)', color: '#facc15', font: { size: 10 } },
+                  ticks: { callback: (v) => fmtBRLShort(v), color: '#facc15' } },
+          },
+        },
+      });
+    }
+
+    // ============================================================
     // BOOT
     // ============================================================
     renderKPIs();
+    renderChannelCards();
+    renderChannelMonthChart();
     renderMonthlyOverview();
     renderMonthMiniCards();
     renderUtmMonthLine('leadsUtmMonthChart', 'leads_by_month', fmtInt, 'Leads');
