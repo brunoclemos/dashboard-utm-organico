@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard de Leads, ROAS e Tráfego por UTM — 2026</title>
-  <meta name="description" content="Leads, faturamento, ROAS por canal de aquisição e funil de tráfego (Meta + Google), alimentado ao vivo da planilha." />
+  <meta name="description" content="Leads por dia, faturamento, ROAS por canal e funil de tráfego (Meta + Google), alimentado ao vivo da planilha." />
   <link rel="icon" type="image/png" href="assets/logo-light.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,28 +17,11 @@
 
   <style>
     :root {
-      --bg: #0a0a0a;
-      --bg-card: #131313;
-      --bg-card-hover: #1a1a1a;
-      --border: #262626;
-      --text: #f5f5f5;
-      --text-muted: #a3a3a3;
-      --text-dim: #737373;
-      --revenue: #facc15;
-      --meta: #4f8cff;
-      --google: #34d399;
-      --yt: #ef4444;
-      --ig: #ec4899;
-      --pos: #34d399;
-      --neg: #ef4444;
+      --bg: #0a0a0a; --bg-card: #131313; --bg-card-hover: #1a1a1a; --border: #262626;
+      --text: #f5f5f5; --text-muted: #a3a3a3; --text-dim: #737373;
+      --revenue: #facc15; --meta: #4f8cff; --google: #34d399; --yt: #ef4444; --ig: #ec4899; --pos: #34d399; --neg: #ef4444;
     }
-    html, body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-feature-settings: 'cv11', 'ss01';
-      -webkit-font-smoothing: antialiased;
-    }
+    html, body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-feature-settings: 'cv11', 'ss01'; -webkit-font-smoothing: antialiased; }
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; transition: border-color 0.15s ease; }
     .card:hover { border-color: #333; }
     .kpi-value { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
@@ -54,7 +37,6 @@
     .scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
     .scrollbar { -webkit-overflow-scrolling: touch; }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink:0; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text-muted); }
     .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
     .section-title::before { content: ""; display: inline-block; width: 3px; height: 16px; background: var(--text); border-radius: 2px; }
     .filter-select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; color-scheme: dark; cursor: pointer; transition: border-color 0.15s ease; }
@@ -66,42 +48,38 @@
     .tab-btn { padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; display:inline-flex; align-items:center; gap:7px; }
     .tab-btn:hover { background: var(--bg-card-hover); color: var(--text); }
     .tab-btn.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
+    .dim-btn { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; }
+    .dim-btn:hover { background: var(--bg-card-hover); color: var(--text); }
+    .dim-btn.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
     .metric-chip { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
     .funnel-bar { height: 26px; border-radius: 6px; min-width: 2px; transition: width .3s ease; }
+    .clink { color: var(--meta); text-decoration: none; border-bottom: 1px dotted rgba(79,140,255,.4); }
+    .clink:hover { color: #7da9ff; border-bottom-color: #7da9ff; }
     .chart-h-overview { height: 340px; }
     .chart-h-tall { height: 360px; }
     .chart-h-md { height: 300px; }
     .chart-h-sm { height: 240px; }
     @media (max-width: 640px) {
-      .chart-h-overview { height: 260px; }
-      .chart-h-tall { height: 280px; }
-      .chart-h-md { height: 240px; }
-      .chart-h-sm { height: 220px; }
+      .chart-h-overview { height: 260px; } .chart-h-tall { height: 280px; } .chart-h-md { height: 240px; } .chart-h-sm { height: 220px; }
       .card { border-radius: 10px; }
       #filterBar > div { flex-direction: column; align-items: stretch; gap: 10px; }
       table th, table td { padding: 8px 6px !important; font-size: 12px; }
-      main > section { margin-bottom: 0 !important; }
-      main { gap: 1.5rem !important; }
-      .section-title h2 { font-size: 1rem !important; }
-      .tab-btn { padding: 8px 14px; font-size: 12px; }
+      main > section { margin-bottom: 0 !important; } main { gap: 1.5rem !important; }
+      .section-title h2 { font-size: 1rem !important; } .tab-btn { padding: 8px 14px; font-size: 12px; }
     }
-    /* AUTH */
     .auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
     .auth-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 380px; width: 100%; }
     .auth-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit; margin-top: 6px; transition: border-color 0.15s ease; }
     .auth-input:focus { outline: none; border-color: var(--text); }
     .auth-submit { width: 100%; padding: 10px 14px; border-radius: 8px; background: var(--text); color: #0a0a0a; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: opacity 0.15s ease; }
-    .auth-submit:hover:not(:disabled) { opacity: 0.85; }
-    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-submit:hover:not(:disabled) { opacity: 0.85; } .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
     .logout-btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; }
     .logout-btn:hover { background: var(--bg-card-hover); color: var(--text); border-color: #404040; }
-    .spin { animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="min-h-screen">
 
-  <!-- AUTH: loading -->
   <div id="authLoading" class="auth-overlay">
     <div class="text-neutral-500 text-sm flex items-center gap-2">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -109,25 +87,15 @@
     </div>
   </div>
 
-  <!-- AUTH: login -->
   <div id="authLogin" class="auth-overlay hidden">
     <div class="auth-card">
       <div class="flex items-center gap-3 mb-6">
         <img src="assets/logo-light.png" alt="Logo" class="h-10 w-10 object-contain" />
-        <div>
-          <div class="text-base font-semibold tracking-tight">Dashboard de UTM</div>
-          <div class="text-xs text-neutral-500">Faça login para continuar</div>
-        </div>
+        <div><div class="text-base font-semibold tracking-tight">Dashboard de UTM</div><div class="text-xs text-neutral-500">Faça login para continuar</div></div>
       </div>
       <form id="loginForm" class="space-y-4" autocomplete="on">
-        <div>
-          <label for="loginEmail" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Email</label>
-          <input type="email" id="loginEmail" required autocomplete="email" placeholder="voce@empresa.com" class="auth-input" />
-        </div>
-        <div>
-          <label for="loginPassword" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Senha</label>
-          <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" class="auth-input" />
-        </div>
+        <div><label for="loginEmail" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Email</label><input type="email" id="loginEmail" required autocomplete="email" placeholder="voce@empresa.com" class="auth-input" /></div>
+        <div><label for="loginPassword" class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Senha</label><input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" class="auth-input" /></div>
         <div id="loginError" class="hidden text-xs text-red-400 bg-red-500/5 border border-red-500/20 rounded px-3 py-2"></div>
         <button type="submit" id="loginSubmit" class="auth-submit">Entrar</button>
       </form>
@@ -135,49 +103,34 @@
     </div>
   </div>
 
-  <!-- HEADER -->
   <header id="appHeader" class="hidden border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
         <img src="assets/logo-light.png" alt="Logo" class="h-8 w-8 sm:h-9 sm:w-9 object-contain flex-shrink-0" />
-        <div class="min-w-0">
-          <h1 class="text-sm sm:text-lg font-semibold tracking-tight truncate">Leads · ROAS · Tráfego por UTM</h1>
-          <p class="text-[11px] sm:text-xs text-neutral-400 truncate">Alimentado ao vivo da planilha — 2026</p>
-        </div>
+        <div class="min-w-0"><h1 class="text-sm sm:text-lg font-semibold tracking-tight truncate">Leads · ROAS · Tráfego por UTM</h1><p class="text-[11px] sm:text-xs text-neutral-400 truncate">Alimentado ao vivo da planilha — 2026</p></div>
       </div>
       <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-        <button id="refreshBtn" class="logout-btn" title="Recarregar dados da planilha">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        </button>
-        <div class="hidden sm:flex flex-col items-end text-right">
-          <span class="text-[10px] uppercase tracking-wider text-neutral-500">Atualizado</span>
-          <span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span>
-        </div>
-        <button id="logoutBtn" class="logout-btn" title="Sair">
-          <span class="hidden sm:inline">Sair</span>
-          <svg class="sm:hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </button>
+        <button id="refreshBtn" class="logout-btn" title="Recarregar dados da planilha"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
+        <div class="hidden sm:flex flex-col items-end text-right"><span class="text-[10px] uppercase tracking-wider text-neutral-500">Atualizado</span><span id="dataDate" class="text-xs text-neutral-300 font-medium">—</span></div>
+        <button id="logoutBtn" class="logout-btn" title="Sair"><span class="hidden sm:inline">Sair</span><svg class="sm:hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
       </div>
     </div>
   </header>
 
   <main id="appMain" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6">
 
-    <!-- DATA LOADING -->
     <div id="dataLoading" class="card p-10 flex flex-col items-center justify-center gap-3 text-neutral-400">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
       <div class="text-sm">Puxando dados da planilha…</div>
       <div class="text-xs text-neutral-600">Leads · Negócios ganhos · Meta Ads · Google Ads</div>
     </div>
 
-    <!-- DATA ERROR -->
     <div id="dataError" class="hidden card p-8 flex flex-col items-center justify-center gap-3 text-center">
       <div class="text-sm text-red-400">Não foi possível carregar a planilha.</div>
       <div id="dataErrorMsg" class="text-xs text-neutral-500 max-w-md"></div>
       <button id="retryBtn" class="filter-preset">Tentar de novo</button>
     </div>
 
-    <!-- DASHBOARD CONTENT -->
     <div id="dashContent" class="hidden space-y-6">
 
       <!-- TABS + FILTER -->
@@ -191,11 +144,7 @@
           <div class="flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-3 flex-wrap">
               <div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Período</div>
-              <div class="flex items-center gap-2">
-                <select id="fStart" class="filter-select"></select>
-                <span class="text-neutral-600">→</span>
-                <select id="fEnd" class="filter-select"></select>
-              </div>
+              <div class="flex items-center gap-2"><select id="fStart" class="filter-select"></select><span class="text-neutral-600">→</span><select id="fEnd" class="filter-select"></select></div>
             </div>
             <div class="flex items-center gap-1.5 flex-wrap" id="presetButtons">
               <button class="filter-preset" data-preset="all">Tudo</button>
@@ -214,13 +163,21 @@
         <!-- KPIs -->
         <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Leads (Todos os Negócios)</div><span id="kpiLeads" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiLeadsSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Investimento (Meta + Google)</div><span id="kpiSpend" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiSpendSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Faturamento ganho</div><span id="kpiRev" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">R$ 0</span><div id="kpiRevSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
           <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Negócios ganhos</div><span id="kpiWon" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiWonSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Faturamento ganho</div><span id="kpiRev" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">R$ 0</span><div id="kpiRevSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Ticket médio · Conversão</div><span id="kpiTicket" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiConvSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Investimento (Meta + Google)</div><span id="kpiSpend" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiSpendSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
           <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--meta)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Tráfego</div><span id="kpiRoasTraf" class="kpi-value text-xl sm:text-3xl font-bold">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento atribuído ao pago ÷ investimento</div></div>
           <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--revenue)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Geral (MER)</div><span id="kpiRoasGeral" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento TOTAL ÷ investimento</div></div>
-          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Ticket médio</div><span id="kpiTicket" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">faturamento ÷ ganhos</div></div>
-          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CPL pago · Conversão</div><span id="kpiCpl" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiConvSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CPL pago</div><span id="kpiCpl" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">investimento ÷ leads pagos</div></div>
+        </section>
+
+        <!-- VISÃO DIÁRIA -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Visão diária</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">Leads por dia (por classificação Typeform) e negócios ganhos por dia.</p>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por dia <span class="text-neutral-600">· Closer / SDR / Perdido</span></div><div class="chart-h-tall"><canvas id="leadsDayChart"></canvas></div></div>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Negócios ganhos por dia <span class="text-neutral-600">· nº de ganhos + faturamento</span></div><div class="chart-h-md"><canvas id="wonDayChart"></canvas></div></div>
         </section>
 
         <!-- ROAS POR CANAL -->
@@ -228,33 +185,14 @@
           <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">ROAS por canal de aquisição</h2></div>
           <p class="text-xs text-neutral-500 -mt-2">Faturamento (Negócios ganhos, cruzado pela UTM do lead) ÷ investimento (abas de tráfego). Canais orgânicos não têm custo de mídia.</p>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="card p-4 sm:p-5">
-              <div class="text-xs text-neutral-400 mb-3 font-medium">ROAS — canais pagos</div>
-              <div class="chart-h-sm"><canvas id="roasChart"></canvas></div>
-            </div>
-            <div class="card p-4 sm:p-5">
-              <div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento ganho por canal</div>
-              <div class="chart-h-sm"><canvas id="revChannelChart"></canvas></div>
-            </div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS — canais pagos</div><div class="chart-h-sm"><canvas id="roasChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento ganho por canal</div><div class="chart-h-sm"><canvas id="revChannelChart"></canvas></div></div>
           </div>
-          <div class="card p-0 overflow-hidden">
-            <div class="overflow-x-auto scrollbar">
-              <table class="w-full text-sm" id="channelTable">
-                <thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-                  <th class="text-left px-4 py-3">Canal</th>
-                  <th class="text-right px-4 py-3">Leads</th>
-                  <th class="text-right px-4 py-3">Investimento</th>
-                  <th class="text-right px-4 py-3">Ganhos (R$)</th>
-                  <th class="text-right px-4 py-3">Nº ganhos</th>
-                  <th class="text-right px-4 py-3">ROAS</th>
-                  <th class="text-right px-4 py-3">CPL</th>
-                  <th class="text-right px-4 py-3">CAC</th>
-                  <th class="text-right px-4 py-3">Conv.</th>
-                </tr></thead>
-                <tbody id="channelTableBody"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
+            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">Canal</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Ganhos (R$)</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th><th class="text-right px-4 py-3">CAC</th><th class="text-right px-4 py-3">Conv.</th>
+            </tr></thead><tbody id="channelTableBody"></tbody></table>
+          </div></div>
         </section>
 
         <!-- MENSAL -->
@@ -269,26 +207,27 @@
 
         <!-- DETALHE POR UTM -->
         <section class="space-y-4">
-          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Detalhe por UTM</h2></div>
-          <p class="text-xs text-neutral-500 -mt-2">UTM individual (utm_source | utm_medium) — leads e faturamento, com o canal a que pertence.</p>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por UTM (top 12)</div><div class="chart-h-md"><canvas id="leadsUtmChart"></canvas></div></div>
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento por UTM (top 12)</div><div class="chart-h-md"><canvas id="revUtmChart"></canvas></div></div>
-          </div>
-          <div class="card p-0 overflow-hidden">
-            <div class="overflow-x-auto scrollbar" style="max-height:520px">
-              <table class="w-full text-sm" id="utmTable">
-                <thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-                  <th class="text-left px-4 py-3 sortable" data-k="utm">UTM (source | medium)</th>
-                  <th class="text-left px-4 py-3 sortable" data-k="ch">Canal</th>
-                  <th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th>
-                  <th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th>
-                  <th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th>
-                </tr></thead>
-                <tbody id="utmTableBody"></tbody>
-              </table>
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Detalhe por UTM</h2></div>
+            <div class="flex items-center gap-1.5" id="dimButtons">
+              <button class="dim-btn active" data-dim="medium">utm_medium</button>
+              <button class="dim-btn" data-dim="content">utm_content</button>
+              <button class="dim-btn" data-dim="term">utm_term</button>
             </div>
           </div>
+          <p class="text-xs text-neutral-500 -mt-2">Leads e faturamento por <span id="dimLabelInline">utm_medium</span> (sem origem/source).</p>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por <span class="dimLabel">utm_medium</span> (top 12)</div><div class="chart-h-md"><canvas id="leadsUtmChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento por <span class="dimLabel">utm_medium</span> (top 12)</div><div class="chart-h-md"><canvas id="revUtmChart"></canvas></div></div>
+          </div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar" style="max-height:520px">
+            <table class="w-full text-sm" id="utmTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3 sortable" data-k="label"><span class="dimLabel">utm_medium</span></th>
+              <th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th>
+              <th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th>
+              <th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th>
+            </tr></thead><tbody id="utmTableBody"></tbody></table>
+          </div></div>
         </section>
 
         <!-- CLASSIFICAÇÃO -->
@@ -298,14 +237,12 @@
           <div class="card p-4 sm:p-5"><div class="chart-h-md"><canvas id="classChart"></canvas></div></div>
         </section>
 
-        <!-- NOTAS -->
         <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
           <div class="text-neutral-300 font-medium mb-2 text-sm">Metodologia &amp; observações</div>
           <ul class="space-y-1.5 list-disc list-inside">
-            <li><b>Fonte ao vivo:</b> dados puxados direto do Google Sheets a cada carregamento (abas <i>Todos os Negócios</i>, <i>Negócios ganhos</i>, <i>Meta Ads</i>, <i>Google Ads</i>).</li>
-            <li><b>Leads</b> vêm sempre da aba <i>Todos os Negócios</i> (pela data de criação). <b>Faturamento</b> da aba <i>Negócios ganhos</i> (valor fechado, pela data de fechamento). <b>Investimento</b> das abas de tráfego.</li>
-            <li><b>ROAS Tráfego</b> = faturamento atribuído aos canais pagos (via UTM do lead) ÷ investimento. <b>ROAS Geral (MER)</b> = faturamento TOTAL do negócio (incluindo orgânico e sem UTM) ÷ investimento em ads — mede o retorno de cada R$ investido sobre toda a operação.</li>
-            <li><b>Classificação de canal</b> por utm_source + utm_medium: <i>FB_*/fb_/ig_Instagram</i> → Meta; <i>Search</i> e <i>YT_*/Demand Gen</i> → Google; <i>*-ORG/*_ORG/social</i> → orgânico.</li>
+            <li><b>Fonte ao vivo:</b> dados puxados direto do Google Sheets a cada carregamento.</li>
+            <li><b>Leads</b> da aba <i>Todos os Negócios</i> (data de criação). <b>Faturamento</b> da aba <i>Negócios ganhos</i> (valor fechado, data de fechamento). <b>Investimento</b> das abas de tráfego.</li>
+            <li><b>ROAS Tráfego</b> = faturamento atribuído aos canais pagos (via UTM do lead) ÷ investimento. <b>ROAS Geral (MER)</b> = faturamento TOTAL ÷ investimento em ads.</li>
             <li id="noteSemUtm"></li>
             <li><b>Atenção:</b> a coluna "Valor fechado" tem formatação mista na planilha — por isso o faturamento é somado item a item no navegador (não pela soma do Sheets, que infla o número).</li>
           </ul>
@@ -321,13 +258,31 @@
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="metaFunnel" class="space-y-2.5 mt-2"></div></div>
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="metaDailyChart"></canvas></div></div>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Impressões × Conversões (diário)</div><div class="chart-h-sm"><canvas id="metaConvChart"></canvas></div></div>
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento por campanha</div><div class="chart-h-sm"><canvas id="metaCampChart"></canvas></div></div>
+        </section>
+
+        <!-- RANKING DE CRIATIVOS -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Ranking de criativos</h2></div>
+            <div class="flex items-center gap-1.5" id="creativeSortButtons">
+              <button class="dim-btn active" data-sort="spend">Investimento</button>
+              <button class="dim-btn" data-sort="conv">Conversões</button>
+              <button class="dim-btn" data-sort="clicks">Cliques</button>
+            </div>
           </div>
+          <p class="text-xs text-neutral-500 -mt-2">Clique no criativo para abrir o anúncio no Instagram.</p>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Top criativos</div><div class="chart-h-md"><canvas id="metaCreativeChart"></canvas></div></div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
+            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th>
+            </tr></thead><tbody id="metaCreativeBody"></tbody></table>
+          </div></div>
+        </section>
+
+        <section class="space-y-4">
           <div class="card p-0 overflow-hidden">
             <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Meta</div>
-            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="metaCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="metaCampBody"></tbody></table></div>
+            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="metaCampBody"></tbody></table></div>
           </div>
         </section>
       </div>
@@ -347,7 +302,7 @@
           </div>
           <div class="card p-0 overflow-hidden">
             <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Google</div>
-            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="googleCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPC</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="googleCampBody"></tbody></table></div>
+            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPC</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="googleCampBody"></tbody></table></div>
           </div>
         </section>
       </div>
@@ -356,16 +311,12 @@
   </main>
 
   <script>
-    // ============================================================
-    // CONFIG
-    // ============================================================
+    // ============================================================ CONFIG
     const SHEET_ID = '1uvWuSsL6BffBqnigclLYZ_oDnEqcayB8kxqGgM34sQs';
     const SHEETS = { leads: 'Todos os Negócios - 2026', won: 'Negócios ganhos - 2026', meta: 'Meta Ads', google: 'Google Ads' };
     const $ = (id) => document.getElementById(id);
 
-    // ============================================================
-    // FORMATTING
-    // ============================================================
+    // ============================================================ FORMAT
     const fmtInt = (n) => Number(n || 0).toLocaleString('pt-BR');
     const fmtBRL = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
     const fmtBRL2 = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -374,25 +325,23 @@
     const fmtBRLShort = (n) => { const v = Number(n || 0); if (Math.abs(v) >= 1000000) return 'R$ ' + (v/1000000).toFixed(2).replace('.', ',') + 'M'; if (Math.abs(v) >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k'; return fmtBRL(v); };
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const fmtYm = (ym) => { if (!ym) return '—'; const [y,m] = ym.split('-'); return `${MONTHS[(+m)-1]}/${y.slice(2)}`; };
+    const fmtDay = (ymd) => { if (!ymd) return ''; const [,m,d] = ymd.split('-'); return `${d}/${m}`; };
+    const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-    // ============================================================
-    // CHANNELS
-    // ============================================================
+    // ============================================================ CHANNELS
     const CHANNELS = {
-      'Meta Ads':           { color: '#4f8cff', paid: true,  platform: 'meta' },
-      'Google Ads':         { color: '#34d399', paid: true,  platform: 'google' },
-      'YouTube Orgânico':   { color: '#ef4444', paid: false },
+      'Meta Ads': { color: '#4f8cff', paid: true, platform: 'meta' },
+      'Google Ads': { color: '#34d399', paid: true, platform: 'google' },
+      'YouTube Orgânico': { color: '#ef4444', paid: false },
       'Instagram Orgânico': { color: '#ec4899', paid: false },
-      'Orgânico (outros)':  { color: '#a78bfa', paid: false },
-      'Sem UTM':            { color: '#525252', paid: false },
-      'Outros':             { color: '#737373', paid: false },
+      'Orgânico (outros)': { color: '#a78bfa', paid: false },
+      'Sem UTM': { color: '#525252', paid: false },
+      'Outros': { color: '#737373', paid: false },
     };
     const CHANNEL_ORDER = Object.keys(CHANNELS);
     const chColor = (c) => (CHANNELS[c] || { color: '#737373' }).color;
-
     function classifyChannel(source, medium) {
-      const s = (source || '').trim().toLowerCase();
-      const m = (medium || '').trim().toLowerCase();
+      const s = (source || '').trim().toLowerCase(); const m = (medium || '').trim().toLowerCase();
       if ((!s || s === '∅') && (!m || m === '∅')) return 'Sem UTM';
       const blob = s + ' ' + m;
       const isOrg = /(^|[\s_-])org([\s_-]|$)/.test(blob) || blob.includes('-org') || blob.includes('_org') || m === 'social' || blob.includes('youtube-org');
@@ -405,64 +354,73 @@
       return 'Outros';
     }
     function normClass(q) { const v = (q || '').trim().toLowerCase(); if (v.startsWith('closer')) return 'Closer'; if (v.startsWith('sdr')) return 'SDR'; if (v.startsWith('perdido')) return 'Perdido'; return 'Outros'; }
-    function utmLabel(src, med, ch) { if (ch === 'Sem UTM') return 'Sem UTM (sem origem)'; return `${src || '∅'} | ${med || '∅'}`; }
 
-    // ============================================================
-    // GVIZ FETCH + CSV
-    // ============================================================
+    // ============================================================ FETCH/CSV
     function gvizUrl(sheet, tq) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&tq=${encodeURIComponent(tq)}`; }
     async function fetchCsv(sheet, tq) { const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' }); if (!r.ok) throw new Error(`HTTP ${r.status} (${sheet})`); return parseCsv(await r.text()); }
     function parseCsv(text) {
       const rows = []; let row = [], cur = '', q = false;
-      for (let i = 0; i < text.length; i++) {
-        const c = text[i];
+      for (let i = 0; i < text.length; i++) { const c = text[i];
         if (q) { if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
-        else { if (c === '"') q = true; else if (c === ',') { row.push(cur); cur = ''; } else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; } else if (c === '\r') {} else cur += c; }
-      }
+        else { if (c === '"') q = true; else if (c === ',') { row.push(cur); cur = ''; } else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; } else if (c === '\r') {} else cur += c; } }
       if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
       return rows.length ? rows.slice(1) : [];
     }
     const numRaw = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
     function pdate(s) { if (!s) return null; const m = String(s).match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if (!m) return null; const mo = String(+m[2]).padStart(2, '0'), d = String(+m[3]).padStart(2, '0'); return { y: m[1], ym: `${m[1]}-${mo}`, ymd: `${m[1]}-${mo}-${d}` }; }
     const ym0 = (y, m0) => `${y}-${String((+m0) + 1).padStart(2, '0')}`;
+    const ymd0 = (y, m0, d) => `${y}-${String((+m0)+1).padStart(2,'0')}-${String(+d).padStart(2,'0')}`;
 
-    // ============================================================
-    // RAW DATA
-    // ============================================================
+    // ============================================================ LOAD
     let RAW = null;
     async function loadData() {
       const Q = {
-        leads:      "select O,N,year(J),month(J),Q,count(A) where A is not null group by O,N,year(J),month(J),Q",
-        won:        "select I,O,N,K where A is not null",
-        metaDaily:  "select A,sum(B),sum(J),sum(G),sum(K),sum(L) where A is not null group by A order by A",
-        metaCamp:   "select C,year(A),month(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A)",
-        googleDaily:"select A,sum(B),sum(F),sum(G),sum(L) where A is not null group by A order by A",
-        googleCamp: "select C,year(A),month(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A)",
+        leads:        "select O,N,year(J),month(J),Q,count(A) where A is not null group by O,N,year(J),month(J),Q",
+        leadsDay:     "select year(J),month(J),day(J),Q,count(A) where A is not null group by year(J),month(J),day(J),Q",
+        leadsContent: "select M,year(J),month(J),count(A) where A is not null group by M,year(J),month(J)",
+        leadsTerm:    "select P,year(J),month(J),count(A) where A is not null group by P,year(J),month(J)",
+        won:          "select I,M,N,O,P,K where A is not null",
+        metaDaily:    "select A,sum(B),sum(J),sum(G),sum(K),sum(L) where A is not null group by A order by A",
+        metaCamp:     "select C,year(A),month(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A)",
+        metaCreative: "select E,F,year(A),month(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by E,F,year(A),month(A)",
+        googleDaily:  "select A,sum(B),sum(F),sum(G),sum(L) where A is not null group by A order by A",
+        googleCamp:   "select C,year(A),month(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A)",
       };
-      const [lead, won, mD, mC, gD, gC] = await Promise.all([
-        fetchCsv(SHEETS.leads,  Q.leads), fetchCsv(SHEETS.won, Q.won),
-        fetchCsv(SHEETS.meta,   Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp),
+      const [lead, lDay, lContent, lTerm, won, mD, mC, mCr, gD, gC] = await Promise.all([
+        fetchCsv(SHEETS.leads, Q.leads), fetchCsv(SHEETS.leads, Q.leadsDay), fetchCsv(SHEETS.leads, Q.leadsContent), fetchCsv(SHEETS.leads, Q.leadsTerm),
+        fetchCsv(SHEETS.won, Q.won),
+        fetchCsv(SHEETS.meta, Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp), fetchCsv(SHEETS.meta, Q.metaCreative),
         fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp),
       ]);
       const monthsSet = new Set();
       const leads = lead.filter(r => r.length >= 6).map(r => { const ym = ym0(r[2], r[3]); monthsSet.add(ym); return { src: r[0], med: r[1], ch: classifyChannel(r[0], r[1]), ym, cls: normClass(r[4]), n: numRaw(r[5]) }; });
-      const wonRows = won.filter(r => r.length >= 4).map(r => { const d = pdate(r[3]); if (d) monthsSet.add(d.ym); return { value: numRaw(r[0]), src: r[1], med: r[2], ch: classifyChannel(r[1], r[2]), ym: d ? d.ym : null }; });
+      const leadsDay = lDay.filter(r => r.length >= 5).map(r => { const ym = ym0(r[0], r[1]); monthsSet.add(ym); return { ym, ymd: ymd0(r[0], r[1], r[2]), cls: normClass(r[3]), n: numRaw(r[4]) }; });
+      const leadsContent = lContent.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); return { v: (r[0]||'').trim(), ym, n: numRaw(r[3]) }; });
+      const leadsTerm = lTerm.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); return { v: (r[0]||'').trim(), ym, n: numRaw(r[3]) }; });
+      const wonRows = won.filter(r => r.length >= 6).map(r => { const d = pdate(r[5]); if (d) monthsSet.add(d.ym); return { value: numRaw(r[0]), content: (r[1]||'').trim(), med: r[2], src: r[3], term: (r[4]||'').trim(), ch: classifyChannel(r[3], r[2]), ym: d ? d.ym : null, ymd: d ? d.ymd : null }; });
       const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => { const d = pdate(r[0]); if (d) monthsSet.add(d.ym); const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
-      const metaDaily   = mapDaily(mD, { spend:1, impr:2, clicks:3, lpv:4, conv:5 });
+      const metaDaily = mapDaily(mD, { spend:1, impr:2, clicks:3, lpv:4, conv:5 });
       const googleDaily = mapDaily(gD, { spend:1, impr:2, clicks:3, conv:4 });
       const mapCamp = (rows, idx) => rows.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); const o = { name: (r[0] || '(sem nome)').trim() || '(sem nome)', ym }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
-      const metaCamp   = mapCamp(mC, { spend:3, impr:4, clicks:5, lpv:6, conv:7, n:8 });
+      const metaCamp = mapCamp(mC, { spend:3, impr:4, clicks:5, lpv:6, conv:7, n:8 });
       const googleCamp = mapCamp(gC, { spend:3, impr:4, clicks:5, conv:6, n:7 });
+      const metaCreative = mCr.filter(r => r.length >= 5).map(r => { const ym = ym0(r[2], r[3]); monthsSet.add(ym); return { name: (r[0]||'(sem nome)').trim() || '(sem nome)', perm: (r[1]||'').trim(), ym, spend: numRaw(r[4]), impr: numRaw(r[5]), clicks: numRaw(r[6]), lpv: numRaw(r[7]), conv: numRaw(r[8]), n: numRaw(r[9]) }; });
       const months = [...monthsSet].filter(Boolean).sort();
-      RAW = { leads, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, months };
+      RAW = { leads, leadsDay, leadsContent, leadsTerm, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, metaCreative, months };
       return RAW;
     }
 
-    // ============================================================
-    // AGGREGATION
-    // ============================================================
+    // ============================================================ AGGREGATE
     let RANGE = { start: null, end: null };
     const inRange = (ym) => ym && ym >= RANGE.start && ym <= RANGE.end;
+
+    function buildDim(leadRows, leadKey, wonKey) {
+      const map = {};
+      const get = (label) => { const k = label || '(vazio)'; if (!map[k]) map[k] = { label: k, leads: 0, won: 0, rev: 0 }; return map[k]; };
+      leadRows.forEach(r => { if (!inRange(r.ym)) return; get((r[leadKey]||'').trim()).leads += r.n; });
+      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const u = get((r[wonKey]||'').trim()); u.won += 1; u.rev += r.value; });
+      return Object.values(map);
+    }
 
     function compute() {
       const ch = {};
@@ -470,13 +428,18 @@
       const monthsInRange = RAW.months.filter(inRange);
       const leadsByChMonth = {}, revByChMonth = {};
       CHANNEL_ORDER.forEach(c => { leadsByChMonth[c] = {}; revByChMonth[c] = {}; monthsInRange.forEach(m => { leadsByChMonth[c][m] = 0; revByChMonth[c][m] = 0; }); });
-      const utm = {};
-      const utmKey = (r) => r.ch === 'Sem UTM' ? '∅sem' : `${r.src}${r.med}`;
-      const getUtm = (r) => { const k = utmKey(r); if (!utm[k]) utm[k] = { utm: utmLabel(r.src, r.med, r.ch), ch: r.ch, leads: 0, won: 0, rev: 0 }; return utm[k]; };
+      RAW.leads.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; leadsByChMonth[r.ch][r.ym] += r.n; });
+      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; });
 
-      RAW.leads.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; leadsByChMonth[r.ch][r.ym] += r.n; getUtm(r).leads += r.n; });
-      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; const u = getUtm(r); u.won += 1; u.rev += r.value; });
+      // daily
+      const dl = {};
+      RAW.leadsDay.forEach(r => { if (!inRange(r.ym)) return; if (!dl[r.ymd]) dl[r.ymd] = { ymd:r.ymd, Closer:0, SDR:0, Perdido:0, Outros:0, total:0 }; dl[r.ymd][r.cls] += r.n; dl[r.ymd].total += r.n; });
+      const dailyLeads = Object.values(dl).sort((a,b)=>a.ymd.localeCompare(b.ymd));
+      const dw = {};
+      RAW.won.forEach(r => { if (!inRange(r.ym) || !r.ymd) return; if (!dw[r.ymd]) dw[r.ymd] = { ymd:r.ymd, count:0, rev:0 }; dw[r.ymd].count += 1; dw[r.ymd].rev += r.value; });
+      const dailyWon = Object.values(dw).sort((a,b)=>a.ymd.localeCompare(b.ymd));
 
+      // traffic
       const platTraffic = { meta: { spend:0, impr:0, clicks:0, lpv:0, conv:0 }, google: { spend:0, impr:0, clicks:0, conv:0 } };
       RAW.metaDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.meta.spend+=d.spend; platTraffic.meta.impr+=d.impr; platTraffic.meta.clicks+=d.clicks; platTraffic.meta.lpv+=d.lpv; platTraffic.meta.conv+=d.conv; });
       RAW.googleDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.google.spend+=d.spend; platTraffic.google.impr+=d.impr; platTraffic.google.clicks+=d.clicks; platTraffic.google.conv+=d.conv; });
@@ -489,10 +452,21 @@
       monthsInRange.forEach(m => { byMonth[m].totRev = CHANNEL_ORDER.reduce((s,c)=>s+(revByChMonth[c][m]||0),0); });
 
       const aggCamp = (rows, keys) => { const map = {}; rows.forEach(r => { if (!inRange(r.ym)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); }); return Object.values(map).sort((a,b) => b.spend - a.spend); };
-      const metaCamp   = aggCamp(RAW.metaCamp,   ['spend','impr','clicks','lpv','conv','n']);
+      const metaCamp = aggCamp(RAW.metaCamp, ['spend','impr','clicks','lpv','conv','n']);
       const googleCamp = aggCamp(RAW.googleCamp, ['spend','impr','clicks','conv','n']);
 
-      const utmList = Object.values(utm).sort((a,b) => b.rev - a.rev);
+      // creatives (merge by name, keep first permalink)
+      const crMap = {};
+      RAW.metaCreative.forEach(r => { if (!inRange(r.ym)) return; if (!crMap[r.name]) crMap[r.name] = { name:r.name, perm:'', spend:0, impr:0, clicks:0, lpv:0, conv:0 }; const o = crMap[r.name]; if (!o.perm && r.perm) o.perm = r.perm; o.spend+=r.spend; o.impr+=r.impr; o.clicks+=r.clicks; o.lpv+=r.lpv; o.conv+=r.conv; });
+      const creatives = Object.values(crMap);
+
+      // dimensions
+      const dims = {
+        medium:  buildDim(RAW.leads, 'med', 'med'),
+        content: buildDim(RAW.leadsContent, 'v', 'content'),
+        term:    buildDim(RAW.leadsTerm, 'v', 'term'),
+      };
+
       const totLeads = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].leads,0);
       const totRev = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].rev,0);
       const totWon = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].won,0);
@@ -500,82 +474,92 @@
       const paidRev = ch['Meta Ads'].rev + ch['Google Ads'].rev;
       const paidLeads = ch['Meta Ads'].leads + ch['Google Ads'].leads;
       const semUtmRev = ch['Sem UTM'].rev;
-
-      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp, utmList, totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
+      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp, creatives, dims, dailyLeads, dailyWon, totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
     }
 
-    // ============================================================
-    // CHARTS
-    // ============================================================
-    Chart.defaults.color = '#a3a3a3';
-    Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.font.size = 11;
-    Chart.defaults.borderColor = '#1f1f1f';
-    Chart.defaults.plugins.legend.labels.boxWidth = 10;
-    Chart.defaults.plugins.legend.labels.boxHeight = 10;
-    Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.padding = 14;
+    // ============================================================ CHARTS
+    Chart.defaults.color = '#a3a3a3'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 11; Chart.defaults.borderColor = '#1f1f1f';
+    Chart.defaults.plugins.legend.labels.boxWidth = 10; Chart.defaults.plugins.legend.labels.boxHeight = 10; Chart.defaults.plugins.legend.labels.usePointStyle = true; Chart.defaults.plugins.legend.labels.padding = 14;
     const charts = {};
     function setChart(id, cfg) { if (charts[id]) charts[id].destroy(); const el = $(id); if (!el) return; charts[id] = new Chart(el.getContext('2d'), cfg); }
     function destroyAllCharts() { Object.keys(charts).forEach(k => { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
     const GRID = { color: '#1a1a1a' };
+    const CLS_COLORS = { Closer:'#f5f5f5', SDR:'#a3a3a3', Perdido:'#ef4444', Outros:'#404040' };
 
+    function renderDailyLeads(D) {
+      const days = D.dailyLeads;
+      setChart('leadsDayChart', { type:'bar', data:{ labels: days.map(d=>fmtDay(d.ymd)), datasets: ['Closer','SDR','Perdido','Outros'].map(k=>({ label:k, data: days.map(d=>d[k]), backgroundColor: CLS_COLORS[k], stack:'s', barPercentage:1, categoryPercentage:0.92 })) },
+        options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ title:(c)=>{ const d=days[c[0].dataIndex]; return `${d.ymd} · ${fmtInt(d.total)} leads`; }, label:(c)=>`${c.dataset.label}: ${fmtInt(c.raw)}` } } }, scales:{ x:{ stacked:true, grid:{display:false}, ticks:{ maxTicksLimit: 16, font:{size:9} } }, y:{ stacked:true, grid:GRID, ticks:{ callback:fmtInt } } } } });
+    }
+    function renderDailyWon(D) {
+      const days = D.dailyWon;
+      setChart('wonDayChart', { data:{ labels: days.map(d=>fmtDay(d.ymd)), datasets:[
+        { type:'bar', label:'Nº ganhos', yAxisID:'y', data: days.map(d=>d.count), backgroundColor:'#4f8cff', borderRadius:3, barPercentage:1, categoryPercentage:0.9 },
+        { type:'line', label:'Faturamento', yAxisID:'y1', data: days.map(d=>d.rev), borderColor:'#facc15', backgroundColor:'#facc15', tension:.25, pointRadius:0, borderWidth:1.6 } ] },
+        options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ title:(c)=>days[c[0].dataIndex].ymd, label:(c)=> c.dataset.yAxisID==='y' ? `Ganhos: ${fmtInt(c.raw)}` : `Faturamento: ${fmtBRL2(c.raw)}` } } }, scales:{ x:{ grid:{display:false}, ticks:{ maxTicksLimit:16, font:{size:9} } }, y:{ grid:GRID, ticks:{ callback:fmtInt, precision:0 } }, y1:{ position:'right', grid:{display:false}, ticks:{ callback:fmtBRLShort } } } } });
+    }
     function renderRoasChart(D) {
       const meta = D.ch['Meta Ads'], google = D.ch['Google Ads'];
       const roasM = meta.spend ? meta.rev/meta.spend : 0, roasG = google.spend ? google.rev/google.spend : 0;
-      setChart('roasChart', { type: 'bar',
-        data: { labels: ['Meta Ads', 'Google Ads'], datasets: [{ label: 'ROAS', data: [roasM, roasG], backgroundColor: [chColor('Meta Ads'), chColor('Google Ads')], borderRadius: 6, maxBarThickness: 90 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => { const r = c.dataIndex===0?meta:google; return [`ROAS: ${fmtX(c.raw)}`, `Faturamento: ${fmtBRL(r.rev)}`, `Investimento: ${fmtBRL(r.spend)}`]; } } } },
-          scales: { x: { grid: GRID, ticks: { callback: (v) => v + 'x' } }, y: { grid: { display: false } } } } });
+      setChart('roasChart', { type: 'bar', data: { labels: ['Meta Ads', 'Google Ads'], datasets: [{ data: [roasM, roasG], backgroundColor: [chColor('Meta Ads'), chColor('Google Ads')], borderRadius: 6, maxBarThickness: 90 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => { const r = c.dataIndex===0?meta:google; return [`ROAS: ${fmtX(c.raw)}`, `Faturamento: ${fmtBRL(r.rev)}`, `Investimento: ${fmtBRL(r.spend)}`]; } } } }, scales: { x: { grid: GRID, ticks: { callback: (v) => v + 'x' } }, y: { grid: { display: false } } } } });
     }
     function renderRevChannelChart(D) {
       const items = CHANNEL_ORDER.map(c => ({ c, rev: D.ch[c].rev })).filter(x => x.rev > 0).sort((a,b)=>b.rev-a.rev);
-      setChart('revChannelChart', { type: 'bar',
-        data: { labels: items.map(x=>x.c), datasets: [{ data: items.map(x=>x.rev), backgroundColor: items.map(x=>chColor(x.c)), borderRadius: 6, maxBarThickness: 40 }] },
+      setChart('revChannelChart', { type: 'bar', data: { labels: items.map(x=>x.c), datasets: [{ data: items.map(x=>x.rev), backgroundColor: items.map(x=>chColor(x.c)), borderRadius: 6, maxBarThickness: 40 }] },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtBRL2(c.raw) } } }, scales: { x: { grid: GRID, ticks: { callback: fmtBRLShort } }, y: { grid: { display: false } } } } });
     }
     function stackedMonth(id, byChMonth, months, fmtTick, fmtTip) {
       const ds = CHANNEL_ORDER.filter(c => months.some(m => (byChMonth[c][m]||0) > 0)).map(c => ({ label: c, data: months.map(m => byChMonth[c][m] || 0), backgroundColor: chColor(c), borderRadius: 3, stack: 's' }));
-      setChart(id, { type: 'bar', data: { labels: months.map(fmtYm), datasets: ds },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtTip(c.raw)}` } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: GRID, ticks: { callback: fmtTick } } } } });
+      setChart(id, { type: 'bar', data: { labels: months.map(fmtYm), datasets: ds }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtTip(c.raw)}` } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: GRID, ticks: { callback: fmtTick } } } } });
     }
     function renderRoasMonthChart(D) {
       const m = D.monthsInRange; const roas = (rev, sp) => sp ? rev/sp : 0;
-      setChart('roasMonthChart', { type: 'bar',
-        data: { labels: m.map(fmtYm), datasets: [
-          { type:'bar', label: 'Investimento', data: m.map(x=>D.byMonth[x].metaSpend + D.byMonth[x].googleSpend), backgroundColor: 'rgba(115,115,115,0.4)', stack:'a', borderRadius:3 },
-          { type:'bar', label: 'Faturamento pago', data: m.map(x=>D.byMonth[x].metaRev + D.byMonth[x].googleRev), backgroundColor: 'rgba(79,140,255,0.85)', stack:'b', borderRadius:3 },
-          { type:'bar', label: 'Faturamento total', data: m.map(x=>D.byMonth[x].totRev), backgroundColor: 'rgba(250,204,21,0.35)', stack:'c', borderRadius:3 },
-          { type:'line', label: 'ROAS Tráfego', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].metaRev + D.byMonth[x].googleRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#4f8cff', backgroundColor:'#4f8cff', tension:.3, pointRadius:3 },
-          { type:'line', label: 'ROAS Geral', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].totRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#facc15', backgroundColor:'#facc15', tension:.3, pointRadius:3, borderDash:[4,3] },
-        ] },
+      setChart('roasMonthChart', { type: 'bar', data: { labels: m.map(fmtYm), datasets: [
+        { type:'bar', label: 'Investimento', data: m.map(x=>D.byMonth[x].metaSpend + D.byMonth[x].googleSpend), backgroundColor: 'rgba(115,115,115,0.4)', stack:'a', borderRadius:3 },
+        { type:'bar', label: 'Faturamento pago', data: m.map(x=>D.byMonth[x].metaRev + D.byMonth[x].googleRev), backgroundColor: 'rgba(79,140,255,0.85)', stack:'b', borderRadius:3 },
+        { type:'bar', label: 'Faturamento total', data: m.map(x=>D.byMonth[x].totRev), backgroundColor: 'rgba(250,204,21,0.35)', stack:'c', borderRadius:3 },
+        { type:'line', label: 'ROAS Tráfego', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].metaRev + D.byMonth[x].googleRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#4f8cff', backgroundColor:'#4f8cff', tension:.3, pointRadius:3 },
+        { type:'line', label: 'ROAS Geral', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].totRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#facc15', backgroundColor:'#facc15', tension:.3, pointRadius:3, borderDash:[4,3] } ] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y1' ? `${c.dataset.label}: ${fmtX(c.raw)}` : `${c.dataset.label}: ${fmtBRL(c.raw)}` } } }, scales: { x: { grid: { display: false } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: (v)=>v+'x' } } } } });
     }
-    function renderUtmCharts(D) {
-      const byLeads = [...D.utmList].filter(u=>u.leads>0).sort((a,b)=>b.leads-a.leads).slice(0,12);
-      const byRev = [...D.utmList].filter(u=>u.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,12);
-      setChart('leadsUtmChart', { type:'bar', data:{ labels: byLeads.map(u=>u.utm), datasets:[{ data: byLeads.map(u=>u.leads), backgroundColor: byLeads.map(u=>chColor(u.ch)), borderRadius:4, maxBarThickness:26 }] },
-        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>`${fmtInt(c.raw)} leads · ${byLeads[c.dataIndex].ch}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtInt } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
-      setChart('revUtmChart', { type:'bar', data:{ labels: byRev.map(u=>u.utm), datasets:[{ data: byRev.map(u=>u.rev), backgroundColor: byRev.map(u=>chColor(u.ch)), borderRadius:4, maxBarThickness:26 }] },
-        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>`${fmtBRL2(c.raw)} · ${byRev[c.dataIndex].ch}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+    let utmDim = 'medium';
+    const DIM_LABEL = { medium:'utm_medium', content:'utm_content', term:'utm_term' };
+    function renderUtm(D) {
+      const list = D.dims[utmDim];
+      document.querySelectorAll('.dimLabel').forEach(e => e.textContent = DIM_LABEL[utmDim]);
+      $('dimLabelInline').textContent = DIM_LABEL[utmDim];
+      const real = list.filter(u => u.label !== '(vazio)');
+      const byLeads = [...real].filter(u=>u.leads>0).sort((a,b)=>b.leads-a.leads).slice(0,12);
+      const byRev = [...real].filter(u=>u.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,12);
+      const clip = (s) => s.length>40 ? s.slice(0,38)+'…' : s;
+      setChart('leadsUtmChart', { type:'bar', data:{ labels: byLeads.map(u=>clip(u.label)), datasets:[{ data: byLeads.map(u=>u.leads), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>byLeads[c[0].dataIndex].label, label:(c)=>`${fmtInt(c.raw)} leads` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtInt } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      setChart('revUtmChart', { type:'bar', data:{ labels: byRev.map(u=>clip(u.label)), datasets:[{ data: byRev.map(u=>u.rev), backgroundColor:'#facc15', borderRadius:4, maxBarThickness:24 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>byRev[c[0].dataIndex].label, label:(c)=>fmtBRL2(c.raw) } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      renderUtmTable(D);
+    }
+    let utmSort = { k: 'rev', dir: -1 };
+    function renderUtmTable(D) {
+      const rows = [...D.dims[utmDim]];
+      rows.sort((a,b) => { let va=a[utmSort.k], vb=b[utmSort.k]; if (typeof va==='string') return utmSort.dir * va.localeCompare(vb); return utmSort.dir * (va-vb); });
+      $('utmTableBody').innerHTML = rows.slice(0, 80).map(u => `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-300">${esc(u.label)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.leads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.won)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(u.rev)}</td></tr>`).join('') || `<tr><td colspan="4" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
     function renderClassChart(D) {
-      const cols = { Closer:'#f5f5f5', SDR:'#a3a3a3', Perdido:'#ef4444', Outros:'#404040' };
       const chans = CHANNEL_ORDER.filter(c => D.ch[c].leads > 0);
-      setChart('classChart', { type: 'bar', data: { labels: chans, datasets: ['Closer','SDR','Perdido','Outros'].map(k => ({ label:k, data: chans.map(c=>D.ch[c].cls[k]), backgroundColor: cols[k], borderRadius:3, stack:'s' })) },
+      setChart('classChart', { type: 'bar', data: { labels: chans, datasets: ['Closer','SDR','Perdido','Outros'].map(k => ({ label:k, data: chans.map(c=>D.ch[c].cls[k]), backgroundColor: CLS_COLORS[k], borderRadius:3, stack:'s' })) },
         options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label:(c)=>{ const tot=chans.map(x=>D.ch[x].leads)[c.dataIndex]||1; return `${c.dataset.label}: ${fmtInt(c.raw)} (${fmtPct(c.raw/tot*100)})`; } } } }, scales: { x:{ stacked:true, grid:{display:false} }, y:{ stacked:true, grid:GRID, ticks:{ callback:fmtInt } } } } });
     }
     function renderDailyChart(id, daily) {
       const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
-      setChart(id, { type: 'line', data: { labels: pts.map(p => { const [,mo,d] = p.ymd.split('-'); return `${d}/${mo}`; }), datasets: [
+      setChart(id, { type: 'line', data: { labels: pts.map(p => fmtDay(p.ymd)), datasets: [
         { label: 'Investimento', yAxisID:'y', data: pts.map(p=>p.spend), borderColor:'#facc15', backgroundColor:'rgba(250,204,21,0.08)', fill:true, tension:.25, pointRadius:0, borderWidth:1.5 },
         { label: 'Cliques', yAxisID:'y1', data: pts.map(p=>p.clicks), borderColor:'#a3a3a3', tension:.25, pointRadius:0, borderWidth:1.5 } ] },
         options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Investimento: ${fmtBRL(c.raw)}` : `Cliques: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
     }
     function renderConvChart(id, daily) {
       const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
-      setChart(id, { type: 'line', data: { labels: pts.map(p => { const [,mo,d] = p.ymd.split('-'); return `${d}/${mo}`; }), datasets: [
+      setChart(id, { type: 'line', data: { labels: pts.map(p => fmtDay(p.ymd)), datasets: [
         { label: 'Impressões', yAxisID:'y', data: pts.map(p=>p.impr), borderColor:'#525252', backgroundColor:'rgba(82,82,82,0.12)', fill:true, tension:.25, pointRadius:0, borderWidth:1.2 },
         { label: 'Conversões', yAxisID:'y1', data: pts.map(p=>p.conv), borderColor:'#34d399', tension:.25, pointRadius:0, borderWidth:1.8 } ] },
         options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Impressões: ${fmtInt(c.raw)}` : `Conversões: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtInt } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
@@ -586,9 +570,7 @@
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>fmtBRL2(c.raw) } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
     }
 
-    // ============================================================
-    // CHIPS / FUNNEL / TABLES
-    // ============================================================
+    // ============================================================ CHIPS/FUNNEL/TABLES
     function chip(label, value, sub) { return `<div class="metric-chip"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-base sm:text-xl font-bold">${value}</div>${sub?`<div class="text-[10px] text-neutral-500 mt-0.5">${sub}</div>`:''}</div>`; }
     function renderFunnel(elId, steps, color) {
       const max = Math.max(...steps.map(s=>s.v), 1);
@@ -596,17 +578,22 @@
     }
     function renderChannelTable(D) {
       const rows = CHANNEL_ORDER.map(c => ({c, ...D.ch[c]})).filter(o => o.leads>0 || o.rev>0 || o.spend>0);
-      $('channelTableBody').innerHTML = rows.map(o => {
-        const cfg = CHANNELS[o.c]; const roas = o.spend ? o.rev/o.spend : null; const cpl = o.spend && o.leads ? o.spend/o.leads : null; const cac = o.spend && o.won ? o.spend/o.won : null; const conv = o.leads ? o.won/o.leads*100 : 0;
+      $('channelTableBody').innerHTML = rows.map(o => { const cfg = CHANNELS[o.c]; const roas = o.spend ? o.rev/o.spend : null; const cpl = o.spend && o.leads ? o.spend/o.leads : null; const cac = o.spend && o.won ? o.spend/o.won : null; const conv = o.leads ? o.won/o.leads*100 : 0;
         const roasCell = cfg.paid ? `<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${roas!=null?fmtX(roas):'—'}</span>` : `<span class="text-neutral-500">Orgânico</span>`;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${cfg.color}"></span>${o.c}</span></td><td class="px-4 py-2.5 text-right">${fmtInt(o.leads)}</td><td class="px-4 py-2.5 text-right">${o.spend?fmtBRL(o.spend):'—'}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(o.rev)}</td><td class="px-4 py-2.5 text-right">${fmtInt(o.won)}</td><td class="px-4 py-2.5 text-right">${roasCell}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td><td class="px-4 py-2.5 text-right">${fmtPct(conv,1)}</td></tr>`;
-      }).join('');
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${cfg.color}"></span>${o.c}</span></td><td class="px-4 py-2.5 text-right">${fmtInt(o.leads)}</td><td class="px-4 py-2.5 text-right">${o.spend?fmtBRL(o.spend):'—'}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(o.rev)}</td><td class="px-4 py-2.5 text-right">${fmtInt(o.won)}</td><td class="px-4 py-2.5 text-right">${roasCell}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td><td class="px-4 py-2.5 text-right">${fmtPct(conv,1)}</td></tr>`; }).join('');
     }
-    let utmSort = { k: 'rev', dir: -1 };
-    function renderUtmTable(D) {
-      const rows = [...D.utmList];
-      rows.sort((a,b) => { let va=a[utmSort.k], vb=b[utmSort.k]; if (typeof va==='string') return utmSort.dir * va.localeCompare(vb); return utmSort.dir * (va-vb); });
-      $('utmTableBody').innerHTML = rows.slice(0, 60).map(u => `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-300">${u.utm}</td><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${chColor(u.ch)}"></span><span class="text-neutral-400 text-xs">${u.ch}</span></span></td><td class="px-4 py-2.5 text-right">${fmtInt(u.leads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.won)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(u.rev)}</td></tr>`).join('') || `<tr><td colspan="5" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+
+    let creativeSort = 'spend';
+    function renderMetaCreatives(D) {
+      const list = [...D.creatives].sort((a,b)=> (b[creativeSort]||0) - (a[creativeSort]||0));
+      const top = list.slice(0, 12);
+      const label = creativeSort==='spend' ? 'Investimento' : creativeSort==='conv' ? 'Conversões' : 'Cliques';
+      const fmtv = creativeSort==='spend' ? fmtBRLShort : fmtInt;
+      setChart('metaCreativeChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>c[creativeSort]), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0;
+        const nameCell = c.perm ? `<a href="${esc(c.perm)}" target="_blank" rel="noopener" class="clink">${esc(c.name)} ↗</a>` : `<span class="text-neutral-300">${esc(c.name)}</span>`;
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left max-w-[280px] truncate" title="${esc(c.name)}">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="10" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     function renderMetaPanel(D) {
@@ -615,72 +602,59 @@
       $('metaKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`), chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`) ].join('');
       renderFunnel('metaFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques no link', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Landing page views', v:t.lpv, fmt:fmtInt, pct: t.clicks? t.lpv/t.clicks*100:0 }, { label:'Conversões (TYP)', v:t.conv, fmt:fmtInt, pct: t.lpv? t.conv/t.lpv*100:0 }, { label:'Negócios ganhos', v:m.won, fmt:fmtInt, pct: t.conv? m.won/t.conv*100:0 } ], chColor('Meta Ads'));
       renderDailyChart('metaDailyChart', RAW.metaDaily);
-      renderConvChart('metaConvChart', RAW.metaDaily);
-      renderCampChart('metaCampChart', D.metaCamp, chColor('Meta Ads'));
-      $('metaCampBody').innerHTML = D.metaCamp.map(c => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="9" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      renderMetaCreatives(D);
+      $('metaCampBody').innerHTML = D.metaCamp.map(c => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="9" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
     function renderGooglePanel(D) {
       const t = D.platTraffic.google; const g = D.ch['Google Ads'];
       const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? g.rev/t.spend : 0;
       $('googleKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPC', fmtBRL2(cpc)), chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`) ].join('');
       renderFunnel('googleFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Conversões', v:t.conv, fmt:fmtInt, pct: t.clicks? t.conv/t.clicks*100:0 }, { label:'Negócios ganhos', v:g.won, fmt:fmtInt, pct: t.conv? g.won/t.conv*100:0 } ], chColor('Google Ads'));
-      renderDailyChart('googleDailyChart', RAW.googleDaily);
-      renderConvChart('googleConvChart', RAW.googleDaily);
-      renderCampChart('googleCampChart', D.googleCamp, chColor('Google Ads'));
-      $('googleCampBody').innerHTML = D.googleCamp.map(c => { const ctr=c.impr? c.clicks/c.impr*100:0, cpc=c.clicks? c.spend/c.clicks:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpc)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="8" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      renderDailyChart('googleDailyChart', RAW.googleDaily); renderConvChart('googleConvChart', RAW.googleDaily); renderCampChart('googleCampChart', D.googleCamp, chColor('Google Ads'));
+      $('googleCampBody').innerHTML = D.googleCamp.map(c => { const ctr=c.impr? c.clicks/c.impr*100:0, cpc=c.clicks? c.spend/c.clicks:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpc)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="8" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
-
     function renderKpis(D) {
       $('kpiLeads').textContent = fmtInt(D.totLeads);
       $('kpiLeadsSub').textContent = `${fmtInt(D.paidLeads)} pagos · ${fmtInt(D.totLeads-D.paidLeads)} orgânico/outros`;
-      $('kpiSpend').textContent = fmtBRL(D.totSpend);
-      $('kpiSpendSub').textContent = `Meta ${fmtBRL(D.ch['Meta Ads'].spend)} · Google ${fmtBRL(D.ch['Google Ads'].spend)}`;
-      $('kpiRev').textContent = fmtBRL(D.totRev);
-      $('kpiRevSub').textContent = `pago ${fmtBRL(D.paidRev)} · orgân. ${fmtBRL(D.totRev-D.paidRev-D.semUtmRev)} · s/UTM ${fmtBRL(D.semUtmRev)}`;
       $('kpiWon').textContent = fmtInt(D.totWon);
       $('kpiWonSub').textContent = `${fmtInt(D.ch['Meta Ads'].won + D.ch['Google Ads'].won)} pagos`;
-      const roasTraf = D.totSpend ? D.paidRev/D.totSpend : 0;
-      const roasGeral = D.totSpend ? D.totRev/D.totSpend : 0;
+      $('kpiRev').textContent = fmtBRL(D.totRev);
+      $('kpiRevSub').textContent = `pago ${fmtBRL(D.paidRev)} · orgân. ${fmtBRL(D.totRev-D.paidRev-D.semUtmRev)} · s/UTM ${fmtBRL(D.semUtmRev)}`;
+      $('kpiTicket').textContent = fmtBRL(D.totWon ? D.totRev/D.totWon : 0);
+      $('kpiConvSub').textContent = `Conv. lead→ganho ${fmtPct(D.totLeads ? D.totWon/D.totLeads*100 : 0, 1)}`;
+      $('kpiSpend').textContent = fmtBRL(D.totSpend);
+      $('kpiSpendSub').textContent = `Meta ${fmtBRL(D.ch['Meta Ads'].spend)} · Google ${fmtBRL(D.ch['Google Ads'].spend)}`;
+      const roasTraf = D.totSpend ? D.paidRev/D.totSpend : 0, roasGeral = D.totSpend ? D.totRev/D.totSpend : 0;
       $('kpiRoasTraf').textContent = fmtX(roasTraf); $('kpiRoasTraf').style.color = roasTraf>=1 ? 'var(--pos)' : 'var(--neg)';
       $('kpiRoasGeral').textContent = fmtX(roasGeral);
-      $('kpiTicket').textContent = fmtBRL(D.totWon ? D.totRev/D.totWon : 0);
       $('kpiCpl').textContent = D.paidLeads ? fmtBRL2(D.totSpend/D.paidLeads) : '—';
-      $('kpiConvSub').textContent = `Conv. lead→ganho ${fmtPct(D.totLeads ? D.totWon/D.totLeads*100 : 0, 1)}`;
     }
 
-    // ============================================================
-    // RENDER (tab-aware)
-    // ============================================================
+    // ============================================================ RENDER (tab-aware)
     let ACTIVE = 'geral';
     function renderAll() {
       const D = compute();
-      $('filterSummary').textContent = `${fmtYm(RANGE.start)} → ${fmtYm(RANGE.end)} · ${fmtInt(D.totLeads)} leads · ${fmtBRL(D.totRev)} faturamento`;
+      $('filterSummary').textContent = `${fmtYm(RANGE.start)} → ${fmtYm(RANGE.end)} · ${fmtInt(D.totLeads)} leads · ${fmtInt(D.totWon)} ganhos · ${fmtBRL(D.totRev)}`;
       if (ACTIVE === 'geral') {
-        renderKpis(D); renderRoasChart(D); renderRevChannelChart(D); renderChannelTable(D);
+        renderKpis(D); renderDailyLeads(D); renderDailyWon(D);
+        renderRoasChart(D); renderRevChannelChart(D); renderChannelTable(D);
         stackedMonth('leadsMonthChart', D.leadsByChMonth, D.monthsInRange, fmtInt, fmtInt);
         stackedMonth('revMonthChart', D.revByChMonth, D.monthsInRange, fmtBRLShort, fmtBRL2);
-        renderRoasMonthChart(D); renderUtmCharts(D); renderUtmTable(D); renderClassChart(D);
+        renderRoasMonthChart(D); renderUtm(D); renderClassChart(D);
       } else if (ACTIVE === 'meta') { renderMetaPanel(D); }
       else if (ACTIVE === 'google') { renderGooglePanel(D); }
     }
-
     function switchTab(t) {
       ACTIVE = t;
-      $('tabGeral').classList.toggle('hidden', t !== 'geral');
-      $('tabMeta').classList.toggle('hidden', t !== 'meta');
-      $('tabGoogle').classList.toggle('hidden', t !== 'google');
+      $('tabGeral').classList.toggle('hidden', t !== 'geral'); $('tabMeta').classList.toggle('hidden', t !== 'meta'); $('tabGoogle').classList.toggle('hidden', t !== 'google');
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' }); renderAll();
     }
 
-    // ============================================================
-    // FILTER UI
-    // ============================================================
+    // ============================================================ FILTER UI
     function populateMonthSelects() { const opts = RAW.months.map(m => `<option value="${m}">${fmtYm(m)}</option>`).join(''); $('fStart').innerHTML = opts; $('fEnd').innerHTML = opts; $('fStart').value = RANGE.start; $('fEnd').value = RANGE.end; }
     function setRange(start, end, presetKey) {
-      const ms = RAW.months;
-      start = start < ms[0] ? ms[0] : start; end = end > ms[ms.length-1] ? ms[ms.length-1] : end; if (start > end) start = end;
+      const ms = RAW.months; start = start < ms[0] ? ms[0] : start; end = end > ms[ms.length-1] ? ms[ms.length-1] : end; if (start > end) start = end;
       RANGE = { start, end }; $('fStart').value = start; $('fEnd').value = end;
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === presetKey));
       renderAll();
@@ -697,12 +671,12 @@
       $('fEnd').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
       document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-      document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='utm'||k==='ch'?1:-1)) }; renderAll(); }));
+      document.querySelectorAll('#dimButtons .dim-btn').forEach(b => b.addEventListener('click', () => { utmDim = b.dataset.dim; document.querySelectorAll('#dimButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); utmSort = { k:'rev', dir:-1 }; renderUtm(compute()); }));
+      document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderMetaCreatives(compute()); }));
+      document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='label'?1:-1)) }; renderUtmTable(compute()); }));
     }
 
-    // ============================================================
-    // BOOT DASHBOARD
-    // ============================================================
+    // ============================================================ BOOT
     function showState(s) { $('dataLoading').classList.toggle('hidden', s !== 'loading'); $('dataError').classList.toggle('hidden', s !== 'error'); $('dashContent').classList.toggle('hidden', s !== 'ok'); }
     async function initDashboard() {
       showState('loading');
@@ -712,24 +686,19 @@
         const ms = RAW.months, last = ms[ms.length-1];
         RANGE = { start: ms[0] >= '2026-01' ? ms[0] : '2026-01', end: last };
         populateMonthSelects(); wireUi();
-        const semRev = RAW.won.filter(w=>w.ch==='Sem UTM').reduce((s,w)=>s+w.value,0);
-        const totRev = RAW.won.reduce((s,w)=>s+w.value,0);
-        $('noteSemUtm').innerHTML = `<b>Sem UTM:</b> cerca de ${fmtPct(totRev?semRev/totRev*100:0,0)} do faturamento ganho (${fmtBRL(semRev)}) está sem UTM no CRM — aparece como canal próprio e não entra no ROAS Tráfego (mas entra no ROAS Geral).`;
+        const semRev = RAW.won.filter(w=>w.ch==='Sem UTM').reduce((s,w)=>s+w.value,0); const totRev = RAW.won.reduce((s,w)=>s+w.value,0);
+        $('noteSemUtm').innerHTML = `<b>Sem UTM:</b> cerca de ${fmtPct(totRev?semRev/totRev*100:0,0)} do faturamento ganho (${fmtBRL(semRev)}) está sem UTM no CRM — canal próprio, fora do ROAS Tráfego (mas entra no ROAS Geral).`;
         $('dataDate').textContent = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-        showState('ok');
-        switchTab('geral');
-        applyPreset('2026');
+        showState('ok'); switchTab('geral'); applyPreset('2026');
       } catch (e) {
-        $('dataErrorMsg').textContent = (e && e.message) ? e.message : 'Erro desconhecido. A planilha precisa estar compartilhada como "qualquer pessoa com o link pode ver".';
+        $('dataErrorMsg').textContent = (e && e.message) ? e.message : 'Erro. A planilha precisa estar compartilhada como "qualquer pessoa com o link pode ver".';
         showState('error');
       }
     }
     $('retryBtn')?.addEventListener('click', initDashboard);
     $('refreshBtn')?.addEventListener('click', () => { destroyAllCharts(); initDashboard(); });
 
-    // ============================================================
-    // AUTH GATE — Supabase email/password + allowlist
-    // ============================================================
+    // ============================================================ AUTH
     const SUPABASE_URL = 'https://mibohjsywvtrukfmphmv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pYm9oanN5d3Z0cnVrZm1waG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMTMzMTYsImV4cCI6MjA5NDg4OTMxNn0.e82F8sn-6W9lfYmD2vflDUe98aU9nUE70JC25SGn8vQ';
     const ALLOWED_EMAILS = [ 'brunoclemos1997@gmail.com', 'dhiego@grupoescalada.com.br' ];
@@ -741,12 +710,10 @@
     async function checkAuth() { const { data } = await sb.auth.getSession(); const session = data?.session; if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) showDashboard(); else { if (session) await sb.auth.signOut(); showLogin(); } }
     $('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = $('loginEmail').value.trim().toLowerCase(); const password = $('loginPassword').value;
-      const errEl = $('loginError'); const submitBtn = $('loginSubmit'); errEl.classList.add('hidden'); errEl.textContent = '';
+      const email = $('loginEmail').value.trim().toLowerCase(); const password = $('loginPassword').value; const errEl = $('loginError'); const submitBtn = $('loginSubmit'); errEl.classList.add('hidden'); errEl.textContent = '';
       if (!ALLOWED_EMAILS.includes(email)) { errEl.textContent = 'Email não autorizado. Solicite acesso a Bruno Lemos.'; errEl.classList.remove('hidden'); return; }
       submitBtn.disabled = true; submitBtn.textContent = 'Entrando…';
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      submitBtn.disabled = false; submitBtn.textContent = 'Entrar';
+      const { error } = await sb.auth.signInWithPassword({ email, password }); submitBtn.disabled = false; submitBtn.textContent = 'Entrar';
       if (error) { errEl.textContent = error.message === 'Invalid login credentials' ? 'Email ou senha incorretos.' : `Erro ao entrar: ${error.message}`; errEl.classList.remove('hidden'); return; }
       $('loginPassword').value = ''; showDashboard();
     });
