@@ -43,17 +43,16 @@
     .card:hover { border-color: #333; }
     .kpi-value { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
     table { font-variant-numeric: tabular-nums; }
-    table thead th { background: var(--bg-card); position: sticky; top: 0; z-index: 1; cursor: pointer; user-select: none; }
-    table thead th:hover { background: var(--bg-card-hover); }
+    table thead th { background: var(--bg-card); position: sticky; top: 0; z-index: 1; user-select: none; }
     table tbody tr { transition: background 0.12s ease; }
     table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    .sortable { cursor: pointer; }
+    .sortable:hover { background: var(--bg-card-hover); }
     .scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
     .scrollbar::-webkit-scrollbar-track { background: transparent; }
     .scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
     .scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
     .scrollbar { -webkit-overflow-scrolling: touch; }
-    .sort-indicator { opacity: 0.4; margin-left: 4px; font-size: 10px; }
-    .sort-active { opacity: 1; color: var(--text); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink:0; }
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text-muted); }
     .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
@@ -64,8 +63,10 @@
     .filter-preset { padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; }
     .filter-preset:hover { background: var(--bg-card-hover); color: var(--text); border-color: #404040; }
     .filter-preset.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
+    .tab-btn { padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; display:inline-flex; align-items:center; gap:7px; }
+    .tab-btn:hover { background: var(--bg-card-hover); color: var(--text); }
+    .tab-btn.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
     .metric-chip { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-    .funnel-row { display:flex; align-items:center; gap:10px; }
     .funnel-bar { height: 26px; border-radius: 6px; min-width: 2px; transition: width .3s ease; }
     .chart-h-overview { height: 340px; }
     .chart-h-tall { height: 360px; }
@@ -75,13 +76,14 @@
       .chart-h-overview { height: 260px; }
       .chart-h-tall { height: 280px; }
       .chart-h-md { height: 240px; }
-      .chart-h-sm { height: 200px; }
+      .chart-h-sm { height: 220px; }
       .card { border-radius: 10px; }
       #filterBar > div { flex-direction: column; align-items: stretch; gap: 10px; }
       table th, table td { padding: 8px 6px !important; font-size: 12px; }
       main > section { margin-bottom: 0 !important; }
       main { gap: 1.5rem !important; }
       .section-title h2 { font-size: 1rem !important; }
+      .tab-btn { padding: 8px 14px; font-size: 12px; }
     }
     /* AUTH */
     .auth-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
@@ -159,7 +161,7 @@
     </div>
   </header>
 
-  <main id="appMain" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-10">
+  <main id="appMain" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-6">
 
     <!-- DATA LOADING -->
     <div id="dataLoading" class="card p-10 flex flex-col items-center justify-center gap-3 text-neutral-400">
@@ -176,133 +178,179 @@
     </div>
 
     <!-- DASHBOARD CONTENT -->
-    <div id="dashContent" class="hidden space-y-6 sm:space-y-10">
+    <div id="dashContent" class="hidden space-y-6">
 
-      <!-- FILTER BAR -->
-      <section class="card p-4" id="filterBar">
-        <div class="flex items-center justify-between gap-4 flex-wrap">
-          <div class="flex items-center gap-3 flex-wrap">
-            <div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Período</div>
-            <div class="flex items-center gap-2">
-              <select id="fStart" class="filter-select"></select>
-              <span class="text-neutral-600">→</span>
-              <select id="fEnd" class="filter-select"></select>
+      <!-- TABS + FILTER -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="tab-btn active" data-tab="geral">Geral</button>
+          <button class="tab-btn" data-tab="meta"><span style="color:var(--meta)">●</span> Meta Ads</button>
+          <button class="tab-btn" data-tab="google"><span style="color:var(--google)">●</span> Google Ads</button>
+        </div>
+        <div class="card p-4" id="filterBar">
+          <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-3 flex-wrap">
+              <div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Período</div>
+              <div class="flex items-center gap-2">
+                <select id="fStart" class="filter-select"></select>
+                <span class="text-neutral-600">→</span>
+                <select id="fEnd" class="filter-select"></select>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap" id="presetButtons">
+              <button class="filter-preset" data-preset="all">Tudo</button>
+              <button class="filter-preset" data-preset="2026">2026</button>
+              <button class="filter-preset" data-preset="l3">Últimos 3 meses</button>
+              <button class="filter-preset" data-preset="month">Este mês</button>
+            </div>
+            <div id="filterSummary" class="text-xs text-neutral-400 font-medium w-full sm:w-auto">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: GERAL ================= -->
+      <div id="tabGeral" class="space-y-6 sm:space-y-10">
+
+        <!-- KPIs -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Leads (Todos os Negócios)</div><span id="kpiLeads" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiLeadsSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Investimento (Meta + Google)</div><span id="kpiSpend" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiSpendSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Faturamento ganho</div><span id="kpiRev" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">R$ 0</span><div id="kpiRevSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Negócios ganhos</div><span id="kpiWon" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiWonSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+          <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--meta)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Tráfego</div><span id="kpiRoasTraf" class="kpi-value text-xl sm:text-3xl font-bold">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento atribuído ao pago ÷ investimento</div></div>
+          <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--revenue)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Geral (MER)</div><span id="kpiRoasGeral" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento TOTAL ÷ investimento</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Ticket médio</div><span id="kpiTicket" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">faturamento ÷ ganhos</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CPL pago · Conversão</div><span id="kpiCpl" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiConvSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
+        </section>
+
+        <!-- ROAS POR CANAL -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">ROAS por canal de aquisição</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">Faturamento (Negócios ganhos, cruzado pela UTM do lead) ÷ investimento (abas de tráfego). Canais orgânicos não têm custo de mídia.</p>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5">
+              <div class="text-xs text-neutral-400 mb-3 font-medium">ROAS — canais pagos</div>
+              <div class="chart-h-sm"><canvas id="roasChart"></canvas></div>
+            </div>
+            <div class="card p-4 sm:p-5">
+              <div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento ganho por canal</div>
+              <div class="chart-h-sm"><canvas id="revChannelChart"></canvas></div>
             </div>
           </div>
-          <div class="flex items-center gap-1.5 flex-wrap" id="presetButtons">
-            <button class="filter-preset" data-preset="all">Tudo</button>
-            <button class="filter-preset" data-preset="2026">2026</button>
-            <button class="filter-preset" data-preset="l3">Últimos 3 meses</button>
-            <button class="filter-preset" data-preset="month">Este mês</button>
+          <div class="card p-0 overflow-hidden">
+            <div class="overflow-x-auto scrollbar">
+              <table class="w-full text-sm" id="channelTable">
+                <thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+                  <th class="text-left px-4 py-3">Canal</th>
+                  <th class="text-right px-4 py-3">Leads</th>
+                  <th class="text-right px-4 py-3">Investimento</th>
+                  <th class="text-right px-4 py-3">Ganhos (R$)</th>
+                  <th class="text-right px-4 py-3">Nº ganhos</th>
+                  <th class="text-right px-4 py-3">ROAS</th>
+                  <th class="text-right px-4 py-3">CPL</th>
+                  <th class="text-right px-4 py-3">CAC</th>
+                  <th class="text-right px-4 py-3">Conv.</th>
+                </tr></thead>
+                <tbody id="channelTableBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div id="filterSummary" class="text-xs text-neutral-400 font-medium w-full sm:w-auto">—</div>
-        </div>
-      </section>
+        </section>
 
-      <!-- KPIs -->
-      <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Leads (Todos os Negócios)</div><span id="kpiLeads" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiLeadsSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Investimento (Meta + Google)</div><span id="kpiSpend" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiSpendSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Faturamento ganho</div><span id="kpiRev" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">R$ 0</span><div id="kpiRevSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS pago (geral)</div><span id="kpiRoas" class="kpi-value text-xl sm:text-3xl font-bold">0,0x</span><div id="kpiRoasSub" class="text-[11px] text-neutral-500 mt-1">faturamento pago ÷ investimento</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Negócios ganhos</div><span id="kpiWon" class="kpi-value text-xl sm:text-3xl font-bold">0</span><div id="kpiWonSub" class="text-[11px] text-neutral-500 mt-1">—</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Ticket médio</div><span id="kpiTicket" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">faturamento ÷ ganhos</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CPL pago</div><span id="kpiCpl" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">investimento ÷ leads pagos</div></div>
-        <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">Conversão lead → ganho</div><span id="kpiConv" class="kpi-value text-xl sm:text-3xl font-bold">0%</span><div class="text-[11px] text-neutral-500 mt-1">ganhos ÷ leads (indicador)</div></div>
-      </section>
-
-      <!-- ROAS POR CANAL -->
-      <section class="space-y-4">
-        <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">ROAS por canal de aquisição</h2></div>
-        <p class="text-xs text-neutral-500 -mt-2">Faturamento (Negócios ganhos, cruzado pela UTM do lead) ÷ investimento (abas de tráfego). Canais orgânicos não têm custo de mídia.</p>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="card p-4 sm:p-5">
-            <div class="text-xs text-neutral-400 mb-3 font-medium">ROAS — canais pagos</div>
-            <div class="chart-h-sm"><canvas id="roasChart"></canvas></div>
+        <!-- MENSAL -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Evolução mensal por canal</h2></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por canal × mês</div><div class="chart-h-md"><canvas id="leadsMonthChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento por canal × mês</div><div class="chart-h-md"><canvas id="revMonthChart"></canvas></div></div>
           </div>
-          <div class="card p-4 sm:p-5">
-            <div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento ganho por canal</div>
-            <div class="chart-h-sm"><canvas id="revChannelChart"></canvas></div>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS Tráfego vs Geral × mês &nbsp;·&nbsp; investimento × faturamento</div><div class="chart-h-md"><canvas id="roasMonthChart"></canvas></div></div>
+        </section>
+
+        <!-- DETALHE POR UTM -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Detalhe por UTM</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">UTM individual (utm_source | utm_medium) — leads e faturamento, com o canal a que pertence.</p>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por UTM (top 12)</div><div class="chart-h-md"><canvas id="leadsUtmChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento por UTM (top 12)</div><div class="chart-h-md"><canvas id="revUtmChart"></canvas></div></div>
           </div>
-        </div>
-        <div class="card p-0 overflow-hidden">
-          <div class="overflow-x-auto scrollbar">
-            <table class="w-full text-sm" id="channelTable">
-              <thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-                <th class="text-left px-4 py-3">Canal</th>
-                <th class="text-right px-4 py-3">Leads</th>
-                <th class="text-right px-4 py-3">Investimento</th>
-                <th class="text-right px-4 py-3">Ganhos (R$)</th>
-                <th class="text-right px-4 py-3">Nº ganhos</th>
-                <th class="text-right px-4 py-3">ROAS</th>
-                <th class="text-right px-4 py-3">CPL</th>
-                <th class="text-right px-4 py-3">CAC</th>
-                <th class="text-right px-4 py-3">Conv.</th>
-              </tr></thead>
-              <tbody id="channelTableBody"></tbody>
-            </table>
+          <div class="card p-0 overflow-hidden">
+            <div class="overflow-x-auto scrollbar" style="max-height:520px">
+              <table class="w-full text-sm" id="utmTable">
+                <thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+                  <th class="text-left px-4 py-3 sortable" data-k="utm">UTM (source | medium)</th>
+                  <th class="text-left px-4 py-3 sortable" data-k="ch">Canal</th>
+                  <th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th>
+                  <th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th>
+                  <th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th>
+                </tr></thead>
+                <tbody id="utmTableBody"></tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- MENSAL -->
-      <section class="space-y-4">
-        <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Evolução mensal por canal</h2></div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Leads por canal × mês</div><div class="chart-h-md"><canvas id="leadsMonthChart"></canvas></div></div>
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Faturamento por canal × mês</div><div class="chart-h-md"><canvas id="revMonthChart"></canvas></div></div>
-        </div>
-        <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS Meta vs Google × mês &nbsp;·&nbsp; investimento × faturamento</div><div class="chart-h-md"><canvas id="roasMonthChart"></canvas></div></div>
-      </section>
+        <!-- CLASSIFICAÇÃO -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Qualidade dos leads por canal</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">Classificação inicial do Typeform (Closer / SDR / Perdido) — share por canal.</p>
+          <div class="card p-4 sm:p-5"><div class="chart-h-md"><canvas id="classChart"></canvas></div></div>
+        </section>
 
-      <!-- PAINEL META -->
-      <section class="space-y-4">
-        <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight"><span style="color:var(--meta)">●</span> Meta Ads — funil de tráfego</h2></div>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3" id="metaKpis"></div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="metaFunnel" class="space-y-2.5 mt-2"></div></div>
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="metaDailyChart"></canvas></div></div>
-        </div>
-        <div class="card p-0 overflow-hidden">
-          <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Meta</div>
-          <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="metaCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="metaCampBody"></tbody></table></div>
-        </div>
-      </section>
+        <!-- NOTAS -->
+        <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
+          <div class="text-neutral-300 font-medium mb-2 text-sm">Metodologia &amp; observações</div>
+          <ul class="space-y-1.5 list-disc list-inside">
+            <li><b>Fonte ao vivo:</b> dados puxados direto do Google Sheets a cada carregamento (abas <i>Todos os Negócios</i>, <i>Negócios ganhos</i>, <i>Meta Ads</i>, <i>Google Ads</i>).</li>
+            <li><b>Leads</b> vêm sempre da aba <i>Todos os Negócios</i> (pela data de criação). <b>Faturamento</b> da aba <i>Negócios ganhos</i> (valor fechado, pela data de fechamento). <b>Investimento</b> das abas de tráfego.</li>
+            <li><b>ROAS Tráfego</b> = faturamento atribuído aos canais pagos (via UTM do lead) ÷ investimento. <b>ROAS Geral (MER)</b> = faturamento TOTAL do negócio (incluindo orgânico e sem UTM) ÷ investimento em ads — mede o retorno de cada R$ investido sobre toda a operação.</li>
+            <li><b>Classificação de canal</b> por utm_source + utm_medium: <i>FB_*/fb_/ig_Instagram</i> → Meta; <i>Search</i> e <i>YT_*/Demand Gen</i> → Google; <i>*-ORG/*_ORG/social</i> → orgânico.</li>
+            <li id="noteSemUtm"></li>
+            <li><b>Atenção:</b> a coluna "Valor fechado" tem formatação mista na planilha — por isso o faturamento é somado item a item no navegador (não pela soma do Sheets, que infla o número).</li>
+          </ul>
+        </section>
+      </div>
 
-      <!-- PAINEL GOOGLE -->
-      <section class="space-y-4">
-        <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight"><span style="color:var(--google)">●</span> Google Ads — funil de tráfego</h2></div>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3" id="googleKpis"></div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="googleFunnel" class="space-y-2.5 mt-2"></div></div>
-          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="googleDailyChart"></canvas></div></div>
-        </div>
-        <div class="card p-0 overflow-hidden">
-          <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Google</div>
-          <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="googleCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPC</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="googleCampBody"></tbody></table></div>
-        </div>
-      </section>
+      <!-- ================= TAB: META ================= -->
+      <div id="tabMeta" class="hidden space-y-6 sm:space-y-10">
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight"><span style="color:var(--meta)">●</span> Meta Ads — funil de tráfego</h2></div>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3" id="metaKpis"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="metaFunnel" class="space-y-2.5 mt-2"></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="metaDailyChart"></canvas></div></div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Impressões × Conversões (diário)</div><div class="chart-h-sm"><canvas id="metaConvChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento por campanha</div><div class="chart-h-sm"><canvas id="metaCampChart"></canvas></div></div>
+          </div>
+          <div class="card p-0 overflow-hidden">
+            <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Meta</div>
+            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="metaCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="metaCampBody"></tbody></table></div>
+          </div>
+        </section>
+      </div>
 
-      <!-- CLASSIFICAÇÃO -->
-      <section class="space-y-4">
-        <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Qualidade dos leads por canal</h2></div>
-        <p class="text-xs text-neutral-500 -mt-2">Classificação inicial do Typeform (Closer / SDR / Perdido) — share por canal.</p>
-        <div class="card p-4 sm:p-5"><div class="chart-h-md"><canvas id="classChart"></canvas></div></div>
-      </section>
-
-      <!-- NOTAS -->
-      <section class="card p-5 text-xs text-neutral-500 leading-relaxed">
-        <div class="text-neutral-300 font-medium mb-2 text-sm">Metodologia &amp; observações</div>
-        <ul class="space-y-1.5 list-disc list-inside">
-          <li><b>Fonte ao vivo:</b> os dados são puxados diretamente da planilha do Google Sheets a cada carregamento (abas <i>Todos os Negócios</i>, <i>Negócios ganhos</i>, <i>Meta Ads</i>, <i>Google Ads</i>).</li>
-          <li><b>Leads</b> vêm sempre da aba <i>Todos os Negócios</i> (contados pela data de criação). <b>Faturamento</b> vem da aba <i>Negócios ganhos</i> (valor fechado, pela data de fechamento). <b>Investimento</b> vem das abas de tráfego.</li>
-          <li><b>ROAS por canal</b> = faturamento atribuído ao canal (via UTM do lead) ÷ investimento do canal. Meta e Google têm custo de mídia; os canais orgânicos (YouTube/Instagram) aparecem como "Orgânico" (sem custo).</li>
-          <li><b>Classificação de canal</b> pela combinação utm_source + utm_medium: <i>FB_*/fb_/ig_Instagram</i> → Meta; <i>Search</i> e <i>YT_*/Demand Gen</i> → Google; <i>*-ORG/*_ORG/social</i> → orgânico.</li>
-          <li id="noteSemUtm"></li>
-          <li><b>Atenção:</b> a coluna "Valor fechado" tem formatação mista na planilha — por isso o faturamento é somado item a item no navegador (não pela soma do Sheets, que infla o número).</li>
-          <li><b>Conversão lead → ganho</b> é um indicador (ganhos no período ÷ leads no período); são coortes diferentes, então leia como tendência, não como taxa exata por lead.</li>
-        </ul>
-      </section>
+      <!-- ================= TAB: GOOGLE ================= -->
+      <div id="tabGoogle" class="hidden space-y-6 sm:space-y-10">
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight"><span style="color:var(--google)">●</span> Google Ads — funil de tráfego</h2></div>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3" id="googleKpis"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="googleFunnel" class="space-y-2.5 mt-2"></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="googleDailyChart"></canvas></div></div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Impressões × Conversões (diário)</div><div class="chart-h-sm"><canvas id="googleConvChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento por campanha</div><div class="chart-h-sm"><canvas id="googleCampChart"></canvas></div></div>
+          </div>
+          <div class="card p-0 overflow-hidden">
+            <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Google</div>
+            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm" id="googleCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPC</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="googleCampBody"></tbody></table></div>
+          </div>
+        </section>
+      </div>
 
     </div>
   </main>
@@ -312,12 +360,7 @@
     // CONFIG
     // ============================================================
     const SHEET_ID = '1uvWuSsL6BffBqnigclLYZ_oDnEqcayB8kxqGgM34sQs';
-    const SHEETS = {
-      leads:  'Todos os Negócios - 2026',
-      won:    'Negócios ganhos - 2026',
-      meta:   'Meta Ads',
-      google: 'Google Ads',
-    };
+    const SHEETS = { leads: 'Todos os Negócios - 2026', won: 'Negócios ganhos - 2026', meta: 'Meta Ads', google: 'Google Ads' };
     const $ = (id) => document.getElementById(id);
 
     // ============================================================
@@ -328,12 +371,7 @@
     const fmtBRL2 = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const fmtPct = (n, d = 1) => `${Number(n || 0).toFixed(d).replace('.', ',')}%`;
     const fmtX = (n) => `${Number(n || 0).toFixed(2).replace('.', ',')}x`;
-    const fmtBRLShort = (n) => {
-      const v = Number(n || 0);
-      if (Math.abs(v) >= 1000000) return 'R$ ' + (v/1000000).toFixed(2).replace('.', ',') + 'M';
-      if (Math.abs(v) >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k';
-      return fmtBRL(v);
-    };
+    const fmtBRLShort = (n) => { const v = Number(n || 0); if (Math.abs(v) >= 1000000) return 'R$ ' + (v/1000000).toFixed(2).replace('.', ',') + 'M'; if (Math.abs(v) >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k'; return fmtBRL(v); };
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const fmtYm = (ym) => { if (!ym) return '—'; const [y,m] = ym.split('-'); return `${MONTHS[(+m)-1]}/${y.slice(2)}`; };
 
@@ -350,6 +388,7 @@
       'Outros':             { color: '#737373', paid: false },
     };
     const CHANNEL_ORDER = Object.keys(CHANNELS);
+    const chColor = (c) => (CHANNELS[c] || { color: '#737373' }).color;
 
     function classifyChannel(source, medium) {
       const s = (source || '').trim().toLowerCase();
@@ -359,71 +398,38 @@
       const isOrg = /(^|[\s_-])org([\s_-]|$)/.test(blob) || blob.includes('-org') || blob.includes('_org') || m === 'social' || blob.includes('youtube-org');
       const isYt = blob.includes('yt') || blob.includes('youtube');
       const isIg = blob.includes('instagram') || /(^|[\s_])ig([\s_]|$)/.test(blob) || s.startsWith('ig');
-      if (isOrg) {
-        if (isYt) return 'YouTube Orgânico';
-        if (isIg) return 'Instagram Orgânico';
-        return 'Orgânico (outros)';
-      }
+      if (isOrg) { if (isYt) return 'YouTube Orgânico'; if (isIg) return 'Instagram Orgânico'; return 'Orgânico (outros)'; }
       if (m.startsWith('fb_') || m === 'paid' || m === 'fb_advantage' || s.startsWith('fb') || s.startsWith('ig_instagram') || blob.includes('site_source_name') || s === 'an_an') return 'Meta Ads';
       if (m === 'search' || s === 'search') return 'Google Ads';
       if (m.startsWith('yt_') || blob.includes('dmg') || isYt) return 'Google Ads';
       return 'Outros';
     }
-
-    function normClass(q) {
-      const v = (q || '').trim().toLowerCase();
-      if (v.startsWith('closer')) return 'Closer';
-      if (v.startsWith('sdr')) return 'SDR';
-      if (v.startsWith('perdido')) return 'Perdido';
-      return 'Outros';
-    }
+    function normClass(q) { const v = (q || '').trim().toLowerCase(); if (v.startsWith('closer')) return 'Closer'; if (v.startsWith('sdr')) return 'SDR'; if (v.startsWith('perdido')) return 'Perdido'; return 'Outros'; }
+    function utmLabel(src, med, ch) { if (ch === 'Sem UTM') return 'Sem UTM (sem origem)'; return `${src || '∅'} | ${med || '∅'}`; }
 
     // ============================================================
     // GVIZ FETCH + CSV
     // ============================================================
-    function gvizUrl(sheet, tq) {
-      return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&tq=${encodeURIComponent(tq)}`;
-    }
-    async function fetchCsv(sheet, tq) {
-      const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' });
-      if (!r.ok) throw new Error(`HTTP ${r.status} (${sheet})`);
-      return parseCsv(await r.text());
-    }
+    function gvizUrl(sheet, tq) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&tq=${encodeURIComponent(tq)}`; }
+    async function fetchCsv(sheet, tq) { const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' }); if (!r.ok) throw new Error(`HTTP ${r.status} (${sheet})`); return parseCsv(await r.text()); }
     function parseCsv(text) {
       const rows = []; let row = [], cur = '', q = false;
       for (let i = 0; i < text.length; i++) {
         const c = text[i];
-        if (q) {
-          if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; }
-          else cur += c;
-        } else {
-          if (c === '"') q = true;
-          else if (c === ',') { row.push(cur); cur = ''; }
-          else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
-          else if (c === '\r') { /* skip */ }
-          else cur += c;
-        }
+        if (q) { if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+        else { if (c === '"') q = true; else if (c === ',') { row.push(cur); cur = ''; } else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; } else if (c === '\r') {} else cur += c; }
       }
       if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
-      return rows.length ? rows.slice(1) : []; // drop header
+      return rows.length ? rows.slice(1) : [];
     }
-    const num = (v) => { const n = parseFloat(String(v == null ? '' : v).replace(/\s/g, '').replace('R$', '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; };
     const numRaw = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
-    function pdate(s) {
-      if (!s) return null;
-      const m = String(s).match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-      if (!m) return null;
-      const mo = String(+m[2]).padStart(2, '0'), d = String(+m[3]).padStart(2, '0');
-      return { y: m[1], ym: `${m[1]}-${mo}`, ymd: `${m[1]}-${mo}-${d}` };
-    }
-    // year/month-as-0-index pair -> 'YYYY-MM'
+    function pdate(s) { if (!s) return null; const m = String(s).match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if (!m) return null; const mo = String(+m[2]).padStart(2, '0'), d = String(+m[3]).padStart(2, '0'); return { y: m[1], ym: `${m[1]}-${mo}`, ymd: `${m[1]}-${mo}-${d}` }; }
     const ym0 = (y, m0) => `${y}-${String((+m0) + 1).padStart(2, '0')}`;
 
     // ============================================================
-    // RAW DATA (loaded once)
+    // RAW DATA
     // ============================================================
-    let RAW = null; // { leads:[], won:[], metaDaily:[], metaCamp:[], googleDaily:[], googleCamp:[], months:[] }
-
+    let RAW = null;
     async function loadData() {
       const Q = {
         leads:      "select O,N,year(J),month(J),Q,count(A) where A is not null group by O,N,year(J),month(J),Q",
@@ -434,53 +440,26 @@
         googleCamp: "select C,year(A),month(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A)",
       };
       const [lead, won, mD, mC, gD, gC] = await Promise.all([
-        fetchCsv(SHEETS.leads,  Q.leads),
-        fetchCsv(SHEETS.won,    Q.won),
-        fetchCsv(SHEETS.meta,   Q.metaDaily),
-        fetchCsv(SHEETS.meta,   Q.metaCamp),
-        fetchCsv(SHEETS.google, Q.googleDaily),
-        fetchCsv(SHEETS.google, Q.googleCamp),
+        fetchCsv(SHEETS.leads,  Q.leads), fetchCsv(SHEETS.won, Q.won),
+        fetchCsv(SHEETS.meta,   Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp),
+        fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp),
       ]);
-
       const monthsSet = new Set();
-
-      const leads = lead.filter(r => r.length >= 6).map(r => {
-        const ym = ym0(r[2], r[3]);
-        monthsSet.add(ym);
-        return { ch: classifyChannel(r[0], r[1]), ym, cls: normClass(r[4]), n: numRaw(r[5]) };
-      });
-
-      const wonRows = won.filter(r => r.length >= 4).map(r => {
-        const d = pdate(r[3]);
-        if (d) monthsSet.add(d.ym);
-        return { value: numRaw(r[0]), ch: classifyChannel(r[1], r[2]), ym: d ? d.ym : null };
-      });
-
-      const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => {
-        const d = pdate(r[0]); if (d) monthsSet.add(d.ym);
-        const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null };
-        for (const k in idx) o[k] = numRaw(r[idx[k]]);
-        return o;
-      });
+      const leads = lead.filter(r => r.length >= 6).map(r => { const ym = ym0(r[2], r[3]); monthsSet.add(ym); return { src: r[0], med: r[1], ch: classifyChannel(r[0], r[1]), ym, cls: normClass(r[4]), n: numRaw(r[5]) }; });
+      const wonRows = won.filter(r => r.length >= 4).map(r => { const d = pdate(r[3]); if (d) monthsSet.add(d.ym); return { value: numRaw(r[0]), src: r[1], med: r[2], ch: classifyChannel(r[1], r[2]), ym: d ? d.ym : null }; });
+      const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => { const d = pdate(r[0]); if (d) monthsSet.add(d.ym); const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
       const metaDaily   = mapDaily(mD, { spend:1, impr:2, clicks:3, lpv:4, conv:5 });
       const googleDaily = mapDaily(gD, { spend:1, impr:2, clicks:3, conv:4 });
-
-      const mapCamp = (rows, idx) => rows.filter(r => r.length >= 4).map(r => {
-        const ym = ym0(r[1], r[2]); monthsSet.add(ym);
-        const o = { name: (r[0] || '(sem nome)').trim() || '(sem nome)', ym };
-        for (const k in idx) o[k] = numRaw(r[idx[k]]);
-        return o;
-      });
+      const mapCamp = (rows, idx) => rows.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); const o = { name: (r[0] || '(sem nome)').trim() || '(sem nome)', ym }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
       const metaCamp   = mapCamp(mC, { spend:3, impr:4, clicks:5, lpv:6, conv:7, n:8 });
       const googleCamp = mapCamp(gC, { spend:3, impr:4, clicks:5, conv:6, n:7 });
-
       const months = [...monthsSet].filter(Boolean).sort();
       RAW = { leads, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, months };
       return RAW;
     }
 
     // ============================================================
-    // AGGREGATION (by selected month range)
+    // AGGREGATION
     // ============================================================
     let RANGE = { start: null, end: null };
     const inRange = (ym) => ym && ym >= RANGE.start && ym <= RANGE.end;
@@ -488,51 +467,41 @@
     function compute() {
       const ch = {};
       CHANNEL_ORDER.forEach(c => ch[c] = { leads: 0, won: 0, rev: 0, spend: 0, cls: { Closer:0, SDR:0, Perdido:0, Outros:0 } });
-
       const monthsInRange = RAW.months.filter(inRange);
       const leadsByChMonth = {}, revByChMonth = {};
       CHANNEL_ORDER.forEach(c => { leadsByChMonth[c] = {}; revByChMonth[c] = {}; monthsInRange.forEach(m => { leadsByChMonth[c][m] = 0; revByChMonth[c][m] = 0; }); });
+      const utm = {};
+      const utmKey = (r) => r.ch === 'Sem UTM' ? '∅sem' : `${r.src}${r.med}`;
+      const getUtm = (r) => { const k = utmKey(r); if (!utm[k]) utm[k] = { utm: utmLabel(r.src, r.med, r.ch), ch: r.ch, leads: 0, won: 0, rev: 0 }; return utm[k]; };
 
-      RAW.leads.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; leadsByChMonth[r.ch][r.ym] += r.n; });
-      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; });
+      RAW.leads.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; leadsByChMonth[r.ch][r.ym] += r.n; getUtm(r).leads += r.n; });
+      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; const u = getUtm(r); u.won += 1; u.rev += r.value; });
 
-      // spend per platform (from daily)
-      const platSpend = { meta: 0, google: 0 };
-      const platTraffic = {
-        meta:   { spend:0, impr:0, clicks:0, lpv:0, conv:0 },
-        google: { spend:0, impr:0, clicks:0, conv:0 },
-      };
+      const platTraffic = { meta: { spend:0, impr:0, clicks:0, lpv:0, conv:0 }, google: { spend:0, impr:0, clicks:0, conv:0 } };
       RAW.metaDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.meta.spend+=d.spend; platTraffic.meta.impr+=d.impr; platTraffic.meta.clicks+=d.clicks; platTraffic.meta.lpv+=d.lpv; platTraffic.meta.conv+=d.conv; });
       RAW.googleDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.google.spend+=d.spend; platTraffic.google.impr+=d.impr; platTraffic.google.clicks+=d.clicks; platTraffic.google.conv+=d.conv; });
-      platSpend.meta = platTraffic.meta.spend; platSpend.google = platTraffic.google.spend;
-      ch['Meta Ads'].spend = platSpend.meta; ch['Google Ads'].spend = platSpend.google;
+      ch['Meta Ads'].spend = platTraffic.meta.spend; ch['Google Ads'].spend = platTraffic.google.spend;
 
-      // monthly meta/google spend & rev for roasMonth chart
       const byMonth = {};
-      monthsInRange.forEach(m => byMonth[m] = { metaSpend:0, googleSpend:0, metaRev: revByChMonth['Meta Ads'][m]||0, googleRev: revByChMonth['Google Ads'][m]||0 });
+      monthsInRange.forEach(m => byMonth[m] = { metaSpend:0, googleSpend:0, metaRev: revByChMonth['Meta Ads'][m]||0, googleRev: revByChMonth['Google Ads'][m]||0, totRev: 0 });
       RAW.metaDaily.forEach(d => { if (byMonth[d.ym]) byMonth[d.ym].metaSpend += d.spend; });
       RAW.googleDaily.forEach(d => { if (byMonth[d.ym]) byMonth[d.ym].googleSpend += d.spend; });
+      monthsInRange.forEach(m => { byMonth[m].totRev = CHANNEL_ORDER.reduce((s,c)=>s+(revByChMonth[c][m]||0),0); });
 
-      // campaigns in range
-      const aggCamp = (rows, keys) => {
-        const map = {};
-        rows.forEach(r => { if (!inRange(r.ym)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); });
-        return Object.values(map).sort((a,b) => b.spend - a.spend);
-      };
+      const aggCamp = (rows, keys) => { const map = {}; rows.forEach(r => { if (!inRange(r.ym)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); }); return Object.values(map).sort((a,b) => b.spend - a.spend); };
       const metaCamp   = aggCamp(RAW.metaCamp,   ['spend','impr','clicks','lpv','conv','n']);
       const googleCamp = aggCamp(RAW.googleCamp, ['spend','impr','clicks','conv','n']);
 
-      // totals
+      const utmList = Object.values(utm).sort((a,b) => b.rev - a.rev);
       const totLeads = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].leads,0);
       const totRev = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].rev,0);
       const totWon = CHANNEL_ORDER.reduce((s,c)=>s+ch[c].won,0);
-      const totSpend = platSpend.meta + platSpend.google;
+      const totSpend = platTraffic.meta.spend + platTraffic.google.spend;
       const paidRev = ch['Meta Ads'].rev + ch['Google Ads'].rev;
       const paidLeads = ch['Meta Ads'].leads + ch['Google Ads'].leads;
       const semUtmRev = ch['Sem UTM'].rev;
 
-      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp,
-               totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
+      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp, utmList, totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
     }
 
     // ============================================================
@@ -546,198 +515,119 @@
     Chart.defaults.plugins.legend.labels.boxHeight = 10;
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
     Chart.defaults.plugins.legend.labels.padding = 14;
-
     const charts = {};
-    function setChart(id, cfg) {
-      if (charts[id]) charts[id].destroy();
-      const el = $(id); if (!el) return;
-      charts[id] = new Chart(el.getContext('2d'), cfg);
-    }
+    function setChart(id, cfg) { if (charts[id]) charts[id].destroy(); const el = $(id); if (!el) return; charts[id] = new Chart(el.getContext('2d'), cfg); }
     function destroyAllCharts() { Object.keys(charts).forEach(k => { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
-
     const GRID = { color: '#1a1a1a' };
 
     function renderRoasChart(D) {
       const meta = D.ch['Meta Ads'], google = D.ch['Google Ads'];
-      const roasM = meta.spend ? meta.rev/meta.spend : 0;
-      const roasG = google.spend ? google.rev/google.spend : 0;
-      setChart('roasChart', {
-        type: 'bar',
-        data: { labels: ['Meta Ads', 'Google Ads'], datasets: [{ label: 'ROAS', data: [roasM, roasG], backgroundColor: [CHANNELS['Meta Ads'].color, CHANNELS['Google Ads'].color], borderRadius: 6, maxBarThickness: 90 }] },
+      const roasM = meta.spend ? meta.rev/meta.spend : 0, roasG = google.spend ? google.rev/google.spend : 0;
+      setChart('roasChart', { type: 'bar',
+        data: { labels: ['Meta Ads', 'Google Ads'], datasets: [{ label: 'ROAS', data: [roasM, roasG], backgroundColor: [chColor('Meta Ads'), chColor('Google Ads')], borderRadius: 6, maxBarThickness: 90 }] },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => {
-            const i = c.dataIndex; const r = i===0?meta:google;
-            return [`ROAS: ${fmtX(c.raw)}`, `Faturamento: ${fmtBRL(r.rev)}`, `Investimento: ${fmtBRL(r.spend)}`]; } } } },
-          scales: { x: { grid: GRID, ticks: { callback: (v) => v + 'x' } }, y: { grid: { display: false } } } }
-      });
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => { const r = c.dataIndex===0?meta:google; return [`ROAS: ${fmtX(c.raw)}`, `Faturamento: ${fmtBRL(r.rev)}`, `Investimento: ${fmtBRL(r.spend)}`]; } } } },
+          scales: { x: { grid: GRID, ticks: { callback: (v) => v + 'x' } }, y: { grid: { display: false } } } } });
     }
-
     function renderRevChannelChart(D) {
       const items = CHANNEL_ORDER.map(c => ({ c, rev: D.ch[c].rev })).filter(x => x.rev > 0).sort((a,b)=>b.rev-a.rev);
-      setChart('revChannelChart', {
-        type: 'bar',
-        data: { labels: items.map(x=>x.c), datasets: [{ data: items.map(x=>x.rev), backgroundColor: items.map(x=>CHANNELS[x.c].color), borderRadius: 6, maxBarThickness: 40 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtBRL2(c.raw) } } },
-          scales: { x: { grid: GRID, ticks: { callback: fmtBRLShort } }, y: { grid: { display: false } } } }
-      });
+      setChart('revChannelChart', { type: 'bar',
+        data: { labels: items.map(x=>x.c), datasets: [{ data: items.map(x=>x.rev), backgroundColor: items.map(x=>chColor(x.c)), borderRadius: 6, maxBarThickness: 40 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmtBRL2(c.raw) } } }, scales: { x: { grid: GRID, ticks: { callback: fmtBRLShort } }, y: { grid: { display: false } } } } });
     }
-
     function stackedMonth(id, byChMonth, months, fmtTick, fmtTip) {
-      const ds = CHANNEL_ORDER.filter(c => months.some(m => (byChMonth[c][m]||0) > 0)).map(c => ({
-        label: c, data: months.map(m => byChMonth[c][m] || 0), backgroundColor: CHANNELS[c].color, borderRadius: 3, stack: 's',
-      }));
-      setChart(id, {
-        type: 'bar',
-        data: { labels: months.map(fmtYm), datasets: ds },
-        options: { responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtTip(c.raw)}` } } },
-          scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: GRID, ticks: { callback: fmtTick } } } }
-      });
+      const ds = CHANNEL_ORDER.filter(c => months.some(m => (byChMonth[c][m]||0) > 0)).map(c => ({ label: c, data: months.map(m => byChMonth[c][m] || 0), backgroundColor: chColor(c), borderRadius: 3, stack: 's' }));
+      setChart(id, { type: 'bar', data: { labels: months.map(fmtYm), datasets: ds },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmtTip(c.raw)}` } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: GRID, ticks: { callback: fmtTick } } } } });
     }
-
     function renderRoasMonthChart(D) {
-      const m = D.monthsInRange;
-      const roas = (rev, sp) => sp ? rev/sp : 0;
-      setChart('roasMonthChart', {
-        type: 'bar',
+      const m = D.monthsInRange; const roas = (rev, sp) => sp ? rev/sp : 0;
+      setChart('roasMonthChart', { type: 'bar',
         data: { labels: m.map(fmtYm), datasets: [
-          { type:'bar', label: 'Investimento Meta', data: m.map(x=>D.byMonth[x].metaSpend), backgroundColor: 'rgba(79,140,255,0.35)', stack:'spend', borderRadius:3 },
-          { type:'bar', label: 'Investimento Google', data: m.map(x=>D.byMonth[x].googleSpend), backgroundColor: 'rgba(52,211,153,0.35)', stack:'spend', borderRadius:3 },
-          { type:'bar', label: 'Faturamento Meta', data: m.map(x=>D.byMonth[x].metaRev), backgroundColor: 'rgba(79,140,255,0.9)', stack:'rev', borderRadius:3 },
-          { type:'bar', label: 'Faturamento Google', data: m.map(x=>D.byMonth[x].googleRev), backgroundColor: 'rgba(52,211,153,0.9)', stack:'rev', borderRadius:3 },
-          { type:'line', label: 'ROAS Meta', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].metaRev, D.byMonth[x].metaSpend)), borderColor:'#4f8cff', backgroundColor:'#4f8cff', tension:.3, pointRadius:3 },
-          { type:'line', label: 'ROAS Google', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].googleRev, D.byMonth[x].googleSpend)), borderColor:'#34d399', backgroundColor:'#34d399', tension:.3, pointRadius:3, borderDash:[4,3] },
+          { type:'bar', label: 'Investimento', data: m.map(x=>D.byMonth[x].metaSpend + D.byMonth[x].googleSpend), backgroundColor: 'rgba(115,115,115,0.4)', stack:'a', borderRadius:3 },
+          { type:'bar', label: 'Faturamento pago', data: m.map(x=>D.byMonth[x].metaRev + D.byMonth[x].googleRev), backgroundColor: 'rgba(79,140,255,0.85)', stack:'b', borderRadius:3 },
+          { type:'bar', label: 'Faturamento total', data: m.map(x=>D.byMonth[x].totRev), backgroundColor: 'rgba(250,204,21,0.35)', stack:'c', borderRadius:3 },
+          { type:'line', label: 'ROAS Tráfego', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].metaRev + D.byMonth[x].googleRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#4f8cff', backgroundColor:'#4f8cff', tension:.3, pointRadius:3 },
+          { type:'line', label: 'ROAS Geral', yAxisID:'y1', data: m.map(x=>roas(D.byMonth[x].totRev, D.byMonth[x].metaSpend + D.byMonth[x].googleSpend)), borderColor:'#facc15', backgroundColor:'#facc15', tension:.3, pointRadius:3, borderDash:[4,3] },
         ] },
-        options: { responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y1' ? `${c.dataset.label}: ${fmtX(c.raw)}` : `${c.dataset.label}: ${fmtBRL(c.raw)}` } } },
-          scales: { x: { grid: { display: false } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: (v)=>v+'x' } } } }
-      });
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y1' ? `${c.dataset.label}: ${fmtX(c.raw)}` : `${c.dataset.label}: ${fmtBRL(c.raw)}` } } }, scales: { x: { grid: { display: false } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: (v)=>v+'x' } } } } });
     }
-
-    function renderDailyChart(id, daily, range) {
-      const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
-      setChart(id, {
-        type: 'line',
-        data: { labels: pts.map(p => { const [,mo,d] = p.ymd.split('-'); return `${d}/${mo}`; }),
-          datasets: [
-            { label: 'Investimento', yAxisID:'y', data: pts.map(p=>p.spend), borderColor:'#facc15', backgroundColor:'rgba(250,204,21,0.08)', fill:true, tension:.25, pointRadius:0, borderWidth:1.5 },
-            { label: 'Cliques', yAxisID:'y1', data: pts.map(p=>p.clicks), borderColor:'#a3a3a3', tension:.25, pointRadius:0, borderWidth:1.5 },
-          ] },
-        options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false },
-          plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Investimento: ${fmtBRL(c.raw)}` : `Cliques: ${fmtInt(c.raw)}` } } },
-          scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } }
-      });
+    function renderUtmCharts(D) {
+      const byLeads = [...D.utmList].filter(u=>u.leads>0).sort((a,b)=>b.leads-a.leads).slice(0,12);
+      const byRev = [...D.utmList].filter(u=>u.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,12);
+      setChart('leadsUtmChart', { type:'bar', data:{ labels: byLeads.map(u=>u.utm), datasets:[{ data: byLeads.map(u=>u.leads), backgroundColor: byLeads.map(u=>chColor(u.ch)), borderRadius:4, maxBarThickness:26 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>`${fmtInt(c.raw)} leads · ${byLeads[c.dataIndex].ch}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtInt } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      setChart('revUtmChart', { type:'bar', data:{ labels: byRev.map(u=>u.utm), datasets:[{ data: byRev.map(u=>u.rev), backgroundColor: byRev.map(u=>chColor(u.ch)), borderRadius:4, maxBarThickness:26 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>`${fmtBRL2(c.raw)} · ${byRev[c.dataIndex].ch}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
     }
-
     function renderClassChart(D) {
       const cols = { Closer:'#f5f5f5', SDR:'#a3a3a3', Perdido:'#ef4444', Outros:'#404040' };
       const chans = CHANNEL_ORDER.filter(c => D.ch[c].leads > 0);
-      setChart('classChart', {
-        type: 'bar',
-        data: { labels: chans, datasets: ['Closer','SDR','Perdido','Outros'].map(k => ({ label:k, data: chans.map(c=>D.ch[c].cls[k]), backgroundColor: cols[k], borderRadius:3, stack:'s' })) },
-        options: { responsive:true, maintainAspectRatio:false,
-          plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label:(c)=>{ const tot=chans.map(x=>D.ch[x].leads)[c.dataIndex]||1; return `${c.dataset.label}: ${fmtInt(c.raw)} (${fmtPct(c.raw/tot*100)})`; } } } },
-          scales: { x:{ stacked:true, grid:{display:false} }, y:{ stacked:true, grid:GRID, ticks:{ callback:fmtInt } } } }
-      });
+      setChart('classChart', { type: 'bar', data: { labels: chans, datasets: ['Closer','SDR','Perdido','Outros'].map(k => ({ label:k, data: chans.map(c=>D.ch[c].cls[k]), backgroundColor: cols[k], borderRadius:3, stack:'s' })) },
+        options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label:(c)=>{ const tot=chans.map(x=>D.ch[x].leads)[c.dataIndex]||1; return `${c.dataset.label}: ${fmtInt(c.raw)} (${fmtPct(c.raw/tot*100)})`; } } } }, scales: { x:{ stacked:true, grid:{display:false} }, y:{ stacked:true, grid:GRID, ticks:{ callback:fmtInt } } } } });
+    }
+    function renderDailyChart(id, daily) {
+      const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
+      setChart(id, { type: 'line', data: { labels: pts.map(p => { const [,mo,d] = p.ymd.split('-'); return `${d}/${mo}`; }), datasets: [
+        { label: 'Investimento', yAxisID:'y', data: pts.map(p=>p.spend), borderColor:'#facc15', backgroundColor:'rgba(250,204,21,0.08)', fill:true, tension:.25, pointRadius:0, borderWidth:1.5 },
+        { label: 'Cliques', yAxisID:'y1', data: pts.map(p=>p.clicks), borderColor:'#a3a3a3', tension:.25, pointRadius:0, borderWidth:1.5 } ] },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Investimento: ${fmtBRL(c.raw)}` : `Cliques: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
+    }
+    function renderConvChart(id, daily) {
+      const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
+      setChart(id, { type: 'line', data: { labels: pts.map(p => { const [,mo,d] = p.ymd.split('-'); return `${d}/${mo}`; }), datasets: [
+        { label: 'Impressões', yAxisID:'y', data: pts.map(p=>p.impr), borderColor:'#525252', backgroundColor:'rgba(82,82,82,0.12)', fill:true, tension:.25, pointRadius:0, borderWidth:1.2 },
+        { label: 'Conversões', yAxisID:'y1', data: pts.map(p=>p.conv), borderColor:'#34d399', tension:.25, pointRadius:0, borderWidth:1.8 } ] },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Impressões: ${fmtInt(c.raw)}` : `Conversões: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtInt } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
+    }
+    function renderCampChart(id, camps, color) {
+      const top = camps.slice(0, 8);
+      setChart(id, { type:'bar', data:{ labels: top.map(c=>c.name.length>34?c.name.slice(0,32)+'…':c.name), datasets:[{ data: top.map(c=>c.spend), backgroundColor: color, borderRadius:4, maxBarThickness:26 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>fmtBRL2(c.raw) } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
     }
 
     // ============================================================
-    // FUNNEL + KPI CHIPS
+    // CHIPS / FUNNEL / TABLES
     // ============================================================
-    function chip(label, value, sub) {
-      return `<div class="metric-chip"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-base sm:text-xl font-bold">${value}</div>${sub?`<div class="text-[10px] text-neutral-500 mt-0.5">${sub}</div>`:''}</div>`;
-    }
+    function chip(label, value, sub) { return `<div class="metric-chip"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-base sm:text-xl font-bold">${value}</div>${sub?`<div class="text-[10px] text-neutral-500 mt-0.5">${sub}</div>`:''}</div>`; }
     function renderFunnel(elId, steps, color) {
       const max = Math.max(...steps.map(s=>s.v), 1);
-      $(elId).innerHTML = steps.map(s => {
-        const w = Math.max((s.v/max)*100, 1.5);
-        return `<div><div class="flex justify-between text-[11px] mb-1"><span class="text-neutral-400">${s.label}</span><span class="font-semibold">${s.fmt(s.v)}${s.pct!=null?` <span class="text-neutral-500">· ${fmtPct(s.pct)}</span>`:''}</span></div><div class="funnel-row"><div class="funnel-bar" style="width:${w}%;background:${color}"></div></div></div>`;
+      $(elId).innerHTML = steps.map(s => { const w = Math.max((s.v/max)*100, 1.5); return `<div><div class="flex justify-between text-[11px] mb-1"><span class="text-neutral-400">${s.label}</span><span class="font-semibold">${s.fmt(s.v)}${s.pct!=null?` <span class="text-neutral-500">· ${fmtPct(s.pct)}</span>`:''}</span></div><div class="funnel-bar" style="width:${w}%;background:${color}"></div></div>`; }).join('');
+    }
+    function renderChannelTable(D) {
+      const rows = CHANNEL_ORDER.map(c => ({c, ...D.ch[c]})).filter(o => o.leads>0 || o.rev>0 || o.spend>0);
+      $('channelTableBody').innerHTML = rows.map(o => {
+        const cfg = CHANNELS[o.c]; const roas = o.spend ? o.rev/o.spend : null; const cpl = o.spend && o.leads ? o.spend/o.leads : null; const cac = o.spend && o.won ? o.spend/o.won : null; const conv = o.leads ? o.won/o.leads*100 : 0;
+        const roasCell = cfg.paid ? `<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${roas!=null?fmtX(roas):'—'}</span>` : `<span class="text-neutral-500">Orgânico</span>`;
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${cfg.color}"></span>${o.c}</span></td><td class="px-4 py-2.5 text-right">${fmtInt(o.leads)}</td><td class="px-4 py-2.5 text-right">${o.spend?fmtBRL(o.spend):'—'}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(o.rev)}</td><td class="px-4 py-2.5 text-right">${fmtInt(o.won)}</td><td class="px-4 py-2.5 text-right">${roasCell}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td><td class="px-4 py-2.5 text-right">${fmtPct(conv,1)}</td></tr>`;
       }).join('');
+    }
+    let utmSort = { k: 'rev', dir: -1 };
+    function renderUtmTable(D) {
+      const rows = [...D.utmList];
+      rows.sort((a,b) => { let va=a[utmSort.k], vb=b[utmSort.k]; if (typeof va==='string') return utmSort.dir * va.localeCompare(vb); return utmSort.dir * (va-vb); });
+      $('utmTableBody').innerHTML = rows.slice(0, 60).map(u => `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-300">${u.utm}</td><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${chColor(u.ch)}"></span><span class="text-neutral-400 text-xs">${u.ch}</span></span></td><td class="px-4 py-2.5 text-right">${fmtInt(u.leads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.won)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(u.rev)}</td></tr>`).join('') || `<tr><td colspan="5" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     function renderMetaPanel(D) {
       const t = D.platTraffic.meta; const m = D.ch['Meta Ads'];
-      const ctr = t.impr ? t.clicks/t.impr*100 : 0;
-      const cpm = t.impr ? t.spend/t.impr*1000 : 0;
-      const cpc = t.clicks ? t.spend/t.clicks : 0;
-      const cpa = t.conv ? t.spend/t.conv : 0;
-      const roas = t.spend ? m.rev/t.spend : 0;
-      $('metaKpis').innerHTML = [
-        chip('Investimento', fmtBRL(t.spend)),
-        chip('Impressões', fmtInt(t.impr)),
-        chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`),
-        chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`),
-        chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`),
-        chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`),
-      ].join('');
-      renderFunnel('metaFunnel', [
-        { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null },
-        { label:'Cliques no link', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 },
-        { label:'Landing page views', v:t.lpv, fmt:fmtInt, pct: t.clicks? t.lpv/t.clicks*100:0 },
-        { label:'Conversões (TYP)', v:t.conv, fmt:fmtInt, pct: t.lpv? t.conv/t.lpv*100:0 },
-        { label:'Negócios ganhos', v:m.won, fmt:fmtInt, pct: t.conv? m.won/t.conv*100:0 },
-      ], CHANNELS['Meta Ads'].color);
+      const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpm = t.impr ? t.spend/t.impr*1000 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? m.rev/t.spend : 0;
+      $('metaKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`), chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`) ].join('');
+      renderFunnel('metaFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques no link', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Landing page views', v:t.lpv, fmt:fmtInt, pct: t.clicks? t.lpv/t.clicks*100:0 }, { label:'Conversões (TYP)', v:t.conv, fmt:fmtInt, pct: t.lpv? t.conv/t.lpv*100:0 }, { label:'Negócios ganhos', v:m.won, fmt:fmtInt, pct: t.conv? m.won/t.conv*100:0 } ], chColor('Meta Ads'));
       renderDailyChart('metaDailyChart', RAW.metaDaily);
-      $('metaCampBody').innerHTML = D.metaCamp.map(c => {
-        const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`;
-      }).join('') || `<tr><td colspan="9" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      renderConvChart('metaConvChart', RAW.metaDaily);
+      renderCampChart('metaCampChart', D.metaCamp, chColor('Meta Ads'));
+      $('metaCampBody').innerHTML = D.metaCamp.map(c => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="9" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
-
     function renderGooglePanel(D) {
       const t = D.platTraffic.google; const g = D.ch['Google Ads'];
-      const ctr = t.impr ? t.clicks/t.impr*100 : 0;
-      const cpc = t.clicks ? t.spend/t.clicks : 0;
-      const cpa = t.conv ? t.spend/t.conv : 0;
-      const roas = t.spend ? g.rev/t.spend : 0;
-      $('googleKpis').innerHTML = [
-        chip('Investimento', fmtBRL(t.spend)),
-        chip('Impressões', fmtInt(t.impr)),
-        chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`),
-        chip('CPC', fmtBRL2(cpc)),
-        chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`),
-        chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`),
-      ].join('');
-      renderFunnel('googleFunnel', [
-        { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null },
-        { label:'Cliques', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 },
-        { label:'Conversões', v:t.conv, fmt:fmtInt, pct: t.clicks? t.conv/t.clicks*100:0 },
-        { label:'Negócios ganhos', v:g.won, fmt:fmtInt, pct: t.conv? g.won/t.conv*100:0 },
-      ], CHANNELS['Google Ads'].color);
+      const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? g.rev/t.spend : 0;
+      $('googleKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPC', fmtBRL2(cpc)), chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`) ].join('');
+      renderFunnel('googleFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Conversões', v:t.conv, fmt:fmtInt, pct: t.clicks? t.conv/t.clicks*100:0 }, { label:'Negócios ganhos', v:g.won, fmt:fmtInt, pct: t.conv? g.won/t.conv*100:0 } ], chColor('Google Ads'));
       renderDailyChart('googleDailyChart', RAW.googleDaily);
-      $('googleCampBody').innerHTML = D.googleCamp.map(c => {
-        const ctr=c.impr? c.clicks/c.impr*100:0, cpc=c.clicks? c.spend/c.clicks:0, cpa=c.conv? c.spend/c.conv:0;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpc)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`;
-      }).join('') || `<tr><td colspan="8" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
-    }
-
-    // ============================================================
-    // CHANNEL TABLE + KPIs
-    // ============================================================
-    function renderChannelTable(D) {
-      const rows = CHANNEL_ORDER.map(c => D.ch[c]).map((o,i)=>({c:CHANNEL_ORDER[i],...o})).filter(o => o.leads>0 || o.rev>0 || o.spend>0);
-      $('channelTableBody').innerHTML = rows.map(o => {
-        const cfg = CHANNELS[o.c];
-        const roas = o.spend ? o.rev/o.spend : null;
-        const cpl = o.spend && o.leads ? o.spend/o.leads : null;
-        const cac = o.spend && o.won ? o.spend/o.won : null;
-        const conv = o.leads ? o.won/o.leads*100 : 0;
-        const roasCell = cfg.paid
-          ? `<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${roas!=null?fmtX(roas):'—'}</span>`
-          : `<span class="text-neutral-500">Orgânico</span>`;
-        return `<tr class="border-t border-neutral-800">
-          <td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${cfg.color}"></span>${o.c}</span></td>
-          <td class="px-4 py-2.5 text-right">${fmtInt(o.leads)}</td>
-          <td class="px-4 py-2.5 text-right">${o.spend?fmtBRL(o.spend):'—'}</td>
-          <td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(o.rev)}</td>
-          <td class="px-4 py-2.5 text-right">${fmtInt(o.won)}</td>
-          <td class="px-4 py-2.5 text-right">${roasCell}</td>
-          <td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td>
-          <td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td>
-          <td class="px-4 py-2.5 text-right">${fmtPct(conv,1)}</td>
-        </tr>`;
-      }).join('');
+      renderConvChart('googleConvChart', RAW.googleDaily);
+      renderCampChart('googleCampChart', D.googleCamp, chColor('Google Ads'));
+      $('googleCampBody').innerHTML = D.googleCamp.map(c => { const ctr=c.impr? c.clicks/c.impr*100:0, cpc=c.clicks? c.spend/c.clicks:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${c.name}">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpc)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="8" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     function renderKpis(D) {
@@ -746,50 +636,52 @@
       $('kpiSpend').textContent = fmtBRL(D.totSpend);
       $('kpiSpendSub').textContent = `Meta ${fmtBRL(D.ch['Meta Ads'].spend)} · Google ${fmtBRL(D.ch['Google Ads'].spend)}`;
       $('kpiRev').textContent = fmtBRL(D.totRev);
-      $('kpiRevSub').textContent = `pago ${fmtBRL(D.paidRev)} · orgân. ${fmtBRL(D.totRev-D.paidRev-D.semUtmRev)}`;
-      const roas = D.totSpend ? D.paidRev/D.totSpend : 0;
-      $('kpiRoas').textContent = fmtX(roas);
-      $('kpiRoas').style.color = roas>=1 ? 'var(--pos)' : 'var(--neg)';
+      $('kpiRevSub').textContent = `pago ${fmtBRL(D.paidRev)} · orgân. ${fmtBRL(D.totRev-D.paidRev-D.semUtmRev)} · s/UTM ${fmtBRL(D.semUtmRev)}`;
       $('kpiWon').textContent = fmtInt(D.totWon);
       $('kpiWonSub').textContent = `${fmtInt(D.ch['Meta Ads'].won + D.ch['Google Ads'].won)} pagos`;
+      const roasTraf = D.totSpend ? D.paidRev/D.totSpend : 0;
+      const roasGeral = D.totSpend ? D.totRev/D.totSpend : 0;
+      $('kpiRoasTraf').textContent = fmtX(roasTraf); $('kpiRoasTraf').style.color = roasTraf>=1 ? 'var(--pos)' : 'var(--neg)';
+      $('kpiRoasGeral').textContent = fmtX(roasGeral);
       $('kpiTicket').textContent = fmtBRL(D.totWon ? D.totRev/D.totWon : 0);
       $('kpiCpl').textContent = D.paidLeads ? fmtBRL2(D.totSpend/D.paidLeads) : '—';
-      $('kpiConv').textContent = fmtPct(D.totLeads ? D.totWon/D.totLeads*100 : 0, 1);
+      $('kpiConvSub').textContent = `Conv. lead→ganho ${fmtPct(D.totLeads ? D.totWon/D.totLeads*100 : 0, 1)}`;
     }
 
     // ============================================================
-    // RENDER ALL
+    // RENDER (tab-aware)
     // ============================================================
+    let ACTIVE = 'geral';
     function renderAll() {
       const D = compute();
       $('filterSummary').textContent = `${fmtYm(RANGE.start)} → ${fmtYm(RANGE.end)} · ${fmtInt(D.totLeads)} leads · ${fmtBRL(D.totRev)} faturamento`;
-      renderKpis(D);
-      renderRoasChart(D);
-      renderRevChannelChart(D);
-      renderChannelTable(D);
-      stackedMonth('leadsMonthChart', D.leadsByChMonth, D.monthsInRange, fmtInt, fmtInt);
-      stackedMonth('revMonthChart', D.revByChMonth, D.monthsInRange, fmtBRLShort, fmtBRL2);
-      renderRoasMonthChart(D);
-      renderMetaPanel(D);
-      renderGooglePanel(D);
-      renderClassChart(D);
+      if (ACTIVE === 'geral') {
+        renderKpis(D); renderRoasChart(D); renderRevChannelChart(D); renderChannelTable(D);
+        stackedMonth('leadsMonthChart', D.leadsByChMonth, D.monthsInRange, fmtInt, fmtInt);
+        stackedMonth('revMonthChart', D.revByChMonth, D.monthsInRange, fmtBRLShort, fmtBRL2);
+        renderRoasMonthChart(D); renderUtmCharts(D); renderUtmTable(D); renderClassChart(D);
+      } else if (ACTIVE === 'meta') { renderMetaPanel(D); }
+      else if (ACTIVE === 'google') { renderGooglePanel(D); }
+    }
+
+    function switchTab(t) {
+      ACTIVE = t;
+      $('tabGeral').classList.toggle('hidden', t !== 'geral');
+      $('tabMeta').classList.toggle('hidden', t !== 'meta');
+      $('tabGoogle').classList.toggle('hidden', t !== 'google');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderAll();
     }
 
     // ============================================================
     // FILTER UI
     // ============================================================
-    function populateMonthSelects() {
-      const opts = RAW.months.map(m => `<option value="${m}">${fmtYm(m)}</option>`).join('');
-      $('fStart').innerHTML = opts; $('fEnd').innerHTML = opts;
-      $('fStart').value = RANGE.start; $('fEnd').value = RANGE.end;
-    }
+    function populateMonthSelects() { const opts = RAW.months.map(m => `<option value="${m}">${fmtYm(m)}</option>`).join(''); $('fStart').innerHTML = opts; $('fEnd').innerHTML = opts; $('fStart').value = RANGE.start; $('fEnd').value = RANGE.end; }
     function setRange(start, end, presetKey) {
       const ms = RAW.months;
-      start = start < ms[0] ? ms[0] : start;
-      end = end > ms[ms.length-1] ? ms[ms.length-1] : end;
-      if (start > end) start = end;
-      RANGE = { start, end };
-      $('fStart').value = start; $('fEnd').value = end;
+      start = start < ms[0] ? ms[0] : start; end = end > ms[ms.length-1] ? ms[ms.length-1] : end; if (start > end) start = end;
+      RANGE = { start, end }; $('fStart').value = start; $('fEnd').value = end;
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === presetKey));
       renderAll();
     }
@@ -800,47 +692,38 @@
       if (key === 'l3') { const idx = Math.max(0, ms.length-3); return setRange(ms[idx], last, 'l3'); }
       if (key === 'month') return setRange(last, last, 'month');
     }
-
-    function wireFilters() {
+    function wireUi() {
       $('fStart').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
       $('fEnd').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
+      document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+      document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='utm'||k==='ch'?1:-1)) }; renderAll(); }));
     }
 
     // ============================================================
-    // BOOT DASHBOARD (after auth)
+    // BOOT DASHBOARD
     // ============================================================
-    let dataLoaded = false;
-    function showState(s) {
-      $('dataLoading').classList.toggle('hidden', s !== 'loading');
-      $('dataError').classList.toggle('hidden', s !== 'error');
-      $('dashContent').classList.toggle('hidden', s !== 'ok');
-    }
+    function showState(s) { $('dataLoading').classList.toggle('hidden', s !== 'loading'); $('dataError').classList.toggle('hidden', s !== 'error'); $('dashContent').classList.toggle('hidden', s !== 'ok'); }
     async function initDashboard() {
       showState('loading');
       try {
         await loadData();
         if (!RAW.months.length) throw new Error('Planilha sem dados.');
-        // default range = 2026 (clamped to available)
         const ms = RAW.months, last = ms[ms.length-1];
         RANGE = { start: ms[0] >= '2026-01' ? ms[0] : '2026-01', end: last };
-        populateMonthSelects();
-        wireFilters();
-        // note: sem utm share
-        const semUtmWon = RAW.won.filter(w=>w.ch==='Sem UTM');
+        populateMonthSelects(); wireUi();
+        const semRev = RAW.won.filter(w=>w.ch==='Sem UTM').reduce((s,w)=>s+w.value,0);
         const totRev = RAW.won.reduce((s,w)=>s+w.value,0);
-        const semRev = semUtmWon.reduce((s,w)=>s+w.value,0);
-        $('noteSemUtm').innerHTML = `<b>Sem UTM:</b> cerca de ${fmtPct(totRev?semRev/totRev*100:0,0)} do faturamento ganho (${fmtBRL(semRev)}) está sem UTM no CRM — aparece como canal próprio e não entra no ROAS pago.`;
+        $('noteSemUtm').innerHTML = `<b>Sem UTM:</b> cerca de ${fmtPct(totRev?semRev/totRev*100:0,0)} do faturamento ganho (${fmtBRL(semRev)}) está sem UTM no CRM — aparece como canal próprio e não entra no ROAS Tráfego (mas entra no ROAS Geral).`;
         $('dataDate').textContent = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
         showState('ok');
+        switchTab('geral');
         applyPreset('2026');
-        dataLoaded = true;
       } catch (e) {
         $('dataErrorMsg').textContent = (e && e.message) ? e.message : 'Erro desconhecido. A planilha precisa estar compartilhada como "qualquer pessoa com o link pode ver".';
         showState('error');
       }
     }
-
     $('retryBtn')?.addEventListener('click', initDashboard);
     $('refreshBtn')?.addEventListener('click', () => { destroyAllCharts(); initDashboard(); });
 
@@ -849,34 +732,17 @@
     // ============================================================
     const SUPABASE_URL = 'https://mibohjsywvtrukfmphmv.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pYm9oanN5d3Z0cnVrZm1waG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMTMzMTYsImV4cCI6MjA5NDg4OTMxNn0.e82F8sn-6W9lfYmD2vflDUe98aU9nUE70JC25SGn8vQ';
-    const ALLOWED_EMAILS = [
-      'brunoclemos1997@gmail.com',
-      'dhiego@grupoescalada.com.br',
-    ];
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
-    });
-
+    const ALLOWED_EMAILS = [ 'brunoclemos1997@gmail.com', 'dhiego@grupoescalada.com.br' ];
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
     let dashboardInitialized = false;
     function showLoading()   { $('authLoading').classList.remove('hidden'); $('authLogin').classList.add('hidden'); $('appHeader').classList.add('hidden'); $('appMain').classList.add('hidden'); }
     function showLogin()     { $('authLoading').classList.add('hidden'); $('authLogin').classList.remove('hidden'); $('appHeader').classList.add('hidden'); $('appMain').classList.add('hidden'); }
-    function showDashboard() {
-      $('authLoading').classList.add('hidden'); $('authLogin').classList.add('hidden');
-      $('appHeader').classList.remove('hidden'); $('appMain').classList.remove('hidden');
-      if (!dashboardInitialized) { dashboardInitialized = true; initDashboard(); }
-    }
-    async function checkAuth() {
-      const { data } = await sb.auth.getSession();
-      const session = data?.session;
-      if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) showDashboard();
-      else { if (session) await sb.auth.signOut(); showLogin(); }
-    }
+    function showDashboard() { $('authLoading').classList.add('hidden'); $('authLogin').classList.add('hidden'); $('appHeader').classList.remove('hidden'); $('appMain').classList.remove('hidden'); if (!dashboardInitialized) { dashboardInitialized = true; initDashboard(); } }
+    async function checkAuth() { const { data } = await sb.auth.getSession(); const session = data?.session; if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) showDashboard(); else { if (session) await sb.auth.signOut(); showLogin(); } }
     $('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = $('loginEmail').value.trim().toLowerCase();
-      const password = $('loginPassword').value;
-      const errEl = $('loginError'); const submitBtn = $('loginSubmit');
-      errEl.classList.add('hidden'); errEl.textContent = '';
+      const email = $('loginEmail').value.trim().toLowerCase(); const password = $('loginPassword').value;
+      const errEl = $('loginError'); const submitBtn = $('loginSubmit'); errEl.classList.add('hidden'); errEl.textContent = '';
       if (!ALLOWED_EMAILS.includes(email)) { errEl.textContent = 'Email não autorizado. Solicite acesso a Bruno Lemos.'; errEl.classList.remove('hidden'); return; }
       submitBtn.disabled = true; submitBtn.textContent = 'Entrando…';
       const { error } = await sb.auth.signInWithPassword({ email, password });
@@ -885,13 +751,7 @@
       $('loginPassword').value = ''; showDashboard();
     });
     $('logoutBtn').addEventListener('click', async () => { await sb.auth.signOut(); destroyAllCharts(); dashboardInitialized = false; showLogin(); });
-    sb.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        if (dashboardInitialized) { destroyAllCharts(); dashboardInitialized = false; }
-        if (!$('authLoading').classList.contains('hidden')) return;
-        showLogin();
-      }
-    });
+    sb.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || !session) { if (dashboardInitialized) { destroyAllCharts(); dashboardInitialized = false; } if (!$('authLoading').classList.contains('hidden')) return; showLogin(); } });
     checkAuth();
   </script>
 </body>
