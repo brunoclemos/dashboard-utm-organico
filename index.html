@@ -42,6 +42,9 @@
     .filter-select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; color-scheme: dark; cursor: pointer; transition: border-color 0.15s ease; }
     .filter-select:hover { border-color: #404040; }
     .filter-select:focus { outline: none; border-color: var(--text); }
+    .filter-date { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; color-scheme: dark; cursor: pointer; transition: border-color 0.15s ease; }
+    .filter-date:hover { border-color: #404040; }
+    .filter-date:focus { outline: none; border-color: var(--text); }
     .filter-preset { padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; }
     .filter-preset:hover { background: var(--bg-card-hover); color: var(--text); border-color: #404040; }
     .filter-preset.active { background: var(--text); color: #0a0a0a; border-color: var(--text); }
@@ -141,18 +144,25 @@
           <button class="tab-btn" data-tab="google"><span style="color:var(--google)">●</span> Google Ads</button>
         </div>
         <div class="card p-4" id="filterBar">
-          <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="space-y-3">
             <div class="flex items-center gap-3 flex-wrap">
               <div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Período</div>
-              <div class="flex items-center gap-2"><select id="fStart" class="filter-select"></select><span class="text-neutral-600">→</span><select id="fEnd" class="filter-select"></select></div>
+              <div class="flex items-center gap-2">
+                <input type="date" id="fStart" class="filter-date" />
+                <span class="text-neutral-600">→</span>
+                <input type="date" id="fEnd" class="filter-date" />
+              </div>
+              <div id="filterSummary" class="text-xs text-neutral-400 font-medium">—</div>
             </div>
             <div class="flex items-center gap-1.5 flex-wrap" id="presetButtons">
-              <button class="filter-preset" data-preset="all">Tudo</button>
-              <button class="filter-preset" data-preset="2026">2026</button>
-              <button class="filter-preset" data-preset="l3">Últimos 3 meses</button>
+              <button class="filter-preset" data-preset="today">Hoje</button>
+              <button class="filter-preset" data-preset="yesterday">Ontem</button>
+              <button class="filter-preset" data-preset="7d">7 dias</button>
+              <button class="filter-preset" data-preset="30d">30 dias</button>
               <button class="filter-preset" data-preset="month">Este mês</button>
+              <button class="filter-preset" data-preset="2026">2026</button>
+              <button class="filter-preset" data-preset="all">Tudo</button>
             </div>
-            <div id="filterSummary" class="text-xs text-neutral-400 font-medium w-full sm:w-auto">—</div>
           </div>
         </div>
       </section>
@@ -375,89 +385,87 @@
     let RAW = null;
     async function loadData() {
       const Q = {
-        leads:        "select O,N,year(J),month(J),Q,count(A) where A is not null group by O,N,year(J),month(J),Q",
-        leadsDay:     "select year(J),month(J),day(J),Q,count(A) where A is not null group by year(J),month(J),day(J),Q",
-        leadsContent: "select M,year(J),month(J),count(A) where A is not null group by M,year(J),month(J)",
-        leadsTerm:    "select P,year(J),month(J),count(A) where A is not null group by P,year(J),month(J)",
+        leads:        "select O,N,year(J),month(J),day(J),Q,count(A) where A is not null group by O,N,year(J),month(J),day(J),Q",
+        leadsContent: "select M,year(J),month(J),day(J),count(A) where A is not null group by M,year(J),month(J),day(J)",
+        leadsTerm:    "select P,year(J),month(J),day(J),count(A) where A is not null group by P,year(J),month(J),day(J)",
         won:          "select I,M,N,O,P,K where A is not null",
         metaDaily:    "select A,sum(B),sum(J),sum(G),sum(K),sum(L) where A is not null group by A order by A",
-        metaCamp:     "select C,year(A),month(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A)",
-        metaCreative: "select E,F,year(A),month(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by E,F,year(A),month(A)",
+        metaCamp:     "select C,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
+        metaCreative: "select E,F,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by E,F,year(A),month(A),day(A)",
         googleDaily:  "select A,sum(B),sum(F),sum(G),sum(L) where A is not null group by A order by A",
-        googleCamp:   "select C,year(A),month(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A)",
+        googleCamp:   "select C,year(A),month(A),day(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
       };
-      const [lead, lDay, lContent, lTerm, won, mD, mC, mCr, gD, gC] = await Promise.all([
-        fetchCsv(SHEETS.leads, Q.leads), fetchCsv(SHEETS.leads, Q.leadsDay), fetchCsv(SHEETS.leads, Q.leadsContent), fetchCsv(SHEETS.leads, Q.leadsTerm),
+      const [lead, lContent, lTerm, won, mD, mC, mCr, gD, gC] = await Promise.all([
+        fetchCsv(SHEETS.leads, Q.leads), fetchCsv(SHEETS.leads, Q.leadsContent), fetchCsv(SHEETS.leads, Q.leadsTerm),
         fetchCsv(SHEETS.won, Q.won),
         fetchCsv(SHEETS.meta, Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp), fetchCsv(SHEETS.meta, Q.metaCreative),
         fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp),
       ]);
-      const monthsSet = new Set();
-      const leads = lead.filter(r => r.length >= 6).map(r => { const ym = ym0(r[2], r[3]); monthsSet.add(ym); return { src: r[0], med: r[1], ch: classifyChannel(r[0], r[1]), ym, cls: normClass(r[4]), n: numRaw(r[5]) }; });
-      const leadsDay = lDay.filter(r => r.length >= 5).map(r => { const ym = ym0(r[0], r[1]); monthsSet.add(ym); return { ym, ymd: ymd0(r[0], r[1], r[2]), cls: normClass(r[3]), n: numRaw(r[4]) }; });
-      const leadsContent = lContent.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); return { v: (r[0]||'').trim(), ym, n: numRaw(r[3]) }; });
-      const leadsTerm = lTerm.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); return { v: (r[0]||'').trim(), ym, n: numRaw(r[3]) }; });
-      const wonRows = won.filter(r => r.length >= 6).map(r => { const d = pdate(r[5]); if (d) monthsSet.add(d.ym); return { value: numRaw(r[0]), content: (r[1]||'').trim(), med: r[2], src: r[3], term: (r[4]||'').trim(), ch: classifyChannel(r[3], r[2]), ym: d ? d.ym : null, ymd: d ? d.ymd : null }; });
-      const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => { const d = pdate(r[0]); if (d) monthsSet.add(d.ym); const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
+      const daysSet = new Set();
+      const leads = lead.filter(r => r.length >= 7).map(r => { const ymd = ymd0(r[2], r[3], r[4]); daysSet.add(ymd); return { src: r[0], med: r[1], ch: classifyChannel(r[0], r[1]), ym: ym0(r[2], r[3]), ymd, cls: normClass(r[5]), n: numRaw(r[6]) }; });
+      const leadsContent = lContent.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); return { v: (r[0]||'').trim(), ym: ym0(r[1], r[2]), ymd, n: numRaw(r[4]) }; });
+      const leadsTerm = lTerm.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); return { v: (r[0]||'').trim(), ym: ym0(r[1], r[2]), ymd, n: numRaw(r[4]) }; });
+      const wonRows = won.filter(r => r.length >= 6).map(r => { const d = pdate(r[5]); if (d) daysSet.add(d.ymd); return { value: numRaw(r[0]), content: (r[1]||'').trim(), med: r[2], src: r[3], term: (r[4]||'').trim(), ch: classifyChannel(r[3], r[2]), ym: d ? d.ym : null, ymd: d ? d.ymd : null }; });
+      const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => { const d = pdate(r[0]); if (d) daysSet.add(d.ymd); const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
       const metaDaily = mapDaily(mD, { spend:1, impr:2, clicks:3, lpv:4, conv:5 });
       const googleDaily = mapDaily(gD, { spend:1, impr:2, clicks:3, conv:4 });
-      const mapCamp = (rows, idx) => rows.filter(r => r.length >= 4).map(r => { const ym = ym0(r[1], r[2]); monthsSet.add(ym); const o = { name: (r[0] || '(sem nome)').trim() || '(sem nome)', ym }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
-      const metaCamp = mapCamp(mC, { spend:3, impr:4, clicks:5, lpv:6, conv:7, n:8 });
-      const googleCamp = mapCamp(gC, { spend:3, impr:4, clicks:5, conv:6, n:7 });
-      const metaCreative = mCr.filter(r => r.length >= 5).map(r => { const ym = ym0(r[2], r[3]); monthsSet.add(ym); return { name: (r[0]||'(sem nome)').trim() || '(sem nome)', perm: (r[1]||'').trim(), ym, spend: numRaw(r[4]), impr: numRaw(r[5]), clicks: numRaw(r[6]), lpv: numRaw(r[7]), conv: numRaw(r[8]), n: numRaw(r[9]) }; });
-      const months = [...monthsSet].filter(Boolean).sort();
-      RAW = { leads, leadsDay, leadsContent, leadsTerm, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, metaCreative, months };
+      const mapCamp = (rows, idx) => rows.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); const o = { name: (r[0] || '(sem nome)').trim() || '(sem nome)', ym: ym0(r[1], r[2]), ymd }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
+      const metaCamp = mapCamp(mC, { spend:4, impr:5, clicks:6, lpv:7, conv:8, n:9 });
+      const googleCamp = mapCamp(gC, { spend:4, impr:5, clicks:6, conv:7, n:8 });
+      const metaCreative = mCr.filter(r => r.length >= 6).map(r => { const ymd = ymd0(r[2], r[3], r[4]); daysSet.add(ymd); return { name: (r[0]||'(sem nome)').trim() || '(sem nome)', perm: (r[1]||'').trim(), ymd, spend: numRaw(r[5]), impr: numRaw(r[6]), clicks: numRaw(r[7]), lpv: numRaw(r[8]), conv: numRaw(r[9]) }; });
+      const days = [...daysSet].filter(Boolean).sort();
+      RAW = { leads, leadsContent, leadsTerm, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, metaCreative, days };
       return RAW;
     }
 
     // ============================================================ AGGREGATE
     let RANGE = { start: null, end: null };
-    const inRange = (ym) => ym && ym >= RANGE.start && ym <= RANGE.end;
+    const inRange = (ymd) => ymd && ymd >= RANGE.start && ymd <= RANGE.end;
+    function monthsBetween(s, e) { const out = []; let y = +s.slice(0,4), m = +s.slice(5,7); const ey = +e.slice(0,4), em = +e.slice(5,7); while (y < ey || (y === ey && m <= em)) { out.push(`${y}-${String(m).padStart(2,'0')}`); m++; if (m > 12) { m = 1; y++; } if (out.length > 240) break; } return out; }
 
     function buildDim(leadRows, leadKey, wonKey) {
       const map = {};
       const get = (label) => { const k = label || '(vazio)'; if (!map[k]) map[k] = { label: k, leads: 0, won: 0, rev: 0 }; return map[k]; };
-      leadRows.forEach(r => { if (!inRange(r.ym)) return; get((r[leadKey]||'').trim()).leads += r.n; });
-      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const u = get((r[wonKey]||'').trim()); u.won += 1; u.rev += r.value; });
+      leadRows.forEach(r => { if (!inRange(r.ymd)) return; get((r[leadKey]||'').trim()).leads += r.n; });
+      RAW.won.forEach(r => { if (!inRange(r.ymd)) return; const u = get((r[wonKey]||'').trim()); u.won += 1; u.rev += r.value; });
       return Object.values(map);
     }
 
     function compute() {
       const ch = {};
       CHANNEL_ORDER.forEach(c => ch[c] = { leads: 0, won: 0, rev: 0, spend: 0, cls: { Closer:0, SDR:0, Perdido:0, Outros:0 } });
-      const monthsInRange = RAW.months.filter(inRange);
+      const monthsInRange = monthsBetween(RANGE.start, RANGE.end);
       const leadsByChMonth = {}, revByChMonth = {};
       CHANNEL_ORDER.forEach(c => { leadsByChMonth[c] = {}; revByChMonth[c] = {}; monthsInRange.forEach(m => { leadsByChMonth[c][m] = 0; revByChMonth[c][m] = 0; }); });
-      RAW.leads.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; leadsByChMonth[r.ch][r.ym] += r.n; });
-      RAW.won.forEach(r => { if (!inRange(r.ym)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; });
 
-      // daily
+      // daily leads (from day-level lead rows) + channel/class aggregation
       const dl = {};
-      RAW.leadsDay.forEach(r => { if (!inRange(r.ym)) return; if (!dl[r.ymd]) dl[r.ymd] = { ymd:r.ymd, Closer:0, SDR:0, Perdido:0, Outros:0, total:0 }; dl[r.ymd][r.cls] += r.n; dl[r.ymd].total += r.n; });
+      RAW.leads.forEach(r => { if (!inRange(r.ymd)) return; const c = ch[r.ch]; c.leads += r.n; c.cls[r.cls] += r.n; if (leadsByChMonth[r.ch][r.ym] != null) leadsByChMonth[r.ch][r.ym] += r.n; if (!dl[r.ymd]) dl[r.ymd] = { ymd:r.ymd, Closer:0, SDR:0, Perdido:0, Outros:0, total:0 }; dl[r.ymd][r.cls] += r.n; dl[r.ymd].total += r.n; });
       const dailyLeads = Object.values(dl).sort((a,b)=>a.ymd.localeCompare(b.ymd));
+
       const dw = {};
-      RAW.won.forEach(r => { if (!inRange(r.ym) || !r.ymd) return; if (!dw[r.ymd]) dw[r.ymd] = { ymd:r.ymd, count:0, rev:0 }; dw[r.ymd].count += 1; dw[r.ymd].rev += r.value; });
+      RAW.won.forEach(r => { if (!inRange(r.ymd)) return; const c = ch[r.ch]; c.won += 1; c.rev += r.value; if (revByChMonth[r.ch][r.ym] != null) revByChMonth[r.ch][r.ym] += r.value; if (!dw[r.ymd]) dw[r.ymd] = { ymd:r.ymd, count:0, rev:0 }; dw[r.ymd].count += 1; dw[r.ymd].rev += r.value; });
       const dailyWon = Object.values(dw).sort((a,b)=>a.ymd.localeCompare(b.ymd));
 
       // traffic
       const platTraffic = { meta: { spend:0, impr:0, clicks:0, lpv:0, conv:0 }, google: { spend:0, impr:0, clicks:0, conv:0 } };
-      RAW.metaDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.meta.spend+=d.spend; platTraffic.meta.impr+=d.impr; platTraffic.meta.clicks+=d.clicks; platTraffic.meta.lpv+=d.lpv; platTraffic.meta.conv+=d.conv; });
-      RAW.googleDaily.forEach(d => { if (!inRange(d.ym)) return; platTraffic.google.spend+=d.spend; platTraffic.google.impr+=d.impr; platTraffic.google.clicks+=d.clicks; platTraffic.google.conv+=d.conv; });
+      RAW.metaDaily.forEach(d => { if (!inRange(d.ymd)) return; platTraffic.meta.spend+=d.spend; platTraffic.meta.impr+=d.impr; platTraffic.meta.clicks+=d.clicks; platTraffic.meta.lpv+=d.lpv; platTraffic.meta.conv+=d.conv; });
+      RAW.googleDaily.forEach(d => { if (!inRange(d.ymd)) return; platTraffic.google.spend+=d.spend; platTraffic.google.impr+=d.impr; platTraffic.google.clicks+=d.clicks; platTraffic.google.conv+=d.conv; });
       ch['Meta Ads'].spend = platTraffic.meta.spend; ch['Google Ads'].spend = platTraffic.google.spend;
 
       const byMonth = {};
       monthsInRange.forEach(m => byMonth[m] = { metaSpend:0, googleSpend:0, metaRev: revByChMonth['Meta Ads'][m]||0, googleRev: revByChMonth['Google Ads'][m]||0, totRev: 0 });
-      RAW.metaDaily.forEach(d => { if (byMonth[d.ym]) byMonth[d.ym].metaSpend += d.spend; });
-      RAW.googleDaily.forEach(d => { if (byMonth[d.ym]) byMonth[d.ym].googleSpend += d.spend; });
+      RAW.metaDaily.forEach(d => { if (inRange(d.ymd) && byMonth[d.ym]) byMonth[d.ym].metaSpend += d.spend; });
+      RAW.googleDaily.forEach(d => { if (inRange(d.ymd) && byMonth[d.ym]) byMonth[d.ym].googleSpend += d.spend; });
       monthsInRange.forEach(m => { byMonth[m].totRev = CHANNEL_ORDER.reduce((s,c)=>s+(revByChMonth[c][m]||0),0); });
 
-      const aggCamp = (rows, keys) => { const map = {}; rows.forEach(r => { if (!inRange(r.ym)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); }); return Object.values(map).sort((a,b) => b.spend - a.spend); };
+      const aggCamp = (rows, keys) => { const map = {}; rows.forEach(r => { if (!inRange(r.ymd)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); }); return Object.values(map).sort((a,b) => b.spend - a.spend); };
       const metaCamp = aggCamp(RAW.metaCamp, ['spend','impr','clicks','lpv','conv','n']);
       const googleCamp = aggCamp(RAW.googleCamp, ['spend','impr','clicks','conv','n']);
 
       // creatives (merge by name, keep first permalink)
       const crMap = {};
-      RAW.metaCreative.forEach(r => { if (!inRange(r.ym)) return; if (!crMap[r.name]) crMap[r.name] = { name:r.name, perm:'', spend:0, impr:0, clicks:0, lpv:0, conv:0 }; const o = crMap[r.name]; if (!o.perm && r.perm) o.perm = r.perm; o.spend+=r.spend; o.impr+=r.impr; o.clicks+=r.clicks; o.lpv+=r.lpv; o.conv+=r.conv; });
+      RAW.metaCreative.forEach(r => { if (!inRange(r.ymd)) return; if (!crMap[r.name]) crMap[r.name] = { name:r.name, perm:'', spend:0, impr:0, clicks:0, lpv:0, conv:0 }; const o = crMap[r.name]; if (!o.perm && r.perm) o.perm = r.perm; o.spend+=r.spend; o.impr+=r.impr; o.clicks+=r.clicks; o.lpv+=r.lpv; o.conv+=r.conv; });
       const creatives = Object.values(crMap);
 
       // dimensions
@@ -551,14 +559,14 @@
         options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label:(c)=>{ const tot=chans.map(x=>D.ch[x].leads)[c.dataIndex]||1; return `${c.dataset.label}: ${fmtInt(c.raw)} (${fmtPct(c.raw/tot*100)})`; } } } }, scales: { x:{ stacked:true, grid:{display:false} }, y:{ stacked:true, grid:GRID, ticks:{ callback:fmtInt } } } } });
     }
     function renderDailyChart(id, daily) {
-      const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
+      const pts = daily.filter(d => inRange(d.ymd)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
       setChart(id, { type: 'line', data: { labels: pts.map(p => fmtDay(p.ymd)), datasets: [
         { label: 'Investimento', yAxisID:'y', data: pts.map(p=>p.spend), borderColor:'#facc15', backgroundColor:'rgba(250,204,21,0.08)', fill:true, tension:.25, pointRadius:0, borderWidth:1.5 },
         { label: 'Cliques', yAxisID:'y1', data: pts.map(p=>p.clicks), borderColor:'#a3a3a3', tension:.25, pointRadius:0, borderWidth:1.5 } ] },
         options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Investimento: ${fmtBRL(c.raw)}` : `Cliques: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtBRLShort } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
     }
     function renderConvChart(id, daily) {
-      const pts = daily.filter(d => inRange(d.ym)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
+      const pts = daily.filter(d => inRange(d.ymd)).sort((a,b)=> (a.ymd||'').localeCompare(b.ymd||''));
       setChart(id, { type: 'line', data: { labels: pts.map(p => fmtDay(p.ymd)), datasets: [
         { label: 'Impressões', yAxisID:'y', data: pts.map(p=>p.impr), borderColor:'#525252', backgroundColor:'rgba(82,82,82,0.12)', fill:true, tension:.25, pointRadius:0, borderWidth:1.2 },
         { label: 'Conversões', yAxisID:'y1', data: pts.map(p=>p.conv), borderColor:'#34d399', tension:.25, pointRadius:0, borderWidth:1.8 } ] },
@@ -634,7 +642,9 @@
     let ACTIVE = 'geral';
     function renderAll() {
       const D = compute();
-      $('filterSummary').textContent = `${fmtYm(RANGE.start)} → ${fmtYm(RANGE.end)} · ${fmtInt(D.totLeads)} leads · ${fmtInt(D.totWon)} ganhos · ${fmtBRL(D.totRev)}`;
+      const fmtDmy = (s) => { const [y,m,d] = s.split('-'); return `${d}/${m}/${y.slice(2)}`; };
+      const rangeLbl = RANGE.start === RANGE.end ? fmtDmy(RANGE.start) : `${fmtDmy(RANGE.start)} → ${fmtDmy(RANGE.end)}`;
+      $('filterSummary').textContent = `${rangeLbl} · ${fmtInt(D.totLeads)} leads · ${fmtInt(D.totWon)} ganhos · ${fmtBRL(D.totRev)}`;
       if (ACTIVE === 'geral') {
         renderKpis(D); renderDailyLeads(D); renderDailyWon(D);
         renderRoasChart(D); renderRevChannelChart(D); renderChannelTable(D);
@@ -652,19 +662,32 @@
     }
 
     // ============================================================ FILTER UI
-    function populateMonthSelects() { const opts = RAW.months.map(m => `<option value="${m}">${fmtYm(m)}</option>`).join(''); $('fStart').innerHTML = opts; $('fEnd').innerHTML = opts; $('fStart').value = RANGE.start; $('fEnd').value = RANGE.end; }
+    let DATA_MIN = '2026-01-01', MAX_BOUND = '2026-12-31';
+    const ymdOf = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const todayYmd = () => ymdOf(new Date());
+    function addDays(ymd, n) { const [y,m,d] = ymd.split('-').map(Number); const dt = new Date(y, m-1, d); dt.setDate(dt.getDate()+n); return ymdOf(dt); }
+    function setupDateInputs() {
+      DATA_MIN = RAW.days[0]; const dataMax = RAW.days[RAW.days.length-1]; const t = todayYmd();
+      MAX_BOUND = t > dataMax ? t : dataMax;
+      [$('fStart'), $('fEnd')].forEach(el => { el.min = DATA_MIN; el.max = MAX_BOUND; });
+      $('fStart').value = RANGE.start; $('fEnd').value = RANGE.end;
+    }
     function setRange(start, end, presetKey) {
-      const ms = RAW.months; start = start < ms[0] ? ms[0] : start; end = end > ms[ms.length-1] ? ms[ms.length-1] : end; if (start > end) start = end;
+      if (!start) start = DATA_MIN; if (!end) end = MAX_BOUND;
+      if (start < DATA_MIN) start = DATA_MIN; if (end > MAX_BOUND) end = MAX_BOUND; if (start > end) start = end;
       RANGE = { start, end }; $('fStart').value = start; $('fEnd').value = end;
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === presetKey));
       renderAll();
     }
     function applyPreset(key) {
-      const ms = RAW.months; const last = ms[ms.length-1];
-      if (key === 'all') return setRange(ms[0], last, 'all');
-      if (key === '2026') return setRange('2026-01', '2026-12', '2026');
-      if (key === 'l3') { const idx = Math.max(0, ms.length-3); return setRange(ms[idx], last, 'l3'); }
-      if (key === 'month') return setRange(last, last, 'month');
+      const t = todayYmd();
+      if (key === 'today')     return setRange(t, t, 'today');
+      if (key === 'yesterday') { const y = addDays(t, -1); return setRange(y, y, 'yesterday'); }
+      if (key === '7d')        return setRange(addDays(t, -6), t, '7d');
+      if (key === '30d')       return setRange(addDays(t, -29), t, '30d');
+      if (key === 'month')     return setRange(t.slice(0,7) + '-01', t, 'month');
+      if (key === '2026')      return setRange('2026-01-01', (t < '2026-12-31' ? t : '2026-12-31'), '2026');
+      if (key === 'all')       return setRange(DATA_MIN, MAX_BOUND, 'all');
     }
     function wireUi() {
       $('fStart').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
@@ -682,10 +705,10 @@
       showState('loading');
       try {
         await loadData();
-        if (!RAW.months.length) throw new Error('Planilha sem dados.');
-        const ms = RAW.months, last = ms[ms.length-1];
-        RANGE = { start: ms[0] >= '2026-01' ? ms[0] : '2026-01', end: last };
-        populateMonthSelects(); wireUi();
+        if (!RAW.days.length) throw new Error('Planilha sem dados.');
+        const t = todayYmd();
+        RANGE = { start: '2026-01-01', end: (t < '2026-12-31' ? t : '2026-12-31') };
+        setupDateInputs(); wireUi();
         const semRev = RAW.won.filter(w=>w.ch==='Sem UTM').reduce((s,w)=>s+w.value,0); const totRev = RAW.won.reduce((s,w)=>s+w.value,0);
         $('noteSemUtm').innerHTML = `<b>Sem UTM:</b> cerca de ${fmtPct(totRev?semRev/totRev*100:0,0)} do faturamento ganho (${fmtBRL(semRev)}) está sem UTM no CRM — canal próprio, fora do ROAS Tráfego (mas entra no ROAS Geral).`;
         $('dataDate').textContent = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
