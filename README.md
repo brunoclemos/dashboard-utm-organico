@@ -9,8 +9,9 @@ Visualização de leads, faturamento, **ROAS por canal de aquisição** e **funi
 - **KPIs gerais:** leads, investimento (Meta + Google), faturamento ganho, ROAS pago, negócios ganhos, ticket médio, CPL e conversão.
 - **ROAS por canal de aquisição:** ROAS dos canais pagos, faturamento por canal e tabela completa (leads, investimento, ganhos, ROAS, CPL, CAC, conversão).
 - **Evolução mensal por canal:** leads e faturamento empilhados por canal × mês + ROAS Meta vs Google.
-- **Painel Meta Ads (isolado):** funil completo (impressões → cliques → LPV → conversões → ganhos), KPIs (CTR, CPM, CPC, CPA, ROAS), gráfico diário e tabela de campanhas.
-- **Painel Google Ads (isolado):** funil, KPIs e campanhas.
+- **Painel Meta Ads (isolado):** funil completo (impressões → cliques → LPV → conversões → ganhos), KPIs (CTR, CPM, CPC, CPA, ROAS), gráfico diário, **performance por campanha** (ROAS, faturamento e leads qualificados) e **ranking de criativos** (com faturamento e ROAS por criativo).
+- **Painel Google Ads (isolado):** funil, KPIs, **performance por campanha** e **ranking de anúncios** (ROAS, faturamento e leads qualificados por anúncio, com rollup anúncio → campanha).
+- **Atribuição por campanha/anúncio:** cruza `utm_campaign` e `utm_content` do lead com os nomes de campanha/anúncio das abas de tráfego, por nome normalizado (ignora espaço, underscore, hífen e acento) e escopado por canal. Leads qualificados = Closer + SDR. "(sem atribuição)" = lead/venda do canal sem correspondência de nome.
 - **Qualidade dos leads por canal:** classificação Typeform (Closer / SDR / Perdido).
 
 ## Fonte dos dados (ao vivo)
@@ -19,10 +20,10 @@ Os dados são puxados em tempo real da planilha do Google Sheets via endpoint CS
 
 | Métrica | Aba | Como |
 |---|---|---|
-| Leads | `Todos os Negócios - 2026` | `COUNT` por utm_source/medium × mês × classificação |
-| Faturamento / ganhos | `Negócios ganhos - 2026` | linhas cruas + soma no navegador (ver nota abaixo) |
-| Investimento + tráfego Meta | `Meta Ads` | `SUM` por dia e por campanha |
-| Investimento + tráfego Google | `Google Ads` | `SUM` por dia e por campanha |
+| Leads | `Todos os Negócios - 2026` | `COUNT` por utm_source/medium/campaign × mês × classificação; utm_content por src/medium/classificação |
+| Faturamento / ganhos | `Negócios ganhos - 2026` | linhas cruas (valor, utm_campaign, utm_content, source, medium) + soma no navegador (ver nota abaixo) |
+| Investimento + tráfego Meta | `Meta Ads` | `SUM` por dia, por campanha e por criativo (Ad Name) |
+| Investimento + tráfego Google | `Google Ads` | `SUM` por dia, por campanha e por anúncio (Ad Name → Campaign) |
 
 A planilha precisa estar compartilhada como **"qualquer pessoa com o link pode ver"**.
 

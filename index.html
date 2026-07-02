@@ -254,6 +254,7 @@
             <li><b>Leads</b> da aba <i>Todos os Negócios</i> (data de criação). <b>Faturamento</b> da aba <i>Negócios ganhos</i> (valor fechado, data de fechamento). <b>Investimento</b> das abas de tráfego.</li>
             <li><b>ROAS Tráfego</b> = faturamento atribuído aos canais pagos (via UTM do lead) ÷ investimento. <b>ROAS Geral (MER)</b> = faturamento TOTAL ÷ investimento em ads.</li>
             <li id="noteSemUtm"></li>
+            <li><b>Performance por campanha/criativo</b> (abas Meta e Google): cruza o <i>utm_campaign</i> e o <i>utm_content</i> do lead com os nomes de campanha e anúncio das abas de tráfego, por nome normalizado (ignora diferenças de espaço, underscore, hífen e acento) e escopado por canal. No Google, como o utm_campaign do lead é genérico, a campanha é atribuída pelo rollup dos anúncios. "(sem atribuição)" reúne leads e vendas do canal sem correspondência de nome.</li>
             <li><b>Atenção:</b> a coluna "Valor fechado" tem formatação mista na planilha — por isso o faturamento é somado item a item no navegador (não pela soma do Sheets, que infla o número).</li>
           </ul>
         </section>
@@ -270,30 +271,50 @@
           </div>
         </section>
 
+        <!-- PERFORMANCE POR CAMPANHA -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">Faturamento, ROAS e leads qualificados por campanha, cruzando o utm_campaign do lead com o nome da campanha na aba Meta Ads.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="metaCampHighlights"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="metaCampRoasChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Faturamento por campanha</div><div class="chart-h-md"><canvas id="metaCampInvRevChart"></canvas></div></div>
+          </div>
+          <div class="flex items-center justify-end gap-1.5 flex-wrap" id="metaCampSortButtons">
+            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Ordenar</span>
+            <button class="dim-btn active" data-sort="spend">Investimento</button>
+            <button class="dim-btn" data-sort="rev">Faturamento</button>
+            <button class="dim-btn" data-sort="roas">ROAS</button>
+            <button class="dim-btn" data-sort="qual">Qualif.</button>
+          </div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
+            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
+            </tr></thead><tbody id="metaCampBody"></tbody></table>
+          </div></div>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha.</p>
+        </section>
+
         <!-- RANKING DE CRIATIVOS -->
         <section class="space-y-4">
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Ranking de criativos</h2></div>
-            <div class="flex items-center gap-1.5" id="creativeSortButtons">
+            <div class="flex items-center gap-1.5 flex-wrap" id="creativeSortButtons">
               <button class="dim-btn active" data-sort="spend">Investimento</button>
+              <button class="dim-btn" data-sort="rev">Faturamento</button>
+              <button class="dim-btn" data-sort="roas">ROAS</button>
+              <button class="dim-btn" data-sort="qual">Qualif.</button>
               <button class="dim-btn" data-sort="conv">Conversões</button>
               <button class="dim-btn" data-sort="clicks">Cliques</button>
             </div>
           </div>
-          <p class="text-xs text-neutral-500 -mt-2">Clique no criativo para abrir o anúncio no Instagram.</p>
+          <p class="text-xs text-neutral-500 -mt-2">Clique no criativo para abrir o anúncio no Instagram. Faturamento e ROAS via utm_content do lead.</p>
           <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Top criativos</div><div class="chart-h-md"><canvas id="metaCreativeChart"></canvas></div></div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
             <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th>
+              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th>
             </tr></thead><tbody id="metaCreativeBody"></tbody></table>
           </div></div>
-        </section>
-
-        <section class="space-y-4">
-          <div class="card p-0 overflow-hidden">
-            <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Meta</div>
-            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="metaCampBody"></tbody></table></div>
-          </div>
         </section>
       </div>
 
@@ -306,14 +327,52 @@
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Funil</div><div id="googleFunnel" class="space-y-2.5 mt-2"></div></div>
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Cliques (diário)</div><div class="chart-h-sm"><canvas id="googleDailyChart"></canvas></div></div>
           </div>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Impressões × Conversões (diário)</div><div class="chart-h-sm"><canvas id="googleConvChart"></canvas></div></div>
+        </section>
+
+        <!-- PERFORMANCE POR CAMPANHA -->
+        <section class="space-y-4">
+          <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
+          <p class="text-xs text-neutral-500 -mt-2">O utm_campaign dos leads Google é genérico, então a atribuição por campanha vem do rollup dos anúncios (utm_content do lead ↔ nome do anúncio ↔ campanha na aba Google Ads).</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="googleCampHighlights"></div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Impressões × Conversões (diário)</div><div class="chart-h-sm"><canvas id="googleConvChart"></canvas></div></div>
-            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento por campanha</div><div class="chart-h-sm"><canvas id="googleCampChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="googleCampRoasChart"></canvas></div></div>
+            <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Faturamento por campanha</div><div class="chart-h-md"><canvas id="googleCampInvRevChart"></canvas></div></div>
           </div>
-          <div class="card p-0 overflow-hidden">
-            <div class="px-4 py-3 text-xs text-neutral-400 font-medium border-b border-neutral-800">Campanhas Google</div>
-            <div class="overflow-x-auto scrollbar"><table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500"><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPC</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">CPA</th></tr></thead><tbody id="googleCampBody"></tbody></table></div>
+          <div class="flex items-center justify-end gap-1.5 flex-wrap" id="googleCampSortButtons">
+            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Ordenar</span>
+            <button class="dim-btn active" data-sort="spend">Investimento</button>
+            <button class="dim-btn" data-sort="rev">Faturamento</button>
+            <button class="dim-btn" data-sort="roas">ROAS</button>
+            <button class="dim-btn" data-sort="qual">Qualif.</button>
           </div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
+            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
+            </tr></thead><tbody id="googleCampBody"></tbody></table>
+          </div></div>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio.</p>
+        </section>
+
+        <!-- RANKING DE ANÚNCIOS -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Ranking de anúncios</h2></div>
+            <div class="flex items-center gap-1.5 flex-wrap" id="googleAdSortButtons">
+              <button class="dim-btn active" data-sort="spend">Investimento</button>
+              <button class="dim-btn" data-sort="rev">Faturamento</button>
+              <button class="dim-btn" data-sort="roas">ROAS</button>
+              <button class="dim-btn" data-sort="qual">Qualif.</button>
+              <button class="dim-btn" data-sort="conv">Conversões</button>
+            </div>
+          </div>
+          <p class="text-xs text-neutral-500 -mt-2">Faturamento e ROAS por anúncio, via utm_content do lead cruzado com o nome do anúncio.</p>
+          <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Top anúncios</div><div class="chart-h-md"><canvas id="googleAdChart"></canvas></div></div>
+          <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
+            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">Anúncio</th><th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th>
+            </tr></thead><tbody id="googleAdBody"></tbody></table>
+          </div></div>
         </section>
       </div>
 
@@ -364,6 +423,8 @@
       return 'Outros';
     }
     function normClass(q) { const v = (q || '').trim().toLowerCase(); if (v.startsWith('closer')) return 'Closer'; if (v.startsWith('sdr')) return 'SDR'; if (v.startsWith('perdido')) return 'Perdido'; return 'Outros'; }
+    // Normaliza nome de campanha/anúncio para casar variações de underscore/espaço/hífen/acento entre CRM e abas de tráfego.
+    const normName = (s) => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 
     // ============================================================ FETCH/CSV
     function gvizUrl(sheet, tq) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&tq=${encodeURIComponent(tq)}`; }
@@ -385,27 +446,28 @@
     let RAW = null;
     async function loadData() {
       const Q = {
-        leads:        "select O,N,year(J),month(J),day(J),Q,count(A) where A is not null group by O,N,year(J),month(J),day(J),Q",
-        leadsContent: "select M,year(J),month(J),day(J),count(A) where A is not null group by M,year(J),month(J),day(J)",
+        leads:        "select O,N,L,year(J),month(J),day(J),Q,count(A) where A is not null group by O,N,L,year(J),month(J),day(J),Q",
+        leadsContent: "select M,N,O,Q,year(J),month(J),day(J),count(A) where A is not null group by M,N,O,Q,year(J),month(J),day(J)",
         leadsTerm:    "select P,year(J),month(J),day(J),count(A) where A is not null group by P,year(J),month(J),day(J)",
-        won:          "select I,M,N,O,P,K where A is not null",
+        won:          "select I,L,M,N,O,P,K where A is not null",
         metaDaily:    "select A,sum(B),sum(J),sum(G),sum(K),sum(L) where A is not null group by A order by A",
         metaCamp:     "select C,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
         metaCreative: "select E,F,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by E,F,year(A),month(A),day(A)",
         googleDaily:  "select A,sum(B),sum(F),sum(G),sum(L) where A is not null group by A order by A",
         googleCamp:   "select C,year(A),month(A),day(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
+        googleAd:     "select E,C,year(A),month(A),day(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by E,C,year(A),month(A),day(A)",
       };
-      const [lead, lContent, lTerm, won, mD, mC, mCr, gD, gC] = await Promise.all([
+      const [lead, lContent, lTerm, won, mD, mC, mCr, gD, gC, gA] = await Promise.all([
         fetchCsv(SHEETS.leads, Q.leads), fetchCsv(SHEETS.leads, Q.leadsContent), fetchCsv(SHEETS.leads, Q.leadsTerm),
         fetchCsv(SHEETS.won, Q.won),
         fetchCsv(SHEETS.meta, Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp), fetchCsv(SHEETS.meta, Q.metaCreative),
-        fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp),
+        fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp), fetchCsv(SHEETS.google, Q.googleAd),
       ]);
       const daysSet = new Set();
-      const leads = lead.filter(r => r.length >= 7).map(r => { const ymd = ymd0(r[2], r[3], r[4]); daysSet.add(ymd); return { src: r[0], med: r[1], ch: classifyChannel(r[0], r[1]), ym: ym0(r[2], r[3]), ymd, cls: normClass(r[5]), n: numRaw(r[6]) }; });
-      const leadsContent = lContent.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); return { v: (r[0]||'').trim(), ym: ym0(r[1], r[2]), ymd, n: numRaw(r[4]) }; });
+      const leads = lead.filter(r => r.length >= 8).map(r => { const ymd = ymd0(r[3], r[4], r[5]); daysSet.add(ymd); return { src: r[0], med: r[1], camp: (r[2]||'').trim(), ch: classifyChannel(r[0], r[1]), ym: ym0(r[3], r[4]), ymd, cls: normClass(r[6]), n: numRaw(r[7]) }; });
+      const leadsContent = lContent.filter(r => r.length >= 8).map(r => { const ymd = ymd0(r[4], r[5], r[6]); daysSet.add(ymd); return { v: (r[0]||'').trim(), med: r[1], src: r[2], ch: classifyChannel(r[2], r[1]), cls: normClass(r[3]), ym: ym0(r[4], r[5]), ymd, n: numRaw(r[7]) }; });
       const leadsTerm = lTerm.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); return { v: (r[0]||'').trim(), ym: ym0(r[1], r[2]), ymd, n: numRaw(r[4]) }; });
-      const wonRows = won.filter(r => r.length >= 6).map(r => { const d = pdate(r[5]); if (d) daysSet.add(d.ymd); return { value: numRaw(r[0]), content: (r[1]||'').trim(), med: r[2], src: r[3], term: (r[4]||'').trim(), ch: classifyChannel(r[3], r[2]), ym: d ? d.ym : null, ymd: d ? d.ymd : null }; });
+      const wonRows = won.filter(r => r.length >= 7).map(r => { const d = pdate(r[6]); if (d) daysSet.add(d.ymd); return { value: numRaw(r[0]), camp: (r[1]||'').trim(), content: (r[2]||'').trim(), med: r[3], src: r[4], term: (r[5]||'').trim(), ch: classifyChannel(r[4], r[3]), ym: d ? d.ym : null, ymd: d ? d.ymd : null }; });
       const mapDaily = (rows, idx) => rows.filter(r => r[0]).map(r => { const d = pdate(r[0]); if (d) daysSet.add(d.ymd); const o = { ym: d ? d.ym : null, ymd: d ? d.ymd : null }; for (const k in idx) o[k] = numRaw(r[idx[k]]); return o; });
       const metaDaily = mapDaily(mD, { spend:1, impr:2, clicks:3, lpv:4, conv:5 });
       const googleDaily = mapDaily(gD, { spend:1, impr:2, clicks:3, conv:4 });
@@ -413,8 +475,9 @@
       const metaCamp = mapCamp(mC, { spend:4, impr:5, clicks:6, lpv:7, conv:8, n:9 });
       const googleCamp = mapCamp(gC, { spend:4, impr:5, clicks:6, conv:7, n:8 });
       const metaCreative = mCr.filter(r => r.length >= 6).map(r => { const ymd = ymd0(r[2], r[3], r[4]); daysSet.add(ymd); return { name: (r[0]||'(sem nome)').trim() || '(sem nome)', perm: (r[1]||'').trim(), ymd, spend: numRaw(r[5]), impr: numRaw(r[6]), clicks: numRaw(r[7]), lpv: numRaw(r[8]), conv: numRaw(r[9]) }; });
+      const googleAd = gA.filter(r => r.length >= 6).map(r => { const ymd = ymd0(r[2], r[3], r[4]); daysSet.add(ymd); return { name: (r[0]||'(sem nome)').trim() || '(sem nome)', camp: (r[1]||'(sem nome)').trim() || '(sem nome)', ym: ym0(r[2], r[3]), ymd, spend: numRaw(r[5]), impr: numRaw(r[6]), clicks: numRaw(r[7]), conv: numRaw(r[8]), n: numRaw(r[9]) }; });
       const days = [...daysSet].filter(Boolean).sort();
-      RAW = { leads, leadsContent, leadsTerm, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, metaCreative, days };
+      RAW = { leads, leadsContent, leadsTerm, won: wonRows, metaDaily, googleDaily, metaCamp, googleCamp, metaCreative, googleAd, days };
       return RAW;
     }
 
@@ -468,6 +531,55 @@
       RAW.metaCreative.forEach(r => { if (!inRange(r.ymd)) return; if (!crMap[r.name]) crMap[r.name] = { name:r.name, perm:'', spend:0, impr:0, clicks:0, lpv:0, conv:0 }; const o = crMap[r.name]; if (!o.perm && r.perm) o.perm = r.perm; o.spend+=r.spend; o.impr+=r.impr; o.clicks+=r.clicks; o.lpv+=r.lpv; o.conv+=r.conv; });
       const creatives = Object.values(crMap);
 
+      // google ads (por anúncio, guardando a campanha do anúncio)
+      const gaMap = {};
+      RAW.googleAd.forEach(r => { if (!inRange(r.ymd)) return; if (!gaMap[r.name]) gaMap[r.name] = { name: r.name, camp: r.camp, spend:0, impr:0, clicks:0, conv:0, n:0 }; const o = gaMap[r.name]; o.spend+=r.spend; o.impr+=r.impr; o.clicks+=r.clicks; o.conv+=r.conv; o.n+=r.n; });
+      const googleAds = Object.values(gaMap).sort((a,b)=>b.spend-a.spend);
+
+      // ---- atribuição CRM por campanha/criativo/anúncio (match por nome normalizado, escopado por canal) ----
+      const zeroCrm = (o) => { o.crmLeads=0; o.crmQual=0; o.crmCloser=0; o.crmSdr=0; o.crmWon=0; o.crmRev=0; return o; };
+      metaCamp.forEach(zeroCrm); creatives.forEach(zeroCrm); googleCamp.forEach(zeroCrm); googleAds.forEach(zeroCrm);
+      const bucketMetaCamp     = zeroCrm({ name:'(sem atribuição)', spend:0, impr:0, clicks:0, lpv:0, conv:0, n:0, unattributed:true });
+      const bucketMetaCreative = zeroCrm({ name:'(sem atribuição)', perm:'', spend:0, impr:0, clicks:0, lpv:0, conv:0, unattributed:true });
+      const bucketGoogle       = zeroCrm({ name:'(sem atribuição)', camp:'', spend:0, impr:0, clicks:0, conv:0, n:0, unattributed:true });
+      const metaCampByName     = {}; metaCamp.forEach(o => { metaCampByName[normName(o.name)] = o; });
+      const metaCreativeByName = {}; creatives.forEach(o => { metaCreativeByName[normName(o.name)] = o; });
+      const googleCampByName   = {}; googleCamp.forEach(o => { googleCampByName[normName(o.name)] = o; });
+      const googleAdByName     = {}; googleAds.forEach(o => { googleAdByName[normName(o.name)] = o; });
+      const addLeadCrm = (o, r, qual) => { o.crmLeads += r.n; if (qual) o.crmQual += r.n; if (r.cls==='Closer') o.crmCloser += r.n; if (r.cls==='SDR') o.crmSdr += r.n; };
+
+      // Leads por campanha Meta (utm_campaign do lead). Google: leads por campanha vêm do rollup via leadsContent, não daqui (evita dupla contagem).
+      RAW.leads.forEach(r => {
+        if (!inRange(r.ymd)) return;
+        const qual = (r.cls==='Closer' || r.cls==='SDR');
+        if (r.ch === 'Meta Ads') addLeadCrm(metaCampByName[normName(r.camp)] || bucketMetaCamp, r, qual);
+      });
+
+      // Leads por criativo Meta / anúncio Google (utm_content). Anúncio Google faz rollup para a campanha do anúncio.
+      RAW.leadsContent.forEach(r => {
+        if (!inRange(r.ymd)) return;
+        const qual = (r.cls==='Closer' || r.cls==='SDR');
+        if (r.ch === 'Meta Ads') addLeadCrm(metaCreativeByName[normName(r.v)] || bucketMetaCreative, r, qual);
+        else if (r.ch === 'Google Ads') {
+          const ad = googleAdByName[normName(r.v)];
+          if (ad) { addLeadCrm(ad, r, qual); const camp = googleCampByName[normName(ad.camp)]; addLeadCrm(camp || bucketGoogle, r, qual); }
+          else addLeadCrm(bucketGoogle, r, qual);
+        }
+      });
+
+      // Faturamento/ganhos: Meta soma na campanha (utm_campaign) e no criativo (utm_content); Google via anúncio (utm_content) com rollup para a campanha.
+      RAW.won.forEach(r => {
+        if (!inRange(r.ymd)) return;
+        if (r.ch === 'Meta Ads') {
+          const camp = metaCampByName[normName(r.camp)] || bucketMetaCamp; camp.crmWon += 1; camp.crmRev += r.value;
+          const cr = metaCreativeByName[normName(r.content)] || bucketMetaCreative; cr.crmWon += 1; cr.crmRev += r.value;
+        } else if (r.ch === 'Google Ads') {
+          const ad = googleAdByName[normName(r.content)];
+          if (ad) { ad.crmWon += 1; ad.crmRev += r.value; const camp = googleCampByName[normName(ad.camp)] || bucketGoogle; camp.crmWon += 1; camp.crmRev += r.value; }
+          else { const camp = googleCampByName[normName(r.camp)]; if (camp) { camp.crmWon += 1; camp.crmRev += r.value; } else { bucketGoogle.crmWon += 1; bucketGoogle.crmRev += r.value; } }
+        }
+      });
+
       // dimensions
       const dims = {
         medium:  buildDim(RAW.leads, 'med', 'med'),
@@ -482,7 +594,7 @@
       const paidRev = ch['Meta Ads'].rev + ch['Google Ads'].rev;
       const paidLeads = ch['Meta Ads'].leads + ch['Google Ads'].leads;
       const semUtmRev = ch['Sem UTM'].rev;
-      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp, creatives, dims, dailyLeads, dailyWon, totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
+      return { ch, monthsInRange, leadsByChMonth, revByChMonth, platTraffic, byMonth, metaCamp, googleCamp, creatives, googleAds, bucketMetaCamp, bucketMetaCreative, bucketGoogle, dims, dailyLeads, dailyWon, totLeads, totRev, totWon, totSpend, paidRev, paidLeads, semUtmRev };
     }
 
     // ============================================================ CHARTS
@@ -493,6 +605,18 @@
     function destroyAllCharts() { Object.keys(charts).forEach(k => { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
     const GRID = { color: '#1a1a1a' };
     const CLS_COLORS = { Closer:'#f5f5f5', SDR:'#a3a3a3', Perdido:'#ef4444', Outros:'#404040' };
+    const C_POS = '#34d399', C_NEG = '#ef4444', C_REV = '#facc15', C_GRAY = 'rgba(115,115,115,0.45)';
+    // ROAS por linha (crmRev/spend); null quando não há investimento.
+    const rowRoas = (o) => (o.spend > 0 ? o.crmRev / o.spend : null);
+    const clip32 = (s) => s.length > 32 ? s.slice(0, 30) + '…' : s;
+    // Rótulos de chart: remove o prefixo comum entre as campanhas (ex.: "[MENTORIA] - PERPETUO - LEAD - ") para o eixo não ficar com labels idênticos; tooltip mantém o nome completo.
+    const chartLabels = (names) => {
+      if (names.length < 2) return names.map(clip32);
+      let p = names[0].length;
+      names.forEach(n => { let i = 0; while (i < p && i < n.length && n[i] === names[0][i]) i++; p = i; });
+      if (p < 10) return names.map(clip32);
+      return names.map(n => clip32('…' + n.slice(p)));
+    };
 
     function renderDailyLeads(D) {
       const days = D.dailyLeads;
@@ -572,11 +696,6 @@
         { label: 'Conversões', yAxisID:'y1', data: pts.map(p=>p.conv), borderColor:'#34d399', tension:.25, pointRadius:0, borderWidth:1.8 } ] },
         options: { responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false }, plugins: { legend: { position:'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.yAxisID==='y' ? `Impressões: ${fmtInt(c.raw)}` : `Conversões: ${fmtInt(c.raw)}` } } }, scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 12 } }, y: { grid: GRID, ticks: { callback: fmtInt } }, y1: { position:'right', grid: { display:false }, ticks: { callback: fmtInt } } } } });
     }
-    function renderCampChart(id, camps, color) {
-      const top = camps.slice(0, 8);
-      setChart(id, { type:'bar', data:{ labels: top.map(c=>c.name.length>34?c.name.slice(0,32)+'…':c.name), datasets:[{ data: top.map(c=>c.spend), backgroundColor: color, borderRadius:4, maxBarThickness:26 }] },
-        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>fmtBRL2(c.raw) } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
-    }
 
     // ============================================================ CHIPS/FUNNEL/TABLES
     function chip(label, value, sub) { return `<div class="metric-chip"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-base sm:text-xl font-bold">${value}</div>${sub?`<div class="text-[10px] text-neutral-500 mt-0.5">${sub}</div>`:''}</div>`; }
@@ -592,16 +711,84 @@
     }
 
     let creativeSort = 'spend';
+    const creativeVal = (c, k) => k==='rev' ? c.crmRev : k==='qual' ? c.crmQual : k==='roas' ? (c.spend>0 ? c.crmRev/c.spend : 0) : (c[k]||0);
     function renderMetaCreatives(D) {
-      const list = [...D.creatives].sort((a,b)=> (b[creativeSort]||0) - (a[creativeSort]||0));
+      const list = [...D.creatives].sort((a,b)=> creativeVal(b, creativeSort) - creativeVal(a, creativeSort));
       const top = list.slice(0, 12);
-      const label = creativeSort==='spend' ? 'Investimento' : creativeSort==='conv' ? 'Conversões' : 'Cliques';
-      const fmtv = creativeSort==='spend' ? fmtBRLShort : fmtInt;
-      setChart('metaCreativeChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>c[creativeSort]), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
+      const CHART_LABEL = { spend:'Investimento', conv:'Conversões', clicks:'Cliques', rev:'Faturamento', qual:'Qualif.', roas:'ROAS' };
+      const label = CHART_LABEL[creativeSort] || 'Investimento';
+      const fmtv = creativeSort==='spend'||creativeSort==='rev' ? fmtBRLShort : creativeSort==='roas' ? fmtX : fmtInt;
+      setChart('metaCreativeChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>creativeVal(c, creativeSort)), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
-      $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0;
+      $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0, roas=rowRoas(c);
         const nameCell = c.perm ? `<a href="${esc(c.perm)}" target="_blank" rel="noopener" class="clink">${esc(c.name)} ↗</a>` : `<span class="text-neutral-300">${esc(c.name)}</span>`;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left max-w-[280px] truncate" title="${esc(c.name)}">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="10" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left max-w-[280px] truncate" title="${esc(c.name)}">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; }).join('') || `<tr><td colspan="14" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+    }
+
+    // Performance por campanha (compartilhado Meta/Google) + destaques + charts ROAS e investimento×faturamento.
+    const campSortState = { meta:'spend', google:'spend' };
+    function sortCamps(list, key) {
+      return [...list].sort((a,b) => {
+        if (key==='roas') { const ra=rowRoas(a), rb=rowRoas(b); return (rb==null?-Infinity:rb) - (ra==null?-Infinity:ra); }
+        const va = key==='rev'?a.crmRev : key==='qual'?a.crmQual : (a[key]||0);
+        const vb = key==='rev'?b.crmRev : key==='qual'?b.crmQual : (b[key]||0);
+        return vb - va;
+      });
+    }
+    function hlChip(label, value, sub, color) {
+      return `<div class="metric-chip" style="border-left:3px solid ${color}"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-lg sm:text-2xl font-bold">${value}</div><div class="text-[10px] text-neutral-500 mt-0.5 truncate" title="${esc(sub||'')}">${esc(sub||'—')}</div></div>`;
+    }
+    function campRow(c, muted) {
+      const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, ctr=c.impr?c.clicks/c.impr*100:0;
+      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left max-w-[240px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
+    }
+    function renderCampPerf(D, plat) {
+      const cfg = plat==='meta'
+        ? { list:D.metaCamp, bucket:D.bucketMetaCamp, hlId:'metaCampHighlights', roasId:'metaCampRoasChart', invRevId:'metaCampInvRevChart', bodyId:'metaCampBody' }
+        : { list:D.googleCamp, bucket:D.bucketGoogle, hlId:'googleCampHighlights', roasId:'googleCampRoasChart', invRevId:'googleCampInvRevChart', bodyId:'googleCampBody' };
+      const list = cfg.list;
+      // destaques
+      const withRoas = list.filter(c => c.spend>0 && c.crmRev>0);
+      const bestRoas = withRoas.reduce((a,c)=> (a==null || rowRoas(c)>rowRoas(a)) ? c : a, null);
+      const bestRev  = list.reduce((a,c)=> (a==null || c.crmRev>a.crmRev) ? c : a, null);
+      const bestQual = list.reduce((a,c)=> (a==null || c.crmQual>a.crmQual) ? c : a, null);
+      $(cfg.hlId).innerHTML = [
+        hlChip('Melhor ROAS', bestRoas?fmtX(rowRoas(bestRoas)):'—', bestRoas?bestRoas.name:'sem dado no período', C_POS),
+        hlChip('Maior faturamento', (bestRev&&bestRev.crmRev>0)?fmtBRL(bestRev.crmRev):'—', (bestRev&&bestRev.crmRev>0)?bestRev.name:'sem dado no período', C_REV),
+        hlChip('Mais leads qualificados', (bestQual&&bestQual.crmQual>0)?fmtInt(bestQual.crmQual):'—', (bestQual&&bestQual.crmQual>0)?bestQual.name:'sem dado no período', '#4f8cff'),
+      ].join('');
+      // charts (top 10 por investimento)
+      const topInv = list.filter(c=>c.spend>0).sort((a,b)=>b.spend-a.spend).slice(0,10);
+      const topLabels = chartLabels(topInv.map(c=>c.name));
+      setChart(cfg.roasId, { type:'bar', data:{ labels: topLabels, datasets:[{ data: topInv.map(c=>rowRoas(c)||0), backgroundColor: topInv.map(c=>(rowRoas(c)||0)>=1?C_POS:C_NEG), borderRadius:4, maxBarThickness:22 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>topInv[c[0].dataIndex].name, label:(c)=>{ const o=topInv[c.dataIndex]; return [`ROAS: ${rowRoas(o)!=null?fmtX(rowRoas(o)):'—'}`, `Investimento: ${fmtBRL(o.spend)}`, `Faturamento: ${fmtBRL(o.crmRev)}`, `Qualif.: ${fmtInt(o.crmQual)}`]; } } } }, scales:{ x:{ grid:GRID, ticks:{ callback:(v)=>v+'x' } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      setChart(cfg.invRevId, { type:'bar', data:{ labels: topLabels, datasets:[
+        { label:'Investimento', data: topInv.map(c=>c.spend), backgroundColor:C_GRAY, borderRadius:3, maxBarThickness:11 },
+        { label:'Faturamento', data: topInv.map(c=>c.crmRev), backgroundColor:C_REV, borderRadius:3, maxBarThickness:11 } ] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ title:(c)=>topInv[c[0].dataIndex].name, label:(c)=>`${c.dataset.label}: ${fmtBRL2(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      // tabela
+      const sorted = sortCamps(list, campSortState[plat]);
+      let html = sorted.map(c=>campRow(c,false)).join('');
+      if (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0) html += campRow(cfg.bucket, true);
+      $(cfg.bodyId).innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+    }
+
+    // Ranking de anúncios Google (utm_content), com chart seguindo o sort ativo.
+    let googleAdSort = 'spend';
+    const adVal = (c, k) => k==='rev' ? c.crmRev : k==='qual' ? c.crmQual : k==='roas' ? (c.spend>0 ? c.crmRev/c.spend : 0) : (c[k]||0);
+    function renderGoogleAds(D) {
+      const list = [...D.googleAds].sort((a,b)=> adVal(b, googleAdSort) - adVal(a, googleAdSort));
+      const top = list.slice(0, 12);
+      const CHART_LABEL = { spend:'Investimento', rev:'Faturamento', roas:'ROAS', qual:'Qualif.', conv:'Conversões' };
+      const label = CHART_LABEL[googleAdSort] || 'Investimento';
+      const fmtv = googleAdSort==='spend'||googleAdSort==='rev' ? fmtBRLShort : googleAdSort==='roas' ? fmtX : fmtInt;
+      setChart('googleAdChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>adVal(c, googleAdSort)), backgroundColor:'#34d399', borderRadius:4, maxBarThickness:24 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
+      const adRow = (c, muted) => { const ctr=c.impr?c.clicks/c.impr*100:0, roas=rowRoas(c);
+        return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left max-w-[240px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-left max-w-[200px] truncate text-neutral-400" title="${esc(c.camp||'')}">${c.camp?esc(c.camp):'—'}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; };
+      let html = list.map(c=>adRow(c,false)).join('');
+      if (D.bucketGoogle.crmLeads>0 || D.bucketGoogle.crmRev>0) html += adRow(D.bucketGoogle, true);
+      $('googleAdBody').innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     function renderMetaPanel(D) {
@@ -610,16 +797,17 @@
       $('metaKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`), chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`) ].join('');
       renderFunnel('metaFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques no link', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Landing page views', v:t.lpv, fmt:fmtInt, pct: t.clicks? t.lpv/t.clicks*100:0 }, { label:'Conversões (TYP)', v:t.conv, fmt:fmtInt, pct: t.lpv? t.conv/t.lpv*100:0 }, { label:'Negócios ganhos', v:m.won, fmt:fmtInt, pct: t.conv? m.won/t.conv*100:0 } ], chColor('Meta Ads'));
       renderDailyChart('metaDailyChart', RAW.metaDaily);
+      renderCampPerf(D, 'meta');
       renderMetaCreatives(D);
-      $('metaCampBody').innerHTML = D.metaCamp.map(c => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="9" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
     function renderGooglePanel(D) {
       const t = D.platTraffic.google; const g = D.ch['Google Ads'];
       const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? g.rev/t.spend : 0;
       $('googleKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPC', fmtBRL2(cpc)), chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`) ].join('');
       renderFunnel('googleFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Conversões', v:t.conv, fmt:fmtInt, pct: t.clicks? t.conv/t.clicks*100:0 }, { label:'Negócios ganhos', v:g.won, fmt:fmtInt, pct: t.conv? g.won/t.conv*100:0 } ], chColor('Google Ads'));
-      renderDailyChart('googleDailyChart', RAW.googleDaily); renderConvChart('googleConvChart', RAW.googleDaily); renderCampChart('googleCampChart', D.googleCamp, chColor('Google Ads'));
-      $('googleCampBody').innerHTML = D.googleCamp.map(c => { const ctr=c.impr? c.clicks/c.impr*100:0, cpc=c.clicks? c.spend/c.clicks:0, cpa=c.conv? c.spend/c.conv:0; return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left max-w-[260px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpc)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td></tr>`; }).join('') || `<tr><td colspan="8" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      renderDailyChart('googleDailyChart', RAW.googleDaily); renderConvChart('googleConvChart', RAW.googleDaily);
+      renderCampPerf(D, 'google');
+      renderGoogleAds(D);
     }
     function renderKpis(D) {
       $('kpiLeads').textContent = fmtInt(D.totLeads);
@@ -696,6 +884,9 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
       document.querySelectorAll('#dimButtons .dim-btn').forEach(b => b.addEventListener('click', () => { utmDim = b.dataset.dim; document.querySelectorAll('#dimButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); utmSort = { k:'rev', dir:-1 }; renderUtm(compute()); }));
       document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderMetaCreatives(compute()); }));
+      document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.meta = b.dataset.sort; document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
+      document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.google = b.dataset.sort; document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
+      document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { googleAdSort = b.dataset.sort; document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderGoogleAds(compute()); }));
       document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='label'?1:-1)) }; renderUtmTable(compute()); }));
     }
 
