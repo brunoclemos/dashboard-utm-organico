@@ -275,12 +275,20 @@
         <section class="space-y-4">
           <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
           <p class="text-xs text-neutral-500 -mt-2">Faturamento, ROAS e leads qualificados por campanha, cruzando o utm_campaign do lead com o nome da campanha na aba Meta Ads.</p>
-          <div class="flex items-center gap-1.5 flex-wrap" id="metaCampFilterButtons">
-            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
-            <button class="dim-btn active" data-filter="all">Todas</button>
-            <button class="dim-btn" data-filter="quente">Quente</button>
-            <button class="dim-btn" data-filter="frio">Frio</button>
-            <button class="dim-btn" data-filter="adv">Advantage</button>
+          <div class="flex items-center gap-x-4 gap-y-2 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-wrap" id="metaCampFilterButtons">
+              <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
+              <button class="dim-btn active" data-filter="all">Todas</button>
+              <button class="dim-btn" data-filter="quente">Quente</button>
+              <button class="dim-btn" data-filter="frio">Frio</button>
+              <button class="dim-btn" data-filter="adv">Advantage</button>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap" id="metaCampStatusButtons">
+              <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Status</span>
+              <button class="dim-btn active" data-status="all">Todas</button>
+              <button class="dim-btn" data-status="ativas">Ativas</button>
+              <button class="dim-btn" data-status="desativadas">Desativadas</button>
+            </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="metaCampHighlights"></div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -299,7 +307,7 @@
               <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
             </tr></thead><tbody id="metaCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento nos últimos 7 dias de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse intervalo.</p>
         </section>
 
         <!-- RANKING DE CRIATIVOS -->
@@ -341,12 +349,20 @@
         <section class="space-y-4">
           <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
           <p class="text-xs text-neutral-500 -mt-2">O utm_campaign dos leads Google é genérico, então a atribuição por campanha vem do rollup dos anúncios (utm_content do lead ↔ nome do anúncio ↔ campanha na aba Google Ads).</p>
-          <div class="flex items-center gap-1.5 flex-wrap" id="googleCampFilterButtons">
-            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
-            <button class="dim-btn active" data-filter="all">Todas</button>
-            <button class="dim-btn" data-filter="quente">Quente</button>
-            <button class="dim-btn" data-filter="frio">Frio</button>
-            <button class="dim-btn" data-filter="adv">Advantage</button>
+          <div class="flex items-center gap-x-4 gap-y-2 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-wrap" id="googleCampFilterButtons">
+              <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
+              <button class="dim-btn active" data-filter="all">Todas</button>
+              <button class="dim-btn" data-filter="quente">Quente</button>
+              <button class="dim-btn" data-filter="frio">Frio</button>
+              <button class="dim-btn" data-filter="adv">Advantage</button>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap" id="googleCampStatusButtons">
+              <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Status</span>
+              <button class="dim-btn active" data-status="all">Todas</button>
+              <button class="dim-btn" data-status="ativas">Ativas</button>
+              <button class="dim-btn" data-status="desativadas">Desativadas</button>
+            </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="googleCampHighlights"></div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -365,7 +381,7 @@
               <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
             </tr></thead><tbody id="googleCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento nos últimos 7 dias de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse intervalo.</p>
         </section>
 
         <!-- RANKING DE ANÚNCIOS -->
@@ -539,6 +555,15 @@
       const aggCamp = (rows, keys) => { const map = {}; rows.forEach(r => { if (!inRange(r.ymd)) return; if (!map[r.name]) { map[r.name] = { name: r.name }; keys.forEach(k => map[r.name][k] = 0); } keys.forEach(k => map[r.name][k] += r[k] || 0); }); return Object.values(map).sort((a,b) => b.spend - a.spend); };
       const metaCamp = aggCamp(RAW.metaCamp, ['spend','impr','clicks','lpv','conv','n']);
       const googleCamp = aggCamp(RAW.googleCamp, ['spend','impr','clicks','conv','n']);
+
+      // Status ativa/desativada (heurística): campanha com investimento nos últimos 7 dias de DADOS da plataforma — independe do período filtrado.
+      const markActive = (aggList, rawRows) => {
+        let lastDay = ''; const lastSpend = {};
+        rawRows.forEach(r => { if (r.spend > 0) { if (r.ymd > lastDay) lastDay = r.ymd; if (!lastSpend[r.name] || r.ymd > lastSpend[r.name]) lastSpend[r.name] = r.ymd; } });
+        const cut = lastDay ? addDays(lastDay, -6) : '';
+        aggList.forEach(c => { c.active = !!lastSpend[c.name] && lastSpend[c.name] >= cut; });
+      };
+      markActive(metaCamp, RAW.metaCamp); markActive(googleCamp, RAW.googleCamp);
 
       // creatives (merge by name, keep first permalink)
       const crMap = {};
@@ -744,6 +769,8 @@
     // Filtro por temperatura da campanha, inferida do nome (QUENTE / FRIO / ADV).
     const campFilterState = { meta:'all', google:'all' };
     const campTemp = (name) => { const u = String(name||'').toUpperCase(); if (u.includes('QUENTE')) return 'quente'; if (u.includes('FRIO') || u.includes('FRIA')) return 'frio'; if (u.includes('ADV')) return 'adv'; return 'outras'; };
+    // Filtro por status (ativa = investimento nos últimos 7 dias de dados; ver markActive em compute).
+    const campStatusState = { meta:'all', google:'all' };
     function sortCamps(list, key) {
       return [...list].sort((a,b) => {
         if (key==='roas') { const ra=rowRoas(a), rb=rowRoas(b); return (rb==null?-Infinity:rb) - (ra==null?-Infinity:ra); }
@@ -757,14 +784,17 @@
     }
     function campRow(c, muted) {
       const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, ctr=c.impr?c.clicks/c.impr*100:0;
-      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[280px]">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
+      const statusDot = c.active != null ? `<span class="legend-dot mt-1 flex-shrink-0" style="background:${c.active?'var(--pos)':'#525252'}" title="${c.active?'Ativa (investiu nos últimos 7 dias de dados)':'Desativada (sem investimento nos últimos 7 dias de dados)'}"></span>` : '';
+      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
     }
     function renderCampPerf(D, plat) {
       const cfg = plat==='meta'
         ? { list:D.metaCamp, bucket:D.bucketMetaCamp, hlId:'metaCampHighlights', roasId:'metaCampRoasChart', invRevId:'metaCampInvRevChart', bodyId:'metaCampBody' }
         : { list:D.googleCamp, bucket:D.bucketGoogle, hlId:'googleCampHighlights', roasId:'googleCampRoasChart', invRevId:'googleCampInvRevChart', bodyId:'googleCampBody' };
-      const filt = campFilterState[plat];
-      const list = filt === 'all' ? cfg.list : cfg.list.filter(c => campTemp(c.name) === filt);
+      const filt = campFilterState[plat], st = campStatusState[plat];
+      let list = cfg.list;
+      if (filt !== 'all') list = list.filter(c => campTemp(c.name) === filt);
+      if (st !== 'all') list = list.filter(c => st === 'ativas' ? c.active : !c.active);
       // destaques
       const withRoas = list.filter(c => c.spend>0 && c.crmRev>0);
       const bestRoas = withRoas.reduce((a,c)=> (a==null || rowRoas(c)>rowRoas(a)) ? c : a, null);
@@ -787,7 +817,7 @@
       // tabela
       const sorted = sortCamps(list, campSortState[plat]);
       let html = sorted.map(c=>campRow(c,false)).join('');
-      if (filt === 'all' && (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0)) html += campRow(cfg.bucket, true);
+      if (filt === 'all' && st === 'all' && (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0)) html += campRow(cfg.bucket, true);
       $(cfg.bodyId).innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
@@ -906,6 +936,8 @@
       document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.google = b.dataset.sort; document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
       document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.meta = b.dataset.filter; document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
       document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.google = b.dataset.filter; document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
+      document.querySelectorAll('#metaCampStatusButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campStatusState.meta = b.dataset.status; document.querySelectorAll('#metaCampStatusButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
+      document.querySelectorAll('#googleCampStatusButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campStatusState.google = b.dataset.status; document.querySelectorAll('#googleCampStatusButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
       document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { googleAdSort = b.dataset.sort; document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderGoogleAds(compute()); }));
       document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='label'?1:-1)) }; renderUtmTable(compute()); }));
     }
