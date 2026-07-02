@@ -981,7 +981,21 @@
     function showLoading()   { $('authLoading').classList.remove('hidden'); $('authLogin').classList.add('hidden'); $('appHeader').classList.add('hidden'); $('appMain').classList.add('hidden'); }
     function showLogin()     { $('authLoading').classList.add('hidden'); $('authLogin').classList.remove('hidden'); $('appHeader').classList.add('hidden'); $('appMain').classList.add('hidden'); }
     function showDashboard() { $('authLoading').classList.add('hidden'); $('authLogin').classList.add('hidden'); $('appHeader').classList.remove('hidden'); $('appMain').classList.remove('hidden'); if (!dashboardInitialized) { dashboardInitialized = true; initDashboard(); } }
-    async function checkAuth() { const { data } = await sb.auth.getSession(); const session = data?.session; if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) showDashboard(); else { if (session) await sb.auth.signOut(); showLogin(); } }
+    async function checkAuth() { const { data } = await sb.auth.getSession(); const session = data?.session; if (session && ALLOWED_EMAILS.includes((session.user.email || '').toLowerCase())) showDashboard(); else { if (session) await sb.auth.signOut(); if (HUB_EMBED && !hubSsoWaited) { hubSsoWaited = true; setTimeout(() => { if (!dashboardInitialized) checkAuth(); }, 3000); return; } showLogin(); } }
+    /* SSO via Hub de Dados Escalada: quando embedado, recebe a sessão do hub por postMessage */
+    const HUB_ORIGIN = 'https://hub-dados-escalada.pages.dev';
+    const HUB_EMBED = (() => { try { return window.self !== window.top; } catch { return true; } })();
+    let hubSsoWaited = false;
+    if (HUB_EMBED) {
+      window.addEventListener('message', async (ev) => {
+        if (ev.origin !== HUB_ORIGIN || !ev.data || ev.data.type !== 'escalada-sso') return;
+        if (ev.data.action === 'signout') { await sb.auth.signOut(); return; }
+        if (!ev.data.access_token || !ev.data.refresh_token) return;
+        const { error } = await sb.auth.setSession({ access_token: ev.data.access_token, refresh_token: ev.data.refresh_token });
+        if (!error) checkAuth();
+      });
+      window.parent.postMessage({ type: 'escalada-sso-ready' }, HUB_ORIGIN);
+    }
     $('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = $('loginEmail').value.trim().toLowerCase(); const password = $('loginPassword').value; const errEl = $('loginError'); const submitBtn = $('loginSubmit'); errEl.classList.add('hidden'); errEl.textContent = '';
