@@ -275,6 +275,13 @@
         <section class="space-y-4">
           <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
           <p class="text-xs text-neutral-500 -mt-2">Faturamento, ROAS e leads qualificados por campanha, cruzando o utm_campaign do lead com o nome da campanha na aba Meta Ads.</p>
+          <div class="flex items-center gap-1.5 flex-wrap" id="metaCampFilterButtons">
+            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
+            <button class="dim-btn active" data-filter="all">Todas</button>
+            <button class="dim-btn" data-filter="quente">Quente</button>
+            <button class="dim-btn" data-filter="frio">Frio</button>
+            <button class="dim-btn" data-filter="adv">Advantage</button>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="metaCampHighlights"></div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="metaCampRoasChart"></canvas></div></div>
@@ -334,6 +341,13 @@
         <section class="space-y-4">
           <div class="section-title"><h2 class="text-base sm:text-xl font-semibold tracking-tight">Performance por campanha</h2></div>
           <p class="text-xs text-neutral-500 -mt-2">O utm_campaign dos leads Google é genérico, então a atribuição por campanha vem do rollup dos anúncios (utm_content do lead ↔ nome do anúncio ↔ campanha na aba Google Ads).</p>
+          <div class="flex items-center gap-1.5 flex-wrap" id="googleCampFilterButtons">
+            <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mr-1">Filtrar</span>
+            <button class="dim-btn active" data-filter="all">Todas</button>
+            <button class="dim-btn" data-filter="quente">Quente</button>
+            <button class="dim-btn" data-filter="frio">Frio</button>
+            <button class="dim-btn" data-filter="adv">Advantage</button>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="googleCampHighlights"></div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="googleCampRoasChart"></canvas></div></div>
@@ -722,11 +736,14 @@
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0, roas=rowRoas(c);
         const nameCell = c.perm ? `<a href="${esc(c.perm)}" target="_blank" rel="noopener" class="clink">${esc(c.name)} ↗</a>` : `<span class="text-neutral-300">${esc(c.name)}</span>`;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left max-w-[280px] truncate" title="${esc(c.name)}">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; }).join('') || `<tr><td colspan="14" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[240px]">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; }).join('') || `<tr><td colspan="14" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     // Performance por campanha (compartilhado Meta/Google) + destaques + charts ROAS e investimento×faturamento.
     const campSortState = { meta:'spend', google:'spend' };
+    // Filtro por temperatura da campanha, inferida do nome (QUENTE / FRIO / ADV).
+    const campFilterState = { meta:'all', google:'all' };
+    const campTemp = (name) => { const u = String(name||'').toUpperCase(); if (u.includes('QUENTE')) return 'quente'; if (u.includes('FRIO') || u.includes('FRIA')) return 'frio'; if (u.includes('ADV')) return 'adv'; return 'outras'; };
     function sortCamps(list, key) {
       return [...list].sort((a,b) => {
         if (key==='roas') { const ra=rowRoas(a), rb=rowRoas(b); return (rb==null?-Infinity:rb) - (ra==null?-Infinity:ra); }
@@ -740,13 +757,14 @@
     }
     function campRow(c, muted) {
       const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, ctr=c.impr?c.clicks/c.impr*100:0;
-      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left max-w-[240px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
+      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[280px]">${esc(c.name)}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
     }
     function renderCampPerf(D, plat) {
       const cfg = plat==='meta'
         ? { list:D.metaCamp, bucket:D.bucketMetaCamp, hlId:'metaCampHighlights', roasId:'metaCampRoasChart', invRevId:'metaCampInvRevChart', bodyId:'metaCampBody' }
         : { list:D.googleCamp, bucket:D.bucketGoogle, hlId:'googleCampHighlights', roasId:'googleCampRoasChart', invRevId:'googleCampInvRevChart', bodyId:'googleCampBody' };
-      const list = cfg.list;
+      const filt = campFilterState[plat];
+      const list = filt === 'all' ? cfg.list : cfg.list.filter(c => campTemp(c.name) === filt);
       // destaques
       const withRoas = list.filter(c => c.spend>0 && c.crmRev>0);
       const bestRoas = withRoas.reduce((a,c)=> (a==null || rowRoas(c)>rowRoas(a)) ? c : a, null);
@@ -769,7 +787,7 @@
       // tabela
       const sorted = sortCamps(list, campSortState[plat]);
       let html = sorted.map(c=>campRow(c,false)).join('');
-      if (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0) html += campRow(cfg.bucket, true);
+      if (filt === 'all' && (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0)) html += campRow(cfg.bucket, true);
       $(cfg.bodyId).innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
@@ -785,7 +803,7 @@
       setChart('googleAdChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>adVal(c, googleAdSort)), backgroundColor:'#34d399', borderRadius:4, maxBarThickness:24 }] },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       const adRow = (c, muted) => { const ctr=c.impr?c.clicks/c.impr*100:0, roas=rowRoas(c);
-        return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left max-w-[240px] truncate" title="${esc(c.name)}">${esc(c.name)}</td><td class="px-4 py-2.5 text-left max-w-[200px] truncate text-neutral-400" title="${esc(c.camp||'')}">${c.camp?esc(c.camp):'—'}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; };
+        return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px]">${esc(c.name)}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px] text-neutral-400">${c.camp?esc(c.camp):'—'}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; };
       let html = list.map(c=>adRow(c,false)).join('');
       if (D.bucketGoogle.crmLeads>0 || D.bucketGoogle.crmRev>0) html += adRow(D.bucketGoogle, true);
       $('googleAdBody').innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
@@ -886,6 +904,8 @@
       document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderMetaCreatives(compute()); }));
       document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.meta = b.dataset.sort; document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
       document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.google = b.dataset.sort; document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
+      document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.meta = b.dataset.filter; document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
+      document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.google = b.dataset.filter; document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
       document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { googleAdSort = b.dataset.sort; document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderGoogleAds(compute()); }));
       document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='label'?1:-1)) }; renderUtmTable(compute()); }));
     }
