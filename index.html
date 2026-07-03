@@ -308,7 +308,7 @@
               <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
             </tr></thead><tbody id="metaCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento nos últimos 7 dias de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse intervalo.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
         </section>
 
         <!-- RANKING DE CRIATIVOS -->
@@ -383,7 +383,7 @@
               <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
             </tr></thead><tbody id="googleCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento nos últimos 7 dias de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse intervalo.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
         </section>
 
         <!-- RANKING DE ANÚNCIOS -->
@@ -558,12 +558,12 @@
       const metaCamp = aggCamp(RAW.metaCamp, ['spend','impr','clicks','lpv','conv','n']);
       const googleCamp = aggCamp(RAW.googleCamp, ['spend','impr','clicks','conv','n']);
 
-      // Status ativa/desativada (heurística): campanha com investimento nos últimos 7 dias de DADOS da plataforma — independe do período filtrado.
+      // Status ativa/desativada (heurística): campanha com investimento no ÚLTIMO dia de DADOS da plataforma — independe do período filtrado.
+      // Janela de 1 dia: campanha pausada some do "ativa" assim que a planilha registrar um dia sem gasto dela (~1 dia de lag).
       const markActive = (aggList, rawRows) => {
         let lastDay = ''; const lastSpend = {};
         rawRows.forEach(r => { if (r.spend > 0) { if (r.ymd > lastDay) lastDay = r.ymd; if (!lastSpend[r.name] || r.ymd > lastSpend[r.name]) lastSpend[r.name] = r.ymd; } });
-        const cut = lastDay ? addDays(lastDay, -6) : '';
-        aggList.forEach(c => { c.active = !!lastSpend[c.name] && lastSpend[c.name] >= cut; });
+        aggList.forEach(c => { c.active = !!lastSpend[c.name] && lastSpend[c.name] === lastDay; });
       };
       markActive(metaCamp, RAW.metaCamp); markActive(googleCamp, RAW.googleCamp);
 
@@ -771,7 +771,7 @@
     // Filtro por temperatura da campanha, inferida do nome (QUENTE / FRIO / ADV).
     const campFilterState = { meta:'all', google:'all' };
     const campTemp = (name) => { const u = String(name||'').toUpperCase(); if (u.includes('QUENTE')) return 'quente'; if (u.includes('FRIO') || u.includes('FRIA')) return 'frio'; if (u.includes('ADV')) return 'adv'; return 'outras'; };
-    // Filtro por status (ativa = investimento nos últimos 7 dias de dados; ver markActive em compute).
+    // Filtro por status (ativa = investimento no último dia de dados; ver markActive em compute).
     const campStatusState = { meta:'all', google:'all' };
     // Taxa de qualificação = leads Closer+SDR ÷ leads atribuídos à campanha.
     const qualRate = (c) => c.crmLeads > 0 ? c.crmQual / c.crmLeads : null;
@@ -789,7 +789,7 @@
     }
     function campRow(c, muted) {
       const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, ctr=c.impr?c.clicks/c.impr*100:0;
-      const statusDot = c.active != null ? `<span class="legend-dot mt-1 flex-shrink-0" style="background:${c.active?'var(--pos)':'#525252'}" title="${c.active?'Ativa (investiu nos últimos 7 dias de dados)':'Desativada (sem investimento nos últimos 7 dias de dados)'}"></span>` : '';
+      const statusDot = c.active != null ? `<span class="legend-dot mt-1 flex-shrink-0" style="background:${c.active?'var(--pos)':'#525252'}" title="${c.active?'Ativa (investiu no último dia de dados da planilha)':'Desativada (sem investimento no último dia de dados da planilha)'}"></span>` : '';
       return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${qualRate(c)!=null?fmtPct(qualRate(c)*100,1):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
     }
     function renderCampPerf(D, plat) {
