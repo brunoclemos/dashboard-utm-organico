@@ -58,6 +58,20 @@
     .funnel-bar { height: 26px; border-radius: 6px; min-width: 2px; transition: width .3s ease; }
     .clink { color: var(--meta); text-decoration: none; border-bottom: 1px dotted rgba(79,140,255,.4); }
     .clink:hover { color: #7da9ff; border-bottom-color: #7da9ff; }
+    /* Preview do criativo (embed Instagram cropado para mostrar só a mídia) */
+    .ig-thumb { position: relative; width: 84px; height: 84px; border-radius: 8px; overflow: hidden; background: #1a1a1a; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; }
+    .ig-thumb:hover { border-color: #3a3a3a; }
+    .ig-thumb iframe { position: absolute; top: 0; left: 0; width: 340px; height: 440px; border: 0; transform-origin: 0 0; transform: scale(0.247) translateY(-66px); pointer-events: none; background: #fff; }
+    .ig-thumb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #4b4b4b; }
+    .ig-thumb-ph.skeleton { background: linear-gradient(100deg, #1a1a1a 30%, #242424 50%, #1a1a1a 70%); background-size: 200% 100%; animation: igshimmer 1.4s ease-in-out infinite; }
+    @keyframes igshimmer { to { background-position: -200% 0; } }
+    .ig-thumb.no-perm { cursor: default; }
+    .ig-thumb.no-perm:hover { border-color: var(--border); }
+    .ig-modal { position: fixed; inset: 0; z-index: 120; background: rgba(0,0,0,.82); display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .ig-modal-inner { position: relative; width: 400px; max-width: 100%; }
+    .ig-modal-inner iframe { width: 400px; max-width: 100%; height: 560px; max-height: 88vh; border: 0; border-radius: 14px; background: #fff; display: block; }
+    .ig-modal-close { position: absolute; top: -42px; right: 0; width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 20px; line-height: 1; cursor: pointer; }
+    .ig-modal-close:hover { background: var(--bg-card-hover); }
     .chart-h-overview { height: 340px; }
     .chart-h-tall { height: 360px; }
     .chart-h-md { height: 300px; }
@@ -324,11 +338,11 @@
               <button class="dim-btn" data-sort="clicks">Cliques</button>
             </div>
           </div>
-          <p class="text-xs text-neutral-500 -mt-2">Clique no criativo para abrir o anúncio no Instagram. Faturamento e ROAS via utm_content do lead.</p>
+          <p class="text-xs text-neutral-500 -mt-2">O preview mostra a mídia do anúncio direto do Instagram. Clique no preview para ampliar; clique no nome para abrir o post no Instagram. Faturamento e ROAS via utm_content do lead.</p>
           <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Top criativos</div><div class="chart-h-md"><canvas id="metaCreativeChart"></canvas></div></div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
             <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th>
+              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Preview</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th>
             </tr></thead><tbody id="metaCreativeBody"></tbody></table>
           </div></div>
         </section>
@@ -410,6 +424,14 @@
 
     </div>
   </main>
+
+  <!-- Modal de preview ampliado do criativo (embed Instagram) -->
+  <div id="igModal" class="ig-modal hidden">
+    <div class="ig-modal-inner">
+      <button class="ig-modal-close" id="igModalClose" aria-label="Fechar">&times;</button>
+      <div id="igModalBody"></div>
+    </div>
+  </div>
 
   <script>
     // ============================================================ CONFIG
@@ -753,6 +775,26 @@
 
     let creativeSort = 'spend';
     const creativeVal = (c, k) => k==='rev' ? c.crmRev : k==='qual' ? c.crmQual : k==='roas' ? (c.spend>0 ? c.crmRev/c.spend : 0) : (c[k]||0);
+    // Extrai o shortcode do permalink do Instagram (/p/, /reel/, /tv/) para montar o embed.
+    const igShortcode = (url) => { const m = String(url||'').match(/instagram\.com\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/); return m ? m[1] : ''; };
+    const IG_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>';
+    // Lazy-load dos previews: só injeta o iframe do embed quando a linha entra no viewport. Religado a cada render.
+    let igObserver = null;
+    function wireIgPreviews() {
+      if (igObserver) igObserver.disconnect();
+      igObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target; obs.unobserve(el);
+          if (el.dataset.loaded) return; el.dataset.loaded = '1';
+          const f = document.createElement('iframe');
+          f.src = `https://www.instagram.com/p/${el.dataset.sc}/embed/`;
+          f.loading = 'lazy'; f.setAttribute('scrolling', 'no'); f.setAttribute('allowtransparency', 'true');
+          el.appendChild(f);
+        });
+      }, { rootMargin: '250px' });
+      document.querySelectorAll('#metaCreativeBody .ig-thumb[data-sc]').forEach(el => igObserver.observe(el));
+    }
     function renderMetaCreatives(D) {
       const list = [...D.creatives].sort((a,b)=> creativeVal(b, creativeSort) - creativeVal(a, creativeSort));
       const top = list.slice(0, 12);
@@ -763,7 +805,12 @@
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0, roas=rowRoas(c);
         const nameCell = c.perm ? `<a href="${esc(c.perm)}" target="_blank" rel="noopener" class="clink">${esc(c.name)} ↗</a>` : `<span class="text-neutral-300">${esc(c.name)}</span>`;
-        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[240px]">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; }).join('') || `<tr><td colspan="14" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+        const sc = igShortcode(c.perm);
+        const previewCell = sc
+          ? `<div class="ig-thumb" data-sc="${esc(sc)}" data-perm="${esc(c.perm)}" role="button" tabindex="0" title="Ampliar criativo"><div class="ig-thumb-ph skeleton"></div></div>`
+          : `<div class="ig-thumb no-perm" title="Sem preview disponível"><div class="ig-thumb-ph">${IG_ICON}</div></div>`;
+        return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-500">${i+1}</td><td class="px-4 py-2.5 text-left">${previewCell}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[240px]">${nameCell}</td><td class="px-4 py-2.5 text-right">${fmtBRL(c.spend)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${fmtPct(ctr,2)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpm)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.lpv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtBRL2(cpa)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; }).join('') || `<tr><td colspan="15" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      wireIgPreviews();
     }
 
     // Performance por campanha (compartilhado Meta/Google) + destaques + charts ROAS e investimento×faturamento.
@@ -948,6 +995,20 @@
       document.querySelectorAll('#googleCampStatusButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campStatusState.google = b.dataset.status; document.querySelectorAll('#googleCampStatusButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
       document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { googleAdSort = b.dataset.sort; document.querySelectorAll('#googleAdSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderGoogleAds(compute()); }));
       document.querySelectorAll('#utmTable .sortable').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; utmSort = { k, dir: (utmSort.k === k ? -utmSort.dir : (k==='label'?1:-1)) }; renderUtmTable(compute()); }));
+      // Modal do preview: abre embed completo ao clicar no thumbnail (delegação, sobrevive ao re-render).
+      $('metaCreativeBody').addEventListener('click', (e) => { const t = e.target.closest('.ig-thumb[data-sc]'); if (t) openIgModal(t.dataset.sc); });
+      $('metaCreativeBody').addEventListener('keydown', (e) => { if (e.key !== 'Enter' && e.key !== ' ') return; const t = e.target.closest('.ig-thumb[data-sc]'); if (t) { e.preventDefault(); openIgModal(t.dataset.sc); } });
+      $('igModalClose').addEventListener('click', closeIgModal);
+      $('igModal').addEventListener('click', (e) => { if (e.target === $('igModal')) closeIgModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('igModal').classList.contains('hidden')) closeIgModal(); });
+    }
+    function openIgModal(sc) {
+      $('igModalBody').innerHTML = `<iframe src="https://www.instagram.com/p/${sc}/embed/captioned/" scrolling="no" allowtransparency="true"></iframe>`;
+      $('igModal').classList.remove('hidden');
+    }
+    function closeIgModal() {
+      $('igModal').classList.add('hidden');
+      $('igModalBody').innerHTML = ''; // destrói o iframe para parar o carregamento
     }
 
     // ============================================================ BOOT
