@@ -305,6 +305,10 @@
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="metaCampHighlights"></div>
+          <div class="space-y-2">
+            <div class="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">CAC por temperatura <span class="text-neutral-600 normal-case tracking-normal">· investimento ÷ nº de negócios ganhos</span></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="metaCacTemp"></div>
+          </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="metaCampRoasChart"></canvas></div></div>
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Faturamento por campanha</div><div class="chart-h-md"><canvas id="metaCampInvRevChart"></canvas></div></div>
@@ -319,7 +323,7 @@
           </div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
             <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
+              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th><th class="text-right px-4 py-3">CAC</th>
             </tr></thead><tbody id="metaCampBody"></tbody></table>
           </div></div>
           <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
@@ -380,6 +384,10 @@
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="googleCampHighlights"></div>
+          <div class="space-y-2">
+            <div class="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">CAC por temperatura <span class="text-neutral-600 normal-case tracking-normal">· investimento ÷ nº de negócios ganhos</span></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="googleCacTemp"></div>
+          </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">ROAS por campanha <span class="text-neutral-600">· top 10 por investimento</span></div><div class="chart-h-md"><canvas id="googleCampRoasChart"></canvas></div></div>
             <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Investimento × Faturamento por campanha</div><div class="chart-h-md"><canvas id="googleCampInvRevChart"></canvas></div></div>
@@ -394,7 +402,7 @@
           </div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
             <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th>
+              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th><th class="text-right px-4 py-3">CAC</th>
             </tr></thead><tbody id="googleCampBody"></tbody></table>
           </div></div>
           <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
@@ -835,14 +843,28 @@
       return `<div class="metric-chip" style="border-left:3px solid ${color}"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">${label}</div><div class="kpi-value text-lg sm:text-2xl font-bold">${value}</div><div class="text-[10px] text-neutral-500 mt-0.5 truncate" title="${esc(sub||'')}">${esc(sub||'—')}</div></div>`;
     }
     function campRow(c, muted) {
-      const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, ctr=c.impr?c.clicks/c.impr*100:0;
+      const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, cac=(c.spend>0 && c.crmWon>0)?c.spend/c.crmWon:null, ctr=c.impr?c.clicks/c.impr*100:0;
       const statusDot = c.active != null ? `<span class="legend-dot mt-1 flex-shrink-0" style="background:${c.active?'var(--pos)':'#525252'}" title="${c.active?'Ativa (investiu no último dia de dados da planilha)':'Desativada (sem investimento no último dia de dados da planilha)'}"></span>` : '';
-      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${qualRate(c)!=null?fmtPct(qualRate(c)*100,1):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td></tr>`;
+      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${qualRate(c)!=null?fmtPct(qualRate(c)*100,1):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td></tr>`;
+    }
+    // CAC agregado por temperatura de campanha (nome ↔ QUENTE / FRIO / ADV) = investimento ÷ nº de negócios ganhos.
+    function cacByTemp(list) {
+      const g = { quente:{spend:0,won:0}, frio:{spend:0,won:0}, adv:{spend:0,won:0}, outras:{spend:0,won:0} };
+      list.forEach(c => { const seg = g[campTemp(c.name)]; seg.spend += (c.spend||0); seg.won += (c.crmWon||0); });
+      return g;
+    }
+    function renderCacTemp(elId, list) {
+      const g = cacByTemp(list);
+      const chip = (label, seg, color) => hlChip('CAC ' + label, seg.won>0 ? fmtBRL(seg.spend/seg.won) : '—', `${fmtBRL(seg.spend)} · ${fmtInt(seg.won)} ganhos`, color);
+      const chips = [ chip('Quente', g.quente, '#f97316'), chip('Frio', g.frio, '#38bdf8'), chip('Advantage', g.adv, '#a78bfa') ];
+      if (g.outras.spend > 0) chips.push(chip('Outras', g.outras, '#737373'));
+      $(elId).innerHTML = chips.join('');
     }
     function renderCampPerf(D, plat) {
       const cfg = plat==='meta'
-        ? { list:D.metaCamp, bucket:D.bucketMetaCamp, hlId:'metaCampHighlights', roasId:'metaCampRoasChart', invRevId:'metaCampInvRevChart', bodyId:'metaCampBody' }
-        : { list:D.googleCamp, bucket:D.bucketGoogle, hlId:'googleCampHighlights', roasId:'googleCampRoasChart', invRevId:'googleCampInvRevChart', bodyId:'googleCampBody' };
+        ? { list:D.metaCamp, bucket:D.bucketMetaCamp, hlId:'metaCampHighlights', cacId:'metaCacTemp', roasId:'metaCampRoasChart', invRevId:'metaCampInvRevChart', bodyId:'metaCampBody' }
+        : { list:D.googleCamp, bucket:D.bucketGoogle, hlId:'googleCampHighlights', cacId:'googleCacTemp', roasId:'googleCampRoasChart', invRevId:'googleCampInvRevChart', bodyId:'googleCampBody' };
+      renderCacTemp(cfg.cacId, cfg.list);
       const filt = campFilterState[plat], st = campStatusState[plat];
       let list = cfg.list;
       if (filt !== 'all') list = list.filter(c => campTemp(c.name) === filt);
@@ -873,7 +895,7 @@
       const sorted = sortCamps(list, campSortState[plat]);
       let html = sorted.map(c=>campRow(c,false)).join('');
       if (filt === 'all' && st === 'all' && (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0)) html += campRow(cfg.bucket, true);
-      $(cfg.bodyId).innerHTML = html || `<tr><td colspan="12" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
+      $(cfg.bodyId).innerHTML = html || `<tr><td colspan="13" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
 
     // Ranking de anúncios Google (utm_content), com chart seguindo o sort ativo.
