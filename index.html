@@ -194,6 +194,7 @@
           <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--meta)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Tráfego</div><span id="kpiRoasTraf" class="kpi-value text-xl sm:text-3xl font-bold">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento atribuído ao pago ÷ investimento</div></div>
           <div class="card p-4 sm:p-5 border-l-2" style="border-left-color:var(--revenue)"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">ROAS Geral (MER)</div><span id="kpiRoasGeral" class="kpi-value text-xl sm:text-3xl font-bold" style="color:var(--revenue)">0,0x</span><div class="text-[11px] text-neutral-500 mt-1">faturamento TOTAL ÷ investimento</div></div>
           <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CPL pago</div><span id="kpiCpl" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div class="text-[11px] text-neutral-500 mt-1">investimento ÷ leads pagos</div></div>
+          <div class="card p-4 sm:p-5"><div class="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">CAC pago</div><span id="kpiCac" class="kpi-value text-xl sm:text-3xl font-bold">R$ 0</span><div id="kpiCacSub" class="text-[11px] text-neutral-500 mt-1">investimento ÷ ganhos pagos</div></div>
         </section>
 
         <!-- VISÃO DIÁRIA -->
@@ -919,7 +920,7 @@
     function renderMetaPanel(D) {
       const t = D.platTraffic.meta; const m = D.ch['Meta Ads'];
       const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpm = t.impr ? t.spend/t.impr*1000 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? m.rev/t.spend : 0;
-      $('metaKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`), chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`) ].join('');
+      $('metaKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPM / CPC', `${fmtBRL2(cpm)} / ${fmtBRL2(cpc)}`), chip('Conv. (TYP)', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(m.leads)} leads · ${fmtInt(m.won)} ganhos`), chip('CAC', m.won?fmtBRL(t.spend/m.won):'—', `investimento ÷ ${fmtInt(m.won)} ganhos`) ].join('');
       renderFunnel('metaFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques no link', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Landing page views', v:t.lpv, fmt:fmtInt, pct: t.clicks? t.lpv/t.clicks*100:0 }, { label:'Conversões (TYP)', v:t.conv, fmt:fmtInt, pct: t.lpv? t.conv/t.lpv*100:0 }, { label:'Negócios ganhos', v:m.won, fmt:fmtInt, pct: t.conv? m.won/t.conv*100:0 } ], chColor('Meta Ads'));
       renderDailyChart('metaDailyChart', RAW.metaDaily);
       renderCampPerf(D, 'meta');
@@ -928,7 +929,7 @@
     function renderGooglePanel(D) {
       const t = D.platTraffic.google; const g = D.ch['Google Ads'];
       const ctr = t.impr ? t.clicks/t.impr*100 : 0, cpc = t.clicks ? t.spend/t.clicks : 0, cpa = t.conv ? t.spend/t.conv : 0, roas = t.spend ? g.rev/t.spend : 0;
-      $('googleKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPC', fmtBRL2(cpc)), chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`) ].join('');
+      $('googleKpis').innerHTML = [ chip('Investimento', fmtBRL(t.spend)), chip('Impressões', fmtInt(t.impr)), chip('Cliques', fmtInt(t.clicks), `CTR ${fmtPct(ctr,2)}`), chip('CPC', fmtBRL2(cpc)), chip('Conversões', fmtInt(t.conv), `CPA ${fmtBRL2(cpa)}`), chip('ROAS', fmtX(roas), `${fmtInt(g.leads)} leads · ${fmtInt(g.won)} ganhos`), chip('CAC', g.won?fmtBRL(t.spend/g.won):'—', `investimento ÷ ${fmtInt(g.won)} ganhos`) ].join('');
       renderFunnel('googleFunnel', [ { label:'Impressões', v:t.impr, fmt:fmtInt, pct:null }, { label:'Cliques', v:t.clicks, fmt:fmtInt, pct: t.impr? t.clicks/t.impr*100:0 }, { label:'Conversões', v:t.conv, fmt:fmtInt, pct: t.clicks? t.conv/t.clicks*100:0 }, { label:'Negócios ganhos', v:g.won, fmt:fmtInt, pct: t.conv? g.won/t.conv*100:0 } ], chColor('Google Ads'));
       renderDailyChart('googleDailyChart', RAW.googleDaily); renderConvChart('googleConvChart', RAW.googleDaily);
       renderCampPerf(D, 'google');
@@ -949,6 +950,9 @@
       $('kpiRoasTraf').textContent = fmtX(roasTraf); $('kpiRoasTraf').style.color = roasTraf>=1 ? 'var(--pos)' : 'var(--neg)';
       $('kpiRoasGeral').textContent = fmtX(roasGeral);
       $('kpiCpl').textContent = D.paidLeads ? fmtBRL2(D.totSpend/D.paidLeads) : '—';
+      const paidWon = D.ch['Meta Ads'].won + D.ch['Google Ads'].won;
+      $('kpiCac').textContent = paidWon ? fmtBRL(D.totSpend/paidWon) : '—';
+      $('kpiCacSub').textContent = `investimento ÷ ${fmtInt(paidWon)} ganhos pagos`;
     }
 
     // ============================================================ RENDER (tab-aware)
