@@ -16,6 +16,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
+    :root { --grid: #1a1a1a; --chart-txt: #a3a3a3; --chart-line: #1f1f1f; --hover-line: #333; }
+    :root[data-tema="claro"] {
+      --bg: #f7f7f5; --bg-card: #ffffff; --bg-card-hover: #f1f1ee; --border: #e4e4df;
+      --text: #101010; --text-muted: #565651; --text-dim: #8a8a83;
+      --revenue: #b45309; --meta: #2563eb; --google: #059669; --lucas: #2563eb; --amanda: #db2777; --pos: #059669; --neg: #dc2626;
+      --grid: #e8e8e3; --chart-txt: #565651; --chart-line: #e4e4df; --hover-line: #cdcdc6;
+      color-scheme: light;
+    }
+    [data-tema="claro"] .text-neutral-300 { color: #3a3a36; }
+    [data-tema="claro"] .text-neutral-400 { color: #4f4f4a; }
+    [data-tema="claro"] .text-neutral-500 { color: #6b6b66; }
+    [data-tema="claro"] .text-neutral-600 { color: #7d7d77; }
+    [data-tema="claro"] .text-neutral-700 { color: #8a8a83; }
+    [data-tema="claro"] .text-white { color: var(--text); }
+    [data-tema="claro"] .border-neutral-700,
+    [data-tema="claro"] .border-neutral-800,
+    [data-tema="claro"] .border-neutral-900 { border-color: var(--border); }
+    [data-tema="claro"] .bg-neutral-800, [data-tema="claro"] .bg-neutral-900 { background-color: var(--bg-card-hover); }
+    [data-tema="claro"] .bg-black\/40, [data-tema="claro"] .bg-black\/50 { background-color: rgba(255,255,255,.72); }
+    [data-tema="claro"] .bg-black { background-color: var(--bg-card); }
+
     :root {
       --bg: #0a0a0a; --bg-card: #131313; --bg-card-hover: #1a1a1a; --border: #262626;
       --text: #f5f5f5; --text-muted: #a3a3a3; --text-dim: #737373;
@@ -443,6 +464,8 @@
   </div>
 
   <script>
+    function cssVarTema(nome) { return getComputedStyle(document.documentElement).getPropertyValue(nome).trim(); }
+
     // ============================================================ CONFIG
     const SHEET_ID = '1uvWuSsL6BffBqnigclLYZ_oDnEqcayB8kxqGgM34sQs';
     const SHEETS = { leads: 'Todos os Negócios - 2026', won: 'Negócios ganhos - 2026', meta: 'Meta Ads', google: 'Google Ads' };
@@ -670,12 +693,12 @@
     }
 
     // ============================================================ CHARTS
-    Chart.defaults.color = '#a3a3a3'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 11; Chart.defaults.borderColor = '#1f1f1f';
+    Chart.defaults.color = cssVarTema('--chart-txt'); Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 11; Chart.defaults.borderColor = cssVarTema('--chart-line');
     Chart.defaults.plugins.legend.labels.boxWidth = 10; Chart.defaults.plugins.legend.labels.boxHeight = 10; Chart.defaults.plugins.legend.labels.usePointStyle = true; Chart.defaults.plugins.legend.labels.padding = 14; Chart.defaults.plugins.legend.labels.sort = (a, b) => (a.datasetIndex ?? 0) - (b.datasetIndex ?? 0);
     const charts = {};
     function setChart(id, cfg) { if (charts[id]) charts[id].destroy(); const el = $(id); if (!el) return; charts[id] = new Chart(el.getContext('2d'), cfg); }
     function destroyAllCharts() { Object.keys(charts).forEach(k => { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
-    const GRID = { color: '#1a1a1a' };
+    const GRID = { color: cssVarTema('--grid') };
     const CLS_COLORS = { Closer:'#f5f5f5', SDR:'#a3a3a3', Perdido:'#ef4444', Outros:'#404040' };
     const C_POS = '#34d399', C_NEG = '#ef4444', C_REV = '#facc15', C_GRAY = 'rgba(115,115,115,0.45)';
     // ROAS por linha (crmRev/spend); null quando não há investimento.
@@ -1095,6 +1118,25 @@
     $('logoutBtn').addEventListener('click', async () => { await sb.auth.signOut(); destroyAllCharts(); dashboardInitialized = false; showLogin(); });
     sb.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || !session) { if (dashboardInitialized) { destroyAllCharts(); dashboardInitialized = false; } if (!$('authLoading').classList.contains('hidden')) return; showLogin(); } });
     checkAuth();
-  </script>
+      window.aoTrocarTema = () => { if (window.Chart) { Chart.defaults.color = cssVarTema('--chart-txt'); Chart.defaults.borderColor = cssVarTema('--chart-line'); } if (typeof GRID === 'object') GRID.color = cssVarTema('--grid'); if (typeof dashboardInitialized !== 'undefined' && dashboardInitialized) { destroyAllCharts(); initDashboard(); } };
+
+    /* ---- tema claro/escuro (controlado pelo Hub de Dados Escalada) ---- */
+    (function () {
+      const HUB_TEMA_ORIGIN = 'https://hub-dados-escalada.pages.dev';
+      const TEMA_KEY = 'escalada-tema';
+      function aplicaTema(tema, persistir) {
+        document.documentElement.setAttribute('data-tema', tema === 'claro' ? 'claro' : 'escuro');
+        if (persistir) { try { localStorage.setItem(TEMA_KEY, tema); } catch {} }
+        if (typeof window.aoTrocarTema === 'function') window.aoTrocarTema();
+      }
+      let inicial = 'escuro';
+      try { if (localStorage.getItem(TEMA_KEY) === 'claro') inicial = 'claro'; } catch {}
+      aplicaTema(inicial, false);
+      window.addEventListener('message', (ev) => {
+        if (ev.origin !== HUB_TEMA_ORIGIN || !ev.data || ev.data.type !== 'escalada-tema') return;
+        aplicaTema(ev.data.tema, true);
+      });
+    })();
+</script>
 </body>
 </html>
