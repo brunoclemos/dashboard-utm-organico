@@ -52,6 +52,11 @@
     table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
     .sortable { cursor: pointer; }
     .sortable:hover { background: var(--bg-card-hover); }
+    .sortable::after { content: ''; display: inline-block; vertical-align: middle; margin-left: 5px; width: 0; height: 0; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 4px solid currentColor; opacity: 0; transition: opacity .12s ease; }
+    .sortable:hover::after { opacity: .4; }
+    .sortable.sort-active { color: var(--text); }
+    .sortable.sort-active::after { opacity: .9; }
+    .sortable.sort-active.sort-asc::after { border-top: 0; border-bottom: 4px solid currentColor; }
     .scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
     .scrollbar::-webkit-scrollbar-track { background: transparent; }
     .scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
@@ -344,8 +349,8 @@
             <button class="dim-btn" data-sort="qrate">Tx. Qualif.</button>
           </div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
-            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th><th class="text-right px-4 py-3">CAC</th>
+            <table class="w-full text-sm" id="metaCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3 sortable" data-k="name">Campanha</th><th class="text-right px-4 py-3 sortable" data-k="spend">Investimento</th><th class="text-right px-4 py-3 sortable" data-k="clicks">Cliques</th><th class="text-right px-4 py-3 sortable" data-k="ctr">CTR</th><th class="text-right px-4 py-3 sortable" data-k="conv">Conv. (TYP)</th><th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th><th class="text-right px-4 py-3 sortable" data-k="qual">Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="qrate">Tx. Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th><th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th><th class="text-right px-4 py-3 sortable" data-k="roas">ROAS</th><th class="text-right px-4 py-3 sortable" data-k="cpl">CPL</th><th class="text-right px-4 py-3 sortable" data-k="cac">CAC</th>
             </tr></thead><tbody id="metaCampBody"></tbody></table>
           </div></div>
           <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
@@ -423,8 +428,8 @@
             <button class="dim-btn" data-sort="qrate">Tx. Qualif.</button>
           </div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
-            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">Campanha</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">Conv.</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Tx. Qualif.</th><th class="text-right px-4 py-3">Nº ganhos</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th><th class="text-right px-4 py-3">CPL</th><th class="text-right px-4 py-3">CAC</th>
+            <table class="w-full text-sm" id="googleCampTable"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3 sortable" data-k="name">Campanha</th><th class="text-right px-4 py-3 sortable" data-k="spend">Investimento</th><th class="text-right px-4 py-3 sortable" data-k="clicks">Cliques</th><th class="text-right px-4 py-3 sortable" data-k="ctr">CTR</th><th class="text-right px-4 py-3 sortable" data-k="conv">Conv.</th><th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th><th class="text-right px-4 py-3 sortable" data-k="qual">Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="qrate">Tx. Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th><th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th><th class="text-right px-4 py-3 sortable" data-k="roas">ROAS</th><th class="text-right px-4 py-3 sortable" data-k="cpl">CPL</th><th class="text-right px-4 py-3 sortable" data-k="cac">CAC</th>
             </tr></thead><tbody id="googleCampBody"></tbody></table>
           </div></div>
           <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
@@ -770,6 +775,7 @@
     function renderUtmTable(D) {
       const rows = [...D.dims[utmDim]];
       rows.sort((a,b) => { let va=a[utmSort.k], vb=b[utmSort.k]; if (typeof va==='string') return utmSort.dir * va.localeCompare(vb); return utmSort.dir * (va-vb); });
+      markSortHeaders('#utmTable', utmSort.k, utmSort.dir);
       $('utmTableBody').innerHTML = rows.slice(0, 80).map(u => `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left text-neutral-300">${esc(u.label)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.leads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(u.won)}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(u.rev)}</td></tr>`).join('') || `<tr><td colspan="4" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
     }
     function renderClassChart(D) {
@@ -846,7 +852,8 @@
     }
 
     // Performance por campanha (compartilhado Meta/Google) + destaques + charts ROAS e investimento×faturamento.
-    const campSortState = { meta:'spend', google:'spend' };
+    // dir -1 = maior→menor (padrão ao clicar num cabeçalho), 1 = menor→maior.
+    const campSortState = { meta:{k:'spend',dir:-1}, google:{k:'spend',dir:-1} };
     // Filtro por temperatura da campanha, inferida do nome (QUENTE / FRIO / ADV).
     const campFilterState = { meta:'all', google:'all' };
     const campTemp = (name) => { const u = String(name||'').toUpperCase(); if (u.includes('QUENTE')) return 'quente'; if (u.includes('FRIO') || u.includes('FRIA')) return 'frio'; if (u.includes('ADV')) return 'adv'; return 'outras'; };
@@ -854,13 +861,37 @@
     const campStatusState = { meta:'all', google:'all' };
     // Taxa de qualificação = leads Closer+SDR ÷ leads atribuídos à campanha.
     const qualRate = (c) => c.crmLeads > 0 ? c.crmQual / c.crmLeads : null;
-    function sortCamps(list, key) {
+    // Valor numérico da coluna; null = sem dado (vai sempre pro fim da lista, nos dois sentidos).
+    function campVal(c, key) {
+      switch (key) {
+        case 'ctr':   return c.impr ? c.clicks / c.impr : null;
+        case 'leads': return c.crmLeads || 0;
+        case 'qual':  return c.crmQual || 0;
+        case 'qrate': return qualRate(c);
+        case 'won':   return c.crmWon || 0;
+        case 'rev':   return c.crmRev || 0;
+        case 'roas':  return rowRoas(c);
+        case 'cpl':   return (c.spend > 0 && c.crmLeads > 0) ? c.spend / c.crmLeads : null;
+        case 'cac':   return (c.spend > 0 && c.crmWon > 0) ? c.spend / c.crmWon : null;
+        default:      return c[key] || 0;
+      }
+    }
+    function sortCamps(list, key, dir) {
+      if (key === 'name') return [...list].sort((a,b) => dir * String(a.name||'').localeCompare(String(b.name||''), 'pt-BR'));
       return [...list].sort((a,b) => {
-        if (key==='roas') { const ra=rowRoas(a), rb=rowRoas(b); return (rb==null?-Infinity:rb) - (ra==null?-Infinity:ra); }
-        if (key==='qrate') { const ra=qualRate(a), rb=qualRate(b); return (rb==null?-Infinity:rb) - (ra==null?-Infinity:ra); }
-        const va = key==='rev'?a.crmRev : key==='qual'?a.crmQual : (a[key]||0);
-        const vb = key==='rev'?b.crmRev : key==='qual'?b.crmQual : (b[key]||0);
-        return vb - va;
+        const va = campVal(a, key), vb = campVal(b, key);
+        if (va == null && vb == null) return 0;
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        return dir * (va - vb);
+      });
+    }
+    // Marca a coluna ativa no cabeçalho (seta pra baixo = maior→menor).
+    function markSortHeaders(tableSel, key, dir) {
+      document.querySelectorAll(tableSel + ' .sortable').forEach(th => {
+        const on = th.dataset.k === key;
+        th.classList.toggle('sort-active', on);
+        th.classList.toggle('sort-asc', on && dir === 1);
       });
     }
     function hlChip(label, value, sub, color) {
@@ -916,7 +947,11 @@
         { label:'Faturamento', data: topInv.map(c=>c.crmRev), backgroundColor:C_REV, borderRadius:3, maxBarThickness:11 } ] },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ title:(c)=>topInv[c[0].dataIndex].name, label:(c)=>`${c.dataset.label}: ${fmtBRL2(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtBRLShort } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       // tabela
-      const sorted = sortCamps(list, campSortState[plat]);
+      const sortState = campSortState[plat];
+      const sorted = sortCamps(list, sortState.k, sortState.dir);
+      markSortHeaders(`#${plat}CampTable`, sortState.k, sortState.dir);
+      // Os botões "Ordenar" só ficam ativos quando batem com o sort atual (coluna + maior→menor).
+      document.querySelectorAll(`#${plat}CampSortButtons .dim-btn`).forEach(b => b.classList.toggle('active', b.dataset.sort === sortState.k && sortState.dir === -1));
       let html = sorted.map(c=>campRow(c,false)).join('');
       if (filt === 'all' && st === 'all' && (cfg.bucket.crmLeads>0 || cfg.bucket.crmRev>0)) html += campRow(cfg.bucket, true);
       $(cfg.bodyId).innerHTML = html || `<tr><td colspan="13" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
@@ -1036,8 +1071,15 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
       document.querySelectorAll('#dimButtons .dim-btn').forEach(b => b.addEventListener('click', () => { utmDim = b.dataset.dim; document.querySelectorAll('#dimButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); utmSort = { k:'rev', dir:-1 }; renderUtm(compute()); }));
       document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderMetaCreatives(compute()); }));
-      document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.meta = b.dataset.sort; document.querySelectorAll('#metaCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
-      document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campSortState.google = b.dataset.sort; document.querySelectorAll('#googleCampSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
+      ['meta','google'].forEach(plat => {
+        document.querySelectorAll(`#${plat}CampSortButtons .dim-btn`).forEach(b => b.addEventListener('click', () => { campSortState[plat] = { k: b.dataset.sort, dir: -1 }; renderCampPerf(compute(), plat); }));
+        // Clique no cabeçalho: 1º clique ordena maior→menor, clique repetido inverte.
+        document.querySelectorAll(`#${plat}CampTable .sortable`).forEach(th => th.addEventListener('click', () => {
+          const k = th.dataset.k, st = campSortState[plat];
+          campSortState[plat] = { k, dir: st.k === k ? -st.dir : (k === 'name' ? 1 : -1) };
+          renderCampPerf(compute(), plat);
+        }));
+      });
       document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.meta = b.dataset.filter; document.querySelectorAll('#metaCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
       document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campFilterState.google = b.dataset.filter; document.querySelectorAll('#googleCampFilterButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'google'); }));
       document.querySelectorAll('#metaCampStatusButtons .dim-btn').forEach(b => b.addEventListener('click', () => { campStatusState.meta = b.dataset.status; document.querySelectorAll('#metaCampStatusButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderCampPerf(compute(), 'meta'); }));
