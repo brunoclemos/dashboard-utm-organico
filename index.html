@@ -24,7 +24,6 @@
       --grid: #e8e8e3; --chart-txt: #565651; --chart-line: #e4e4df; --hover-line: #cdcdc6;
       color-scheme: light;
     }
-    [data-tema="claro"] .badge-untracked { color: #92610a; background: rgba(217,119,6,.12); border-color: rgba(217,119,6,.40); }
     [data-tema="claro"] .text-neutral-300 { color: #3a3a36; }
     [data-tema="claro"] .text-neutral-400 { color: #4f4f4a; }
     [data-tema="claro"] .text-neutral-500 { color: #6b6b66; }
@@ -64,7 +63,6 @@
     .scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
     .scrollbar { -webkit-overflow-scrolling: touch; }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink:0; }
-    .badge-untracked { display:inline-block; margin-left:6px; padding:1px 5px; border-radius:4px; font-size:9px; line-height:14px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; color:#fbbf24; background:rgba(251,191,36,.10); border:1px solid rgba(251,191,36,.35); vertical-align:1px; cursor:help; }
     .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
     .section-title::before { content: ""; display: inline-block; width: 3px; height: 16px; background: var(--text); border-radius: 2px; }
     .filter-select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; color-scheme: dark; cursor: pointer; transition: border-color 0.15s ease; }
@@ -299,7 +297,8 @@
             <li id="noteSemUtm"></li>
             <li><b>Google inclui Search</b>: a aba Google Ads (Demand Gen/YouTube) e a aba Google Ads2 (Search) somam no mesmo canal — investimento, funil e campanhas. Como o lead de Search só carrega <i>utm_medium=Search</i>, sem anúncio, seus leads e vendas são distribuídos entre as campanhas e grupos de Search na proporção do investimento.</li>
             <li><b>Performance por campanha/criativo</b> (abas Meta e Google): cruza o <i>utm_campaign</i> e o <i>utm_content</i> do lead com os nomes de campanha e anúncio das abas de tráfego, por nome normalizado (ignora diferenças de espaço, underscore, hífen e acento) e escopado por canal. No Google, como o utm_campaign do lead é genérico, a campanha é atribuída pelo rollup dos anúncios; quando o mesmo anúncio rodou em mais de uma campanha, o lead é dividido entre elas na proporção do investimento do dia. "(sem atribuição)" reúne leads e vendas do canal sem correspondência de nome.</li>
-            <li><b>Etiqueta <span class="badge-untracked">sem UTM</span></b>: a campanha ou anúncio investiu e registrou conversões na plataforma, mas nenhum lead do CRM carrega a UTM dela. Isso é falha de tagueamento na origem, não desempenho zero — por isso o ROAS aparece como "—" e não como 0,00x. O caminho é corrigir a UTM do anúncio no gerenciador.</li>
+            <li><b>UTM espelhada</b> (Google): quando um anúncio é duplicado no gerenciador e fica com a <i>utm_content</i> de outro, o lead chega no CRM com o nome errado. Nesses casos os leads e as vendas são divididos entre os dois anúncios pelas conversões que cada um registrou na plataforma — e só enquanto o duplicado não tiver lead próprio, então a divisão se desliga sozinha assim que a UTM for corrigida. Casos ativos: <i>AD_ESCALADADAY_BASIC</i> usando a UTM do <i>ANÚNCIO_07_MENTORIA_DHIEGO</i> e <i>AD09_MENTORIA_GALPAO_LAUBEN</i> usando a do <i>AD08</i>.</li>
+            <li><b>ROAS "—"</b>: a campanha ou anúncio investiu e registrou conversões na plataforma, mas nenhum lead do CRM carrega a UTM dela. Isso é falha de tagueamento na origem, não desempenho zero — por isso não aparece como 0,00x. O caminho é corrigir a UTM do anúncio no gerenciador.</li>
             <li><b>Atenção:</b> a coluna "Valor fechado" tem formatação mista na planilha — por isso o faturamento é somado item a item no navegador (não pela soma do Sheets, que infla o número).</li>
           </ul>
         </section>
@@ -357,7 +356,7 @@
               <th class="text-left px-4 py-3 sortable" data-k="name">Campanha</th><th class="text-right px-4 py-3 sortable" data-k="spend">Investimento</th><th class="text-right px-4 py-3 sortable" data-k="clicks">Cliques</th><th class="text-right px-4 py-3 sortable" data-k="ctr">CTR</th><th class="text-right px-4 py-3 sortable" data-k="conv">Conv. (TYP)</th><th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th><th class="text-right px-4 py-3 sortable" data-k="qual">Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="qrate">Tx. Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th><th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th><th class="text-right px-4 py-3 sortable" data-k="roas">ROAS</th><th class="text-right px-4 py-3 sortable" data-k="cpl">CPL</th><th class="text-right px-4 py-3 sortable" data-k="cac">CAC</th>
             </tr></thead><tbody id="metaCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. <span class="badge-untracked">sem UTM</span> = investiu e converteu na plataforma, mas nenhum lead do CRM tem a UTM da campanha (falha de tagueamento, por isso ROAS "—"). "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado (utm_campaign do lead ↔ nome da campanha), escopada ao canal Meta. ROAS "—" = investiu e converteu na plataforma, mas nenhum lead do CRM carrega a UTM da campanha (tagueamento a corrigir na origem, não desempenho zero). "(sem atribuição)" reúne leads e vendas do Meta sem correspondência de campanha. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
         </section>
 
         <!-- RANKING DE CRIATIVOS -->
@@ -436,7 +435,7 @@
               <th class="text-left px-4 py-3 sortable" data-k="name">Campanha</th><th class="text-right px-4 py-3 sortable" data-k="spend">Investimento</th><th class="text-right px-4 py-3 sortable" data-k="clicks">Cliques</th><th class="text-right px-4 py-3 sortable" data-k="ctr">CTR</th><th class="text-right px-4 py-3 sortable" data-k="conv">Conv.</th><th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th><th class="text-right px-4 py-3 sortable" data-k="qual">Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="qrate">Tx. Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="won">Nº ganhos</th><th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th><th class="text-right px-4 py-3 sortable" data-k="roas">ROAS</th><th class="text-right px-4 py-3 sortable" data-k="cpl">CPL</th><th class="text-right px-4 py-3 sortable" data-k="cac">CAC</th>
             </tr></thead><tbody id="googleCampBody"></tbody></table>
           </div></div>
-          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. Anúncio que rodou em mais de uma campanha tem os leads e o faturamento divididos entre elas na proporção do investimento do dia. <span class="badge-untracked">sem UTM</span> = investiu e converteu na plataforma, mas nenhum lead do CRM tem a UTM da campanha (falha de tagueamento, por isso ROAS "—"). "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
+          <p class="text-[11px] text-neutral-600">Atribuição por nome normalizado, escopada ao canal Google. Anúncio que rodou em mais de uma campanha tem os leads e o faturamento divididos entre elas na proporção do investimento do dia. Anúncio duplicado que ficou com a utm_content de outro (UTM espelhada) tem os leads divididos entre os dois pelas conversões da plataforma, e só enquanto o duplicado não registrar lead próprio. ROAS "—" = investiu e converteu, mas nenhum lead do CRM carrega a UTM (tagueamento a corrigir na origem, não desempenho zero). "(sem atribuição)" reúne leads e vendas do Google sem correspondência de anúncio. Nº de ganhos com casa decimal = venda dividida entre campanhas. Status: <span style="color:var(--pos)">●</span> ativa = com investimento no último dia de dados da planilha; <span class="text-neutral-500">●</span> desativada = sem investimento nesse dia.</p>
         </section>
 
         <!-- RANKING DE ANÚNCIOS -->
@@ -487,6 +486,8 @@
     const fmtBRL2 = (n) => (Number(n || 0)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const fmtPct = (n, d = 1) => `${Number(n || 0).toFixed(d).replace('.', ',')}%`;
     const fmtX = (n) => `${Number(n || 0).toFixed(2).replace('.', ',')}x`;
+    // Venda rateada entre campanhas dá nº de ganhos fracionário; mostra a casa decimal em vez de esconder no arredondamento.
+    const fmtGanhos = (n) => { const v = Number(n || 0); return Math.abs(v - Math.round(v)) < 0.05 ? fmtInt(v) : v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
     const fmtBRLShort = (n) => { const v = Number(n || 0); if (Math.abs(v) >= 1000000) return 'R$ ' + (v/1000000).toFixed(2).replace('.', ',') + 'M'; if (Math.abs(v) >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.', ',') + 'k'; return fmtBRL(v); };
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const fmtYm = (ym) => { if (!ym) return '—'; const [y,m] = ym.split('-'); return `${MONTHS[(+m)-1]}/${y.slice(2)}`; };
@@ -523,6 +524,18 @@
     const normName = (s) => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 
     // ============================================================ FETCH/CSV
+    // UTM espelhada: anúncio duplicado no gerenciador que ficou com a utm_content de OUTRO anúncio, então o lead
+    // chega no CRM marcado com o nome errado. A chave é o nome que o lead carrega; a lista é quem também usa
+    // essa UTM. A divisão é feita pelas conversões da plataforma e SÓ nos dias em que o espelho não tem lead
+    // próprio — quando a UTM for corrigida na origem, o espelho passa a ter lead e a divisão se desliga sozinha.
+    // Evidência (leads do CRM menos conversões da plataforma, mês a mês):
+    //   AD_ESCALADADAY_BASIC  −191 −177 −157 −129 −127  (abr→ago) ↔ ANÚNCIO_07_MENTORIA_DHIEGO +171 +153 +122 +128 +129
+    //   AD09_MENTORIA_GALPAO_LAUBEN −124 −173 (jul→ago) ↔ AD08_MENTORIA_GALPAO_LAUBEN +121 +178
+    const UTM_ESPELHADA = {
+      'ANÚNCIO_07_MENTORIA_DHIEGO':  ['AD_ESCALADADAY_BASIC'],
+      'AD08_MENTORIA_GALPAO_LAUBEN': ['AD09_MENTORIA_GALPAO_LAUBEN'],
+    };
+
     const sheetKey = (sheet) => (sheet && sheet.gid) ? `gid=${encodeURIComponent(sheet.gid)}` : `sheet=${encodeURIComponent(sheet)}`;
     function gvizUrl(sheet, tq) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&${sheetKey(sheet)}&tq=${encodeURIComponent(tq)}`; }
     async function fetchCsv(sheet, tq) { const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' }); if (!r.ok) throw new Error(`HTTP ${r.status} (${sheetKey(sheet)})`); return parseCsv(await r.text()); }
@@ -706,6 +719,30 @@
       const searchGroupShares = spendSplitter(RAW.googleAd,   r => RAW.searchGroupNorm.has(normName(r.name)), googleAdByName);
       const isSearch = (r) => /^search$/i.test(String(r.med||'').trim()) || /^search$/i.test(String(r.src||'').trim());
 
+      // Conversões da plataforma e leads do CRM por anúncio (dia e período) para resolver a UTM espelhada.
+      const convDia = {}, convTot = {}, leadDia = {}, leadTot = {};
+      RAW.googleAd.forEach(r => { if (!inRange(r.ymd)) return; const k = normName(r.name);
+        if (!convDia[k]) convDia[k] = {}; convDia[k][r.ymd] = (convDia[k][r.ymd] || 0) + r.conv; convTot[k] = (convTot[k] || 0) + r.conv; });
+      RAW.leadsContent.forEach(r => { if (!inRange(r.ymd) || r.ch !== 'Google Ads') return; const k = normName(r.v);
+        if (!leadDia[k]) leadDia[k] = {}; leadDia[k][r.ymd] = (leadDia[k][r.ymd] || 0) + r.n; leadTot[k] = (leadTot[k] || 0) + r.n; });
+      const espelhoDe = {};
+      for (const k in UTM_ESPELHADA) espelhoDe[normName(k)] = UTM_ESPELHADA[k].map(normName);
+
+      // Anúncios que dividem o lead de um mesmo utm_content, com o peso de cada um.
+      const adShares = (contentNorm, ymd) => {
+        const base = googleAdByName[contentNorm] ? [contentNorm] : [];
+        (espelhoDe[contentNorm] || []).forEach(e => {
+          if (!googleAdByName[e]) return;
+          const proprios = ymd ? ((leadDia[e] || {})[ymd] || 0) : (leadTot[e] || 0);
+          if (!proprios) base.push(e);
+        });
+        if (base.length < 2) return base.map(k => [k, 1]);
+        const peso = base.map(k => (ymd ? ((convDia[k] || {})[ymd] || 0) : (convTot[k] || 0)));
+        const soma = peso.reduce((a,v) => a+v, 0);
+        if (!(soma > 0)) return [[base[0], 1]];
+        return base.map((k,i) => [k, peso[i]/soma]).filter(x => x[1] > 0);
+      };
+
       const campShares = (adName, ymd) => {
         const a = normName(adName);
         const src = (ymd && adDaySpend[a] && adDaySpend[a][ymd]) || adTotSpend[a];
@@ -736,14 +773,15 @@
           if (!gs && !cs) addLeadCrm(bucketGoogle, r, qual);
         }
         else if (r.ch === 'Google Ads') {
-          const ad = googleAdByName[normName(r.v)];
-          if (ad) {
-            addLeadCrm(ad, r, qual);
-            const shares = campShares(r.v, r.ymd);
-            if (shares) shares.forEach(([camp, w]) => addLeadCrm(camp, r, qual, w));
-            else addLeadCrm(bucketGoogle, r, qual);
-          }
-          else addLeadCrm(bucketGoogle, r, qual);
+          const parts = adShares(normName(r.v), r.ymd);
+          if (!parts.length) { addLeadCrm(bucketGoogle, r, qual); return; }
+          parts.forEach(([k, w]) => {
+            const ad = googleAdByName[k];
+            addLeadCrm(ad, r, qual, w);
+            const shares = campShares(ad.name, r.ymd);
+            if (shares) shares.forEach(([camp, cw]) => addLeadCrm(camp, r, qual, w*cw));
+            else addLeadCrm(bucketGoogle, r, qual, w);
+          });
         }
       });
 
@@ -759,12 +797,15 @@
           if (cs) cs.forEach(([camp, w]) => { camp.crmWon += w; camp.crmRev += r.value*w; });
           if (!gs && !cs) { bucketGoogle.crmWon += 1; bucketGoogle.crmRev += r.value; }
         } else if (r.ch === 'Google Ads') {
-          const ad = googleAdByName[normName(r.content)];
-          if (ad) {
-            ad.crmWon += 1; ad.crmRev += r.value;
-            const shares = campShares(r.content, null);
-            if (shares) shares.forEach(([camp, w]) => { camp.crmWon += w; camp.crmRev += r.value*w; });
-            else { bucketGoogle.crmWon += 1; bucketGoogle.crmRev += r.value; }
+          const parts = adShares(normName(r.content), null);
+          if (parts.length) {
+            parts.forEach(([k, w]) => {
+              const ad = googleAdByName[k];
+              ad.crmWon += w; ad.crmRev += r.value*w;
+              const shares = campShares(ad.name, null);
+              if (shares) shares.forEach(([camp, cw]) => { camp.crmWon += w*cw; camp.crmRev += r.value*w*cw; });
+              else { bucketGoogle.crmWon += w; bucketGoogle.crmRev += r.value*w; }
+            });
           }
           else { const camp = googleCampByName[normName(r.camp)]; if (camp) { camp.crmWon += 1; camp.crmRev += r.value; } else { bucketGoogle.crmWon += 1; bucketGoogle.crmRev += r.value; } }
         }
@@ -992,8 +1033,7 @@
     function campRow(c, muted) {
       const roas=rowRoas(c), cpl=(c.spend>0 && c.crmLeads>0)?c.spend/c.crmLeads:null, cac=(c.spend>0 && c.crmWon>0)?c.spend/c.crmWon:null, ctr=c.impr?c.clicks/c.impr*100:0;
       const statusDot = c.active != null ? `<span class="legend-dot mt-1 flex-shrink-0" style="background:${c.active?'var(--pos)':'#525252'}" title="${c.active?'Ativa (investiu no último dia de dados da planilha)':'Desativada (sem investimento no último dia de dados da planilha)'}"></span>` : '';
-      const untrackedTag = untracked(c) ? `<span class="badge-untracked" title="Investiu ${fmtBRL(c.spend)} e registrou ${fmtInt(c.conv)} conversões na plataforma, mas nenhum lead do CRM tem a UTM desta campanha. Não é ROAS zero: é lead sem rastreio. Corrigir a UTM dos anúncios na origem.">sem UTM</span>` : '';
-      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}${untrackedTag}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${qualRate(c)!=null?fmtPct(qualRate(c)*100,1):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td></tr>`;
+      return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug min-w-[280px]"><span class="flex items-start gap-2">${statusDot}<span class="whitespace-normal break-words">${esc(c.name)}</span></span></td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right">${qualRate(c)!=null?fmtPct(qualRate(c)*100,1):'—'}</td><td class="px-4 py-2.5 text-right">${fmtGanhos(c.crmWon)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td></tr>`;
     }
     // CAC agregado por temperatura de campanha (nome ↔ QUENTE / FRIO / ADV) = investimento ÷ nº de negócios ganhos.
     function cacByTemp(list) {
@@ -1062,8 +1102,7 @@
       setChart('googleAdChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>adVal(c, googleAdSort)), backgroundColor:'#34d399', borderRadius:4, maxBarThickness:24 }] },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       const adRow = (c, muted) => { const ctr=c.impr?c.clicks/c.impr*100:0, roas=rowRoas(c);
-        const tag = untracked(c) ? `<span class="badge-untracked" title="Investiu ${fmtBRL(c.spend)} e registrou ${fmtInt(c.conv)} conversões na plataforma, mas nenhum lead do CRM tem este nome no utm_content. Lead sem rastreio, não ROAS zero.">sem UTM</span>` : '';
-        return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px]">${esc(c.name)}${tag}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px] text-neutral-400">${c.camp?esc(c.camp):'—'}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; };
+        return `<tr class="border-t border-neutral-800${muted?' text-neutral-500':''}"><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px]">${esc(c.name)}</td><td class="px-4 py-2.5 text-left text-xs leading-snug whitespace-normal break-words min-w-[220px] text-neutral-400">${c.camp?esc(c.camp):'—'}</td><td class="px-4 py-2.5 text-right">${c.spend?fmtBRL(c.spend):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.impr)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.clicks)}</td><td class="px-4 py-2.5 text-right">${c.impr?fmtPct(ctr,2):'—'}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.conv)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmLeads)}</td><td class="px-4 py-2.5 text-right">${fmtInt(c.crmQual)}</td><td class="px-4 py-2.5 text-right"${muted?'':' style="color:var(--revenue)"'}>${c.crmRev?fmtBRL(c.crmRev):'—'}</td><td class="px-4 py-2.5 text-right">${roas!=null?`<span style="color:${roas>=1?'var(--pos)':'var(--neg)'};font-weight:600">${fmtX(roas)}</span>`:'—'}</td></tr>`; };
       let html = list.map(c=>adRow(c,false)).join('');
       if (D.bucketGoogle.crmLeads>0 || D.bucketGoogle.crmRev>0) html += adRow(D.bucketGoogle, true);
       $('googleAdBody').innerHTML = html || `<tr><td colspan="11" class="px-4 py-6 text-center text-neutral-600">Sem dados no período</td></tr>`;
