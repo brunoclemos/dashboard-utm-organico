@@ -557,7 +557,10 @@
         leads:        "select O,N,L,year(J),month(J),day(J),Q,count(A) where A is not null group by O,N,L,year(J),month(J),day(J),Q",
         leadsContent: "select M,N,O,Q,year(J),month(J),day(J),count(A) where A is not null group by M,N,O,Q,year(J),month(J),day(J)",
         leadsTerm:    "select P,year(J),month(J),day(J),count(A) where A is not null group by P,year(J),month(J),day(J)",
-        won:          "select I,L,M,N,O,P,K where A is not null",
+        won:          "select I,L,M,N,O,P,K,A where A is not null",
+        // A aba de ganhos foi zerada em out/26: os ganhos antigos saem da aba de leads (etapa "Negócio ganho")
+        // e se juntam aos da aba de ganhos pelo Record ID (coluna A). Se o ID aparece nas duas, vale a aba de ganhos.
+        wonLeads:     "select I,L,M,N,O,P,K,A where A is not null and G contains 'Negócio ganho'",
         metaDaily:    "select A,sum(B),sum(J),sum(G),sum(K),sum(L) where A is not null group by A order by A",
         metaCamp:     "select C,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
         metaCreative: "select E,F,year(A),month(A),day(A),sum(B),sum(J),sum(G),sum(K),sum(L),count(A) where A is not null group by E,F,year(A),month(A),day(A)",
@@ -569,14 +572,16 @@
         searchCamp:   "select C,year(A),month(A),day(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by C,year(A),month(A),day(A)",
         searchGroup:  "select D,C,year(A),month(A),day(A),sum(B),sum(F),sum(G),sum(L),count(A) where A is not null group by D,C,year(A),month(A),day(A)",
       };
-      const [lead, lContent, lTerm, won, mD, mC, mCr, gD, gC, gA, sD, sC, sG] = await Promise.all([
+      const [lead, lContent, lTerm, wonTab, wonLeads, mD, mC, mCr, gD, gC, gA, sD, sC, sG] = await Promise.all([
         fetchCsv(SHEETS.leads, Q.leads), fetchCsv(SHEETS.leads, Q.leadsContent), fetchCsv(SHEETS.leads, Q.leadsTerm),
-        fetchCsv(SHEETS.won, Q.won),
+        fetchCsv(SHEETS.won, Q.won), fetchCsv(SHEETS.leads, Q.wonLeads),
         fetchCsv(SHEETS.meta, Q.metaDaily), fetchCsv(SHEETS.meta, Q.metaCamp), fetchCsv(SHEETS.meta, Q.metaCreative),
         fetchCsv(SHEETS.google, Q.googleDaily), fetchCsv(SHEETS.google, Q.googleCamp), fetchCsv(SHEETS.google, Q.googleAd),
         fetchCsv(SHEETS.googleSearch, Q.searchDaily), fetchCsv(SHEETS.googleSearch, Q.searchCamp), fetchCsv(SHEETS.googleSearch, Q.searchGroup),
       ]);
       const daysSet = new Set();
+      const wonIds = new Set(wonTab.map(r => (r[7]||'').trim()).filter(Boolean));
+      const won = [...wonTab, ...wonLeads.filter(r => !wonIds.has((r[7]||'').trim()))];
       const leads = lead.filter(r => r.length >= 8).map(r => { const ymd = ymd0(r[3], r[4], r[5]); daysSet.add(ymd); return { src: r[0], med: r[1], camp: (r[2]||'').trim(), ch: classifyChannel(r[0], r[1]), ym: ym0(r[3], r[4]), ymd, cls: normClass(r[6]), n: numRaw(r[7]) }; });
       const leadsContent = lContent.filter(r => r.length >= 8).map(r => { const ymd = ymd0(r[4], r[5], r[6]); daysSet.add(ymd); return { v: (r[0]||'').trim(), med: r[1], src: r[2], ch: classifyChannel(r[2], r[1]), cls: normClass(r[3]), ym: ym0(r[4], r[5]), ymd, n: numRaw(r[7]) }; });
       const leadsTerm = lTerm.filter(r => r.length >= 5).map(r => { const ymd = ymd0(r[1], r[2], r[3]); daysSet.add(ymd); return { v: (r[0]||'').trim(), ym: ym0(r[1], r[2]), ymd, n: numRaw(r[4]) }; });
