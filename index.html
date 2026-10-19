@@ -536,7 +536,18 @@
 
     const sheetKey = (sheet) => (sheet && sheet.gid) ? `gid=${encodeURIComponent(sheet.gid)}` : `sheet=${encodeURIComponent(sheet)}`;
     function gvizUrl(sheet, tq) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&${sheetKey(sheet)}&tq=${encodeURIComponent(tq)}`; }
-    async function fetchCsv(sheet, tq) { const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' }); if (!r.ok) throw new Error(`HTTP ${r.status} (${sheetKey(sheet)})`); return parseCsv(await r.text()); }
+    // A carga faz 14 consultas gviz em paralelo e o Google responde 429 quando a mesma rede
+    // pede demais em pouco tempo (recarregar seguido). Espera e tenta de novo antes de mostrar erro.
+    const espera = (ms) => new Promise(res => setTimeout(res, ms));
+    async function fetchCsv(sheet, tq) {
+      for (let tentativa = 0; ; tentativa++) {
+        const r = await fetch(gvizUrl(sheet, tq), { cache: 'no-store' });
+        if (r.ok) return parseCsv(await r.text());
+        const temporario = r.status === 429 || r.status >= 500;
+        if (!temporario || tentativa >= 4) throw new Error(`HTTP ${r.status} (${sheetKey(sheet)})`);
+        await espera(2000 * 2 ** tentativa + Math.random() * 1500);
+      }
+    }
     function parseCsv(text) {
       const rows = []; let row = [], cur = '', q = false;
       for (let i = 0; i < text.length; i++) { const c = text[i];
