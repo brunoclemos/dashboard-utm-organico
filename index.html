@@ -375,8 +375,8 @@
           <p class="text-xs text-neutral-500 -mt-2">O preview mostra a mídia do anúncio direto do Instagram. Clique no preview para ampliar; clique no nome para abrir o post no Instagram. Faturamento e ROAS via utm_content do lead.</p>
           <div class="card p-4 sm:p-5"><div class="text-xs text-neutral-400 mb-3 font-medium">Top criativos</div><div class="chart-h-md"><canvas id="metaCreativeChart"></canvas></div></div>
           <div class="card p-0 overflow-hidden"><div class="overflow-x-auto scrollbar">
-            <table class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
-              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Preview</th><th class="text-left px-4 py-3">Criativo</th><th class="text-right px-4 py-3">Investimento</th><th class="text-right px-4 py-3">Impressões</th><th class="text-right px-4 py-3">Cliques</th><th class="text-right px-4 py-3">CTR</th><th class="text-right px-4 py-3">CPM</th><th class="text-right px-4 py-3">LPV</th><th class="text-right px-4 py-3">Conv. (TYP)</th><th class="text-right px-4 py-3">CPA</th><th class="text-right px-4 py-3">Leads</th><th class="text-right px-4 py-3">Qualif.</th><th class="text-right px-4 py-3">Faturamento</th><th class="text-right px-4 py-3">ROAS</th>
+            <table id="metaCreativeTable" class="w-full text-sm"><thead><tr class="text-[11px] uppercase tracking-wider text-neutral-500">
+              <th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Preview</th><th class="text-left px-4 py-3 sortable" data-k="name">Criativo</th><th class="text-right px-4 py-3 sortable" data-k="spend">Investimento</th><th class="text-right px-4 py-3 sortable" data-k="impr">Impressões</th><th class="text-right px-4 py-3 sortable" data-k="clicks">Cliques</th><th class="text-right px-4 py-3 sortable" data-k="ctr">CTR</th><th class="text-right px-4 py-3 sortable" data-k="cpm">CPM</th><th class="text-right px-4 py-3 sortable" data-k="lpv">LPV</th><th class="text-right px-4 py-3 sortable" data-k="conv">Conv. (TYP)</th><th class="text-right px-4 py-3 sortable" data-k="cpa">CPA</th><th class="text-right px-4 py-3 sortable" data-k="leads">Leads</th><th class="text-right px-4 py-3 sortable" data-k="qual">Qualif.</th><th class="text-right px-4 py-3 sortable" data-k="rev">Faturamento</th><th class="text-right px-4 py-3 sortable" data-k="roas">ROAS</th>
             </tr></thead><tbody id="metaCreativeBody"></tbody></table>
           </div></div>
         </section>
@@ -947,8 +947,20 @@
         return `<tr class="border-t border-neutral-800"><td class="px-4 py-2.5 text-left"><span class="inline-flex items-center gap-2"><span class="legend-dot" style="background:${cfg.color}"></span>${o.c}</span></td><td class="px-4 py-2.5 text-right">${fmtInt(o.leads)}</td><td class="px-4 py-2.5 text-right">${o.spend?fmtBRL(o.spend):'—'}</td><td class="px-4 py-2.5 text-right" style="color:var(--revenue)">${fmtBRL(o.rev)}</td><td class="px-4 py-2.5 text-right">${fmtInt(o.won)}</td><td class="px-4 py-2.5 text-right">${roasCell}</td><td class="px-4 py-2.5 text-right">${cpl!=null?fmtBRL2(cpl):'—'}</td><td class="px-4 py-2.5 text-right">${cac!=null?fmtBRL(cac):'—'}</td><td class="px-4 py-2.5 text-right">${fmtPct(conv,1)}</td></tr>`; }).join('');
     }
 
-    let creativeSort = 'spend';
-    const creativeVal = (c, k) => k==='rev' ? c.crmRev : k==='qual' ? c.crmQual : k==='roas' ? (c.spend>0 ? c.crmRev/c.spend : 0) : (c[k]||0);
+    let creativeSort = 'spend', creativeDir = -1;
+    const creativeVal = (c, k) => k==='rev' ? c.crmRev : k==='qual' ? c.crmQual : k==='leads' ? c.crmLeads : k==='roas' ? rowRoas(c)
+      : k==='ctr' ? (c.impr ? c.clicks/c.impr*100 : null) : k==='cpm' ? (c.impr ? c.spend/c.impr*1000 : null) : k==='cpa' ? (c.conv ? c.spend/c.conv : null)
+      : k==='name' ? String(c.name||'') : (c[k]||0);
+    function sortCreatives(list) {
+      return [...list].sort((a,b) => {
+        const va = creativeVal(a, creativeSort), vb = creativeVal(b, creativeSort);
+        if (creativeSort === 'name') return creativeDir * va.localeCompare(vb, 'pt-BR');
+        if (va == null && vb == null) return 0;
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        return creativeDir * (va - vb);
+      });
+    }
     // Extrai o shortcode do permalink do Instagram (/p/, /reel/, /tv/) para montar o embed.
     const igShortcode = (url) => { const m = String(url||'').match(/instagram\.com\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/); return m ? m[1] : ''; };
     const IG_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>';
@@ -970,12 +982,16 @@
       document.querySelectorAll('#metaCreativeBody .ig-thumb[data-sc]').forEach(el => igObserver.observe(el));
     }
     function renderMetaCreatives(D) {
-      const list = [...D.creatives].sort((a,b)=> creativeVal(b, creativeSort) - creativeVal(a, creativeSort));
-      const top = list.slice(0, 12);
-      const CHART_LABEL = { spend:'Investimento', conv:'Conversões', clicks:'Cliques', rev:'Faturamento', qual:'Qualif.', roas:'ROAS' };
-      const label = CHART_LABEL[creativeSort] || 'Investimento';
-      const fmtv = creativeSort==='spend'||creativeSort==='rev' ? fmtBRLShort : creativeSort==='roas' ? fmtX : fmtInt;
-      setChart('metaCreativeChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>creativeVal(c, creativeSort)), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
+      const list = sortCreatives(D.creatives);
+      document.querySelectorAll('#metaCreativeTable .sortable').forEach(th => { const on = th.dataset.k === creativeSort; th.classList.toggle('sort-active', on); th.classList.toggle('sort-asc', on && creativeDir === 1); });
+      document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x => x.classList.toggle('active', x.dataset.sort === creativeSort));
+      // Gráfico mostra a coluna ordenada (ordenar por nome cai no investimento); sem base (CPA sem conversão etc.) fica de fora.
+      const chartKey = creativeSort === 'name' ? 'spend' : creativeSort;
+      const top = (creativeSort === 'name' ? [...D.creatives].sort((a,b)=>b.spend-a.spend) : list).filter(c => creativeVal(c, chartKey) != null).slice(0, 12);
+      const CHART_LABEL = { spend:'Investimento', impr:'Impressões', clicks:'Cliques', ctr:'CTR', cpm:'CPM', lpv:'LPV', conv:'Conversões', cpa:'CPA', leads:'Leads', rev:'Faturamento', qual:'Qualif.', roas:'ROAS' };
+      const label = CHART_LABEL[chartKey] || 'Investimento';
+      const fmtv = chartKey==='spend'||chartKey==='rev' ? fmtBRLShort : chartKey==='cpm'||chartKey==='cpa' ? fmtBRL2 : chartKey==='ctr' ? (v=>fmtPct(v,2)) : chartKey==='roas' ? fmtX : fmtInt;
+      setChart('metaCreativeChart', { type:'bar', data:{ labels: top.map(c=>c.name.length>36?c.name.slice(0,34)+'…':c.name), datasets:[{ data: top.map(c=>creativeVal(c, chartKey)), backgroundColor:'#4f8cff', borderRadius:4, maxBarThickness:24 }] },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:(c)=>top[c[0].dataIndex].name, label:(c)=>`${label}: ${fmtv(c.raw)}` } } }, scales:{ x:{ grid:GRID, ticks:{ callback:fmtv } }, y:{ grid:{display:false}, ticks:{ font:{size:10} } } } } });
       $('metaCreativeBody').innerHTML = list.map((c,i) => { const ctr = c.impr? c.clicks/c.impr*100:0, cpm=c.impr? c.spend/c.impr*1000:0, cpa=c.conv? c.spend/c.conv:0, roas=rowRoas(c);
         const nameCell = c.perm ? `<a href="${esc(c.perm)}" target="_blank" rel="noopener" class="clink">${esc(c.name)} ↗</a>` : `<span class="text-neutral-300">${esc(c.name)}</span>`;
@@ -1200,13 +1216,23 @@
       if (key === '2026')      return setRange('2026-01-01', (t < '2026-12-31' ? t : '2026-12-31'), '2026');
       if (key === 'all')       return setRange(DATA_MIN, MAX_BOUND, 'all');
     }
+    // initDashboard roda de novo no Atualizar/Tentar de novo: sem a trava os listeners duplicam e o clique no cabeçalho inverte duas vezes.
+    let uiWired = false;
     function wireUi() {
+      if (uiWired) return; uiWired = true;
       $('fStart').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
       $('fEnd').addEventListener('change', () => setRange($('fStart').value, $('fEnd').value, null));
       document.querySelectorAll('#presetButtons .filter-preset').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
       document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
       document.querySelectorAll('#dimButtons .dim-btn').forEach(b => b.addEventListener('click', () => { utmDim = b.dataset.dim; document.querySelectorAll('#dimButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); utmSort = { k:'rev', dir:-1 }; renderUtm(compute()); }));
-      document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(x=>x.classList.toggle('active', x===b)); renderMetaCreatives(compute()); }));
+      document.querySelectorAll('#creativeSortButtons .dim-btn').forEach(b => b.addEventListener('click', () => { creativeSort = b.dataset.sort; creativeDir = -1; renderMetaCreatives(compute()); }));
+      // Clique no cabeçalho do ranking: 1º clique ordena maior→menor (nome: A→Z), clique repetido inverte.
+      document.querySelectorAll('#metaCreativeTable .sortable').forEach(th => th.addEventListener('click', () => {
+        const k = th.dataset.k;
+        creativeDir = creativeSort === k ? -creativeDir : (k === 'name' ? 1 : -1);
+        creativeSort = k;
+        renderMetaCreatives(compute());
+      }));
       ['meta','google'].forEach(plat => {
         document.querySelectorAll(`#${plat}CampSortButtons .dim-btn`).forEach(b => b.addEventListener('click', () => { campSortState[plat] = { k: b.dataset.sort, dir: -1 }; renderCampPerf(compute(), plat); }));
         // Clique no cabeçalho: 1º clique ordena maior→menor, clique repetido inverte.
